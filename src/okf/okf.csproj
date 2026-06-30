@@ -9,6 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ConsoleAppFramework" Version="5.7.13" PrivateAssets="all" />
+    <PackageReference Include="SharpYaml" Version="2.1.1" />
     <PackageReference Include="NuGetizer" Version="1.4.9">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
