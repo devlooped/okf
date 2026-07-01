@@ -132,18 +132,6 @@
 	sha = 032439dbf180fca0539a5bd3a019f18ab3484b76
 	etag = da7c0104131bd474b52fc9bc9f9bda6470e24ae38d4fb9f5c4f719bc01370ab5
 	weak
-[file "src/Google/."]
-	url = https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf/src/reference_agent/viewer
-[file "src/Google/__init__.py"]
-	url = https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/src/reference_agent/viewer/__init__.py
-	sha = 09f33017d1412f8a08e329358945a74dbac865a3
-	etag = e628a7e596142c8762cd7d3683cc92b4830fbca1ca9205a19c09d9d66699eefe
-	weak
-[file "src/Google/generator.py"]
-	url = https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/src/reference_agent/viewer/generator.py
-	sha = 09f33017d1412f8a08e329358945a74dbac865a3
-	etag = e1b2626b350175d24baab3f8991de22216a435a1d8074e2801622dfd8b235f47
-	weak
 [file "src/Google/viz.css"]
 	url = https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/src/reference_agent/viewer/static/viz.css
 	sha = 09f33017d1412f8a08e329358945a74dbac865a3
@@ -158,4 +146,9 @@
 	url = https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/src/reference_agent/viewer/templates/viz.html
 	sha = 09f33017d1412f8a08e329358945a74dbac865a3
 	etag = da02798063c76547351b36656240f2c2659075c7f309b496cd4810f7c9841ab4
+	weak
+[file "src/okf/Extensions/Base62.cs"]
+	url = https://github.com/devlooped/catbag/blob/main/System/Base62.cs
+	sha = cf76df0d6a218c26ebe117339fe3445050b0532a
+	etag = aed711a45e051edfddfcb76d9f8021d30f9817c342cfe8d1cc38f2af37b47aa8
 	weak

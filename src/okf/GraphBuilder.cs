@@ -41,7 +41,31 @@ public static partial class GraphBuilder
     public sealed record Edge(
         [property: JsonPropertyName("source")] string Source,
         [property: JsonPropertyName("target")] string Target,
-        [property: JsonPropertyName("label")] string? Label);
+        [property: JsonPropertyName("label")] string? Label,
+        [property: JsonPropertyName("id")][property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Id = null);
+
+    /// <summary>
+    /// Loads a previously generated knowledge graph from its JSON file.
+    /// </summary>
+    public static KnowledgeGraph Load(string graphJsonPath)
+    {
+        var fullPath = Path.GetFullPath(graphJsonPath);
+        if (!File.Exists(fullPath))
+        {
+            throw new FileNotFoundException($"Graph file not found: {fullPath}");
+        }
+
+        var json = File.ReadAllText(fullPath);
+        // Strip UTF-8 BOM if present (some older files)
+        if (json.Length > 0 && json[0] == '\uFEFF')
+            json = json[1..];
+
+        var graph = JsonSerializer.Deserialize<KnowledgeGraph>(json, JsonOptions);
+        if (graph is null)
+            throw new InvalidDataException($"Failed to deserialize graph from {fullPath}");
+
+        return graph;
+    }
 
     /// <summary>
     /// Builds the knowledge graph for a bundle and returns the serializable structure.
@@ -140,6 +164,8 @@ public static partial class GraphBuilder
         var ids = concepts.Select(c => c.Id).ToHashSet(StringComparer.Ordinal);
         var idToTitle = concepts.ToDictionary(c => c.Id, c => c.Title, StringComparer.Ordinal);
 
+        var conceptAbbrs = ShortIds.ComputeConceptAbbreviations(concepts.Select(c => c.Id));
+
         var nodes = new List<Node>();
         var edges = new List<Edge>();
         var seenEdges = new HashSet<(string Source, string Target)>(comparer: null);
@@ -195,7 +221,8 @@ public static partial class GraphBuilder
                     ? linkText
                     : (idToTitle.TryGetValue(targetId, out var t) && !string.IsNullOrEmpty(t) ? t : targetId);
 
-                edges.Add(new Edge(c.Id, targetId, label));
+                var shortId = $"{conceptAbbrs[c.Id]}_{conceptAbbrs[targetId]}";
+                edges.Add(new Edge(c.Id, targetId, label, shortId));
             }
         }
 

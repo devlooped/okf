@@ -36,20 +36,35 @@ static int Visualize(
     string? name = null,
     bool open = false)
 {
-    var bundleRoot = Path.GetFullPath(path);
-
-    if (!Directory.Exists(bundleRoot))
-    {
-        Console.Error.WriteLine($"Bundle directory not found: {bundleRoot}");
-        return 1;
-    }
-
-    var outPath = @out ?? Path.Combine(bundleRoot, "viz.html");
-    var displayName = name ?? new DirectoryInfo(bundleRoot).Name;
+    var fullPath = Path.GetFullPath(path);
+    GraphBuilder.KnowledgeGraph? graph = null;
+    string displayName;
+    string outputBaseDir;
 
     try
     {
-        var stats = BundleVisualizer.Generate(bundleRoot, outPath, displayName);
+        if (File.Exists(fullPath) &&
+            fullPath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+        {
+            graph = GraphBuilder.Load(fullPath);
+            displayName = name ?? graph.Bundle.Name ?? Path.GetFileNameWithoutExtension(fullPath);
+            outputBaseDir = Path.GetDirectoryName(fullPath) ?? ".";
+        }
+        else if (Directory.Exists(fullPath))
+        {
+            graph = GraphBuilder.Build(fullPath, name, includeBody: true);
+            displayName = name ?? graph.Bundle.Name;
+            outputBaseDir = fullPath;
+        }
+        else
+        {
+            Console.Error.WriteLine($"Path is not a directory or .json graph file: {fullPath}");
+            return 1;
+        }
+
+        var outPath = @out ?? Path.Combine(outputBaseDir, "viz.html");
+
+        var stats = BundleVisualizer.Generate(graph, outPath, displayName);
         Console.WriteLine($"Wrote {outPath} ({stats.Concepts} concepts, {stats.Edges} edges, {stats.Bytes} bytes).");
 
         if (open)

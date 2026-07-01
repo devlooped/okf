@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 
 namespace okf;
 
@@ -10,8 +8,6 @@ public sealed record VisualizationStats(int Concepts, int Edges, int Bytes);
 
 public static partial class BundleVisualizer
 {
-    const string IndexName = "index.md";
-
     static readonly Dictionary<string, string> TypePalette = new(StringComparer.Ordinal)
     {
         ["BigQuery Dataset"] = "#8b5cf6",
@@ -29,237 +25,133 @@ public static partial class BundleVisualizer
 
     public static VisualizationStats Generate(string bundleRoot, string outPath, string? bundleName = null)
     {
-        bundleRoot = Path.GetFullPath(bundleRoot);
+        // Delegate to the common in-memory graph model (same as `graph` command)
+        var graph = GraphBuilder.Build(bundleRoot, bundleName, includeBody: true);
+        var name = bundleName ?? graph.Bundle.Name;
+        return Generate(graph, outPath, name);
+    }
+
+    /// <summary>
+    /// Generate visualization from an in-memory KnowledgeGraph (supports both
+    /// directory builds and loaded okf.json graphs).
+    /// </summary>
+    public static VisualizationStats Generate(GraphBuilder.KnowledgeGraph graph, string outPath, string? displayName = null)
+    {
         outPath = Path.GetFullPath(outPath);
 
-        if (!Directory.Exists(bundleRoot))
-        {
-            throw new DirectoryNotFoundException($"Bundle directory not found: {bundleRoot}");
-        }
+        var name = displayName ?? graph.Bundle.Name;
 
-        var concepts = WalkConcepts(bundleRoot);
-        var graph = BuildGraph(concepts);
-        var name = bundleName ?? new DirectoryInfo(bundleRoot).Name;
+        var vizData = BuildVizData(graph);
 
         var html = ThisAssembly.Resources.Google.viz_template.Text
             .Replace("/*__VIZ_CSS__*/", ThisAssembly.Resources.Google.viz_styles.Text, StringComparison.Ordinal)
             .Replace("/*__VIZ_JS__*/", ThisAssembly.Resources.Google.viz_script.Text, StringComparison.Ordinal)
             .Replace("__BUNDLE_NAME__", JsonSerializer.Serialize(name, JsonOptions), StringComparison.Ordinal)
-            .Replace("__BUNDLE_DATA__", JsonSerializer.Serialize(graph, JsonOptions), StringComparison.Ordinal);
+            .Replace("__BUNDLE_DATA__", JsonSerializer.Serialize(vizData, JsonOptions), StringComparison.Ordinal);
 
         Directory.CreateDirectory(Path.GetDirectoryName(outPath)!);
         File.WriteAllText(outPath, html, Encoding.UTF8);
 
-        return new VisualizationStats(concepts.Count, graph.Edges.Count, Encoding.UTF8.GetByteCount(html));
+        return new VisualizationStats(graph.Nodes.Count, graph.Edges.Count, Encoding.UTF8.GetByteCount(html));
     }
 
-    static List<Concept> WalkConcepts(string bundleRoot)
+    private static GraphData BuildVizData(GraphBuilder.KnowledgeGraph graph)
     {
-        var concepts = new List<Concept>();
+        var abbrs = ShortIds.ComputeConceptAbbreviations(graph.Nodes.Select(n => n.Id));
 
-        foreach (var absolutePath in Directory.EnumerateFiles(bundleRoot, "*.md", SearchOption.AllDirectories).OrderBy(static path => path, StringComparer.OrdinalIgnoreCase))
+        var vizNodes = graph.Nodes
+            .Select(n => new NodeElement { Data = ToVizNodeData(n) })
+            .ToList();
+
+        var vizEdges = new List<EdgeElement>();
+        foreach (var e in graph.Edges)
         {
-            if (Path.GetFileName(absolutePath).Equals(IndexName, StringComparison.OrdinalIgnoreCase))
+            var sAb = abbrs.TryGetValue(e.Source, out var sa) ? sa : AbbrFallback(e.Source);
+            var tAb = abbrs.TryGetValue(e.Target, out var ta) ? ta : AbbrFallback(e.Target);
+            var edgeId = !string.IsNullOrEmpty(e.Id) ? e.Id : $"{sAb}_{tAb}";
+
+            vizEdges.Add(new EdgeElement
             {
-                continue;
-            }
-
-            var relativePath = Path.GetRelativePath(bundleRoot, absolutePath).Replace('\\', '/');
-            var conceptId = Path.ChangeExtension(relativePath, null)!.Replace('\\', '/');
-
-            var text = File.ReadAllText(absolutePath);
-            if (!OKFDocument.TryParse(text, out var document, out _))
-            {
-                continue;
-            }
-
-            var frontmatter = document!.Frontmatter;
-            concepts.Add(new Concept(
-                conceptId,
-                GetString(frontmatter, "type", "Unknown"),
-                GetString(frontmatter, "title", conceptId),
-                GetString(frontmatter, "description", ""),
-                GetString(frontmatter, "resource", ""),
-                GetTags(frontmatter),
-                document.Body,
-                ExtractLinks(document.Body, Path.GetDirectoryName(absolutePath)!, bundleRoot)));
+                Data = new EdgeData
+                {
+                    Id = edgeId,
+                    Source = e.Source,
+                    Target = e.Target,
+                },
+            });
         }
 
-        return concepts;
-    }
+        var bodies = graph.Nodes
+            .Where(n => !string.IsNullOrEmpty(n.Body))
+            .ToDictionary(n => n.Id, n => n.Body!, StringComparer.Ordinal);
 
-    static GraphData BuildGraph(List<Concept> concepts)
-    {
-        var ids = concepts.Select(static concept => concept.Id).ToHashSet(StringComparer.Ordinal);
-        var nodes = concepts.Select(static concept => concept.ToNode()).ToList();
-        var edges = new List<EdgeElement>();
-        var seenEdges = new HashSet<(string Source, string Target)>();
-
-        foreach (var concept in concepts)
-        {
-            foreach (var target in concept.LinksTo)
-            {
-                if (target == concept.Id || !ids.Contains(target))
-                {
-                    continue;
-                }
-
-                var key = (concept.Id, target);
-                if (!seenEdges.Add(key))
-                {
-                    continue;
-                }
-
-                edges.Add(new EdgeElement
-                {
-                    Data = new EdgeData
-                    {
-                        Id = $"{concept.Id}__{target}",
-                        Source = concept.Id,
-                        Target = target,
-                    },
-                });
-            }
-        }
+        var types = graph.Nodes
+            .Select(n => n.Type)
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(t => t, StringComparer.Ordinal)
+            .ToList();
 
         return new GraphData
         {
-            Nodes = nodes,
-            Edges = edges,
-            Bodies = concepts.ToDictionary(static concept => concept.Id, static concept => concept.Body, StringComparer.Ordinal),
-            Types = concepts.Select(static concept => concept.Type).Distinct().OrderBy(static type => type, StringComparer.Ordinal).ToList(),
+            Nodes = vizNodes,
+            Edges = vizEdges,
+            Bodies = bodies,
+            Types = types,
             Palette = TypePalette,
         };
     }
 
-    static List<string> ExtractLinks(string body, string docDirectory, string bundleRoot)
+    private static string AbbrFallback(string id)
     {
-        var bundleRootResolved = Path.GetFullPath(bundleRoot);
-        var links = new List<string>();
-        var seen = new HashSet<string>(StringComparer.Ordinal);
-
-        foreach (Match match in ConceptLinkRegex().Matches(body))
-        {
-            var target = match.Groups[1].Value;
-            if (target.Contains("://", StringComparison.Ordinal) || target.StartsWith('/'))
-            {
-                continue;
-            }
-
-            var resolved = Path.GetFullPath(Path.Combine(docDirectory, target.Replace('/', Path.DirectorySeparatorChar)));
-            var relative = Path.GetRelativePath(bundleRootResolved, resolved).Replace('\\', '/');
-            if (relative.StartsWith("..", StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            if (relative.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
-            {
-                relative = relative[..^3];
-            }
-
-            if (relative.Length > 0 && seen.Add(relative))
-            {
-                links.Add(relative);
-            }
-        }
-
-        return links;
+        var parts = id.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        return string.Concat(parts.Select(p => p.Length > 0 ? char.ToLowerInvariant(p[0]) : '_'));
     }
 
-    static string GetString(IReadOnlyDictionary<string, object?> frontmatter, string key, string defaultValue)
+    private static NodeData ToVizNodeData(GraphBuilder.Node n)
     {
-        if (!frontmatter.TryGetValue(key, out var value) || value is null)
+        var meta = n.Meta ?? new Dictionary<string, object?>(StringComparer.Ordinal);
+
+        static string GetMeta(Dictionary<string, object?> m, string key, string def = "")
         {
-            return defaultValue;
+            return m.TryGetValue(key, out var v) && v is not null ? v.ToString() ?? def : def;
         }
 
-        return value switch
+        var tags = new List<string>();
+        if (meta.TryGetValue("tags", out var tagVal) && tagVal is not null)
         {
-            string text => text,
-            _ => value.ToString() ?? defaultValue,
+            if (tagVal is string tagStr && !string.IsNullOrWhiteSpace(tagStr))
+            {
+                tags.Add(tagStr);
+            }
+            else if (tagVal is System.Collections.IEnumerable en)
+            {
+                foreach (var item in en)
+                {
+                    var s = item?.ToString();
+                    if (!string.IsNullOrWhiteSpace(s))
+                        tags.Add(s!);
+                }
+            }
+        }
+
+        var color = TypePalette.GetValueOrDefault(n.Type, DefaultNodeColor);
+        int bodyLen = n.Body?.Length ?? 0;
+        int size = 30 + Math.Min(60, bodyLen / 200);
+
+        return new NodeData
+        {
+            Id = n.Id,
+            Label = string.IsNullOrEmpty(n.Label) ? n.Id : n.Label,
+            Type = n.Type,
+            Description = GetMeta(meta, "description"),
+            Resource = GetMeta(meta, "resource"),
+            Tags = tags,
+            Color = color,
+            Size = size,
         };
     }
 
-    static List<string> GetTags(IReadOnlyDictionary<string, object?> frontmatter)
-    {
-        if (!frontmatter.TryGetValue("tags", out var value) || value is null)
-        {
-            return [];
-        }
 
-        if (value is string text)
-        {
-            return [text];
-        }
-
-        if (value is IEnumerable enumerable)
-        {
-            var tags = new List<string>();
-            foreach (var item in enumerable)
-            {
-                tags.Add(item?.ToString() ?? "");
-            }
-
-            return tags;
-        }
-
-        return [value.ToString() ?? ""];
-    }
-
-    [GeneratedRegex(@"\]\(([^)\s]+\.md)(?:#[A-Za-z0-9_\-]*)?\)", RegexOptions.Compiled)]
-    private static partial Regex ConceptLinkRegex();
-
-    sealed class Concept
-    {
-        public Concept(
-            string id,
-            string type,
-            string title,
-            string description,
-            string resource,
-            List<string> tags,
-            string body,
-            List<string> linksTo)
-        {
-            Id = id;
-            Type = type;
-            Title = title;
-            Description = description;
-            Resource = resource;
-            Tags = tags;
-            Body = body;
-            LinksTo = linksTo;
-        }
-
-        public string Id { get; }
-        public string Type { get; }
-        public string Title { get; }
-        public string Description { get; }
-        public string Resource { get; }
-        public List<string> Tags { get; }
-        public string Body { get; }
-        public List<string> LinksTo { get; }
-
-        public NodeElement ToNode()
-        {
-            var color = TypePalette.GetValueOrDefault(Type, DefaultNodeColor);
-            return new NodeElement
-            {
-                Data = new NodeData
-                {
-                    Id = Id,
-                    Label = string.IsNullOrEmpty(Title) ? Id : Title,
-                    Type = Type,
-                    Description = Description,
-                    Resource = Resource,
-                    Tags = Tags,
-                    Color = color,
-                    Size = 30 + Math.Min(60, Body.Length / 200),
-                },
-            };
-        }
-    }
 
     sealed class GraphData
     {

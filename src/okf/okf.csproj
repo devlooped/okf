@@ -12,10 +12,7 @@
     <PackageReference Include="Spectre.Console" Version="0.54.0" />
     <PackageReference Include="SharpYaml" Version="3.11.0" />
     <PackageReference Include="ThisAssembly.Resources" Version="2.1.2" PrivateAssets="all" />
-    <PackageReference Include="NuGetizer" Version="1.4.9">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="NuGetizer" Version="1.4.9" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\Google\viz.html" Link="Google/viz-template.html" Kind="Text" />

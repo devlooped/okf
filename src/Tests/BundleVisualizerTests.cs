@@ -27,7 +27,7 @@ public class BundleVisualizerTests
             Assert.DoesNotContain("/*__VIZ_CSS__*/", html);
             Assert.DoesNotContain("/*__VIZ_JS__*/", html);
             Assert.Equal(2, stats.Concepts);
-            Assert.Equal(0, stats.Edges);
+            Assert.Equal(1, stats.Edges);  // absolute link is now resolved via common GraphBuilder
             Assert.True(stats.Bytes > 0);
         }
         finally
