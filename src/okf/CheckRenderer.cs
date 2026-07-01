@@ -1,9 +1,17 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Spectre.Console;
 
 namespace okf;
 
 public static class CheckRenderer
 {
+    static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+    };
     public static void Render(IReadOnlyList<ValidationIssue> issues, string bundleRoot, bool linksChecked = true)
     {
         var bundleRootFull = Path.GetFullPath(bundleRoot);
@@ -44,6 +52,74 @@ public static class CheckRenderer
         }
     }
 
+    public static void RenderJson(IReadOnlyList<ValidationIssue> issues, string bundleRoot, TextWriter writer)
+    {
+        var result = BuildJsonResult(issues, bundleRoot);
+        writer.WriteLine(JsonSerializer.Serialize(result, JsonOptions));
+    }
+
+    public static CheckJsonResult BuildJsonResult(IReadOnlyList<ValidationIssue> issues, string bundleRoot)
+    {
+        var bundleRootFull = Path.GetFullPath(bundleRoot);
+        var issuesByRule = issues
+            .GroupBy(issue => issue.Rule)
+            .ToDictionary(group => group.Key, group => group.ToList());
+
+        var rules = CheckRules.All;
+        if (issuesByRule.ContainsKey(CheckRule.BundleExists))
+        {
+            rules = [(CheckRule.BundleExists, GetDescription(CheckRule.BundleExists))];
+        }
+
+        var ruleResults = rules
+            .Select(entry => new CheckJsonRule(
+                entry.Rule,
+                entry.Description,
+                !issuesByRule.ContainsKey(entry.Rule)))
+            .ToList();
+
+        var issueResults = issues
+            .Select(issue => ToJsonIssue(issue, bundleRootFull))
+            .ToList();
+
+        return new CheckJsonResult(
+            bundleRootFull,
+            issues.Count == 0,
+            issues.Count,
+            ruleResults,
+            issueResults);
+    }
+
+    static CheckJsonIssue ToJsonIssue(ValidationIssue issue, string bundleRootFull)
+    {
+        var (_, displayPath) = ResolvePaths(issue.File, bundleRootFull);
+        CheckJsonLocation? location = issue.Location is null
+            ? null
+            : new CheckJsonLocation(
+                issue.Location.Line,
+                issue.Location.Column,
+                issue.Location.EndLine,
+                issue.Location.EndColumn);
+
+        CheckJsonSnippet? snippet = issue.Snippet is null
+            ? null
+            : new CheckJsonSnippet(
+                issue.Snippet.Lines
+                    .Select(line => new CheckJsonSnippetLine(
+                        line.LineNumber,
+                        line.Text,
+                        line.StartColumn,
+                        line.EndColumn))
+                    .ToList());
+
+        return new CheckJsonIssue(
+            issue.Rule,
+            displayPath,
+            issue.Message,
+            location,
+            snippet);
+    }
+
     static string GetDescription(CheckRule rule)
         => CheckRules.All.First(entry => entry.Rule == rule).Description;
 
@@ -71,3 +147,37 @@ public static class CheckRenderer
         return (full, relativePath);
     }
 }
+
+public sealed record CheckJsonResult(
+    string Path,
+    bool Success,
+    int Errors,
+    IReadOnlyList<CheckJsonRule> Rules,
+    IReadOnlyList<CheckJsonIssue> Issues);
+
+public sealed record CheckJsonRule(
+    CheckRule Rule,
+    string Description,
+    bool Passed);
+
+public sealed record CheckJsonIssue(
+    CheckRule Rule,
+    string File,
+    string Message,
+    CheckJsonLocation? Location,
+    CheckJsonSnippet? Snippet);
+
+public sealed record CheckJsonLocation(
+    int Line,
+    int? Column,
+    int? EndLine,
+    int? EndColumn);
+
+public sealed record CheckJsonSnippet(
+    IReadOnlyList<CheckJsonSnippetLine> Lines);
+
+public sealed record CheckJsonSnippetLine(
+    int LineNumber,
+    string Text,
+    int StartColumn,
+    int EndColumn);

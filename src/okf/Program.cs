@@ -6,21 +6,26 @@ app.Add("check", Check);
 app.Add("viz", Viz);
 app.Run(args);
 
-static int Check([Argument] string path = ".")
+static int Check([Argument] string path = ".", bool json = false)
 {
     var checker = new BundleChecker(path);
     var issues = checker.Check();
 
-    CheckRenderer.Render(issues, path);
-
-    if (issues.Count == 0)
+    if (json)
     {
-        return 0;
+        CheckRenderer.RenderJson(issues, path, Console.Out);
+    }
+    else
+    {
+        CheckRenderer.Render(issues, path);
+
+        if (issues.Count > 0)
+        {
+            Console.Error.WriteLine($"{issues.Count} error(s).");
+        }
     }
 
-    var errors = issues.Count(issue => issue.Severity == IssueSeverity.Error);
-    Console.Error.WriteLine($"{errors} error(s), {issues.Count - errors} warning(s).");
-    return errors > 0 ? 1 : 0;
+    return issues.Count > 0 ? 1 : 0;
 }
 
 static void Viz()

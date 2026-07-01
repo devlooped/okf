@@ -30,7 +30,7 @@ public sealed partial class BundleChecker
 
         if (!Directory.Exists(bundleRoot))
         {
-            issues.Add(new ValidationIssue(CheckRule.BundleExists, IssueSeverity.Error, bundleRoot, "Bundle directory not found."));
+            issues.Add(new ValidationIssue(CheckRule.BundleExists, bundleRoot, "Bundle directory not found."));
             return issues;
         }
 
@@ -263,7 +263,7 @@ public sealed partial class BundleChecker
     }
 
     void AddError(CheckRule rule, string file, string message, IssueLocation? location = null, SourceSnippet? snippet = null)
-        => issues.Add(new ValidationIssue(rule, IssueSeverity.Error, file, message, location, snippet));
+        => issues.Add(new ValidationIssue(rule, file, message, location, snippet));
 
     [GeneratedRegex(@"^# .+", RegexOptions.Compiled)]
     private static partial Regex SectionHeadingRegex();
