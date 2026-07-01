@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "okf": {
+      "commandName": "Project",
+      "commandLineArgs": "check",
+      "workingDirectory": "C:\\Code\\okf\\samples\\check-failures"
+    }
+  }
+}

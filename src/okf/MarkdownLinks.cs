@@ -7,6 +7,9 @@ public static partial class MarkdownLinks
     [GeneratedRegex(@"\[[^\]]*\]\(([^)]+)\)", RegexOptions.Compiled)]
     private static partial Regex InlineLinkRegex();
 
+    [GeneratedRegex(@"\[([^\]]*)\]\(([^)]+)\)", RegexOptions.Compiled)]
+    private static partial Regex InlineLinkWithTextRegex();
+
     public static IEnumerable<(string Target, int Line)> Extract(string markdown)
     {
         var lineNumber = 1;
@@ -15,6 +18,22 @@ public static partial class MarkdownLinks
             foreach (Match match in InlineLinkRegex().Matches(line))
             {
                 yield return (match.Groups[1].Value.Trim(), lineNumber);
+            }
+
+            lineNumber++;
+        }
+    }
+
+    public static IEnumerable<(string Text, string Target, int Line)> ExtractWithText(string markdown)
+    {
+        var lineNumber = 1;
+        foreach (var line in markdown.Split('\n'))
+        {
+            foreach (Match match in InlineLinkWithTextRegex().Matches(line))
+            {
+                var text = match.Groups[1].Value.Trim();
+                var target = match.Groups[2].Value.Trim();
+                yield return (text, target, lineNumber);
             }
 
             lineNumber++;
