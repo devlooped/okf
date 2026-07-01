@@ -3,7 +3,7 @@ using okf;
 
 var app = ConsoleApp.Create();
 app.Add("check", Check);
-app.Add("viz", Viz);
+app.Add("viz", Visualize);
 app.Run(args);
 
 static int Check([Argument] string path = ".", bool json = false)
@@ -28,6 +28,31 @@ static int Check([Argument] string path = ".", bool json = false)
     return issues.Count > 0 ? 1 : 0;
 }
 
-static void Viz()
+static int Visualize(
+    [Argument] string path = ".",
+    string? @out = null,
+    string? name = null)
 {
+    var bundleRoot = Path.GetFullPath(path);
+
+    if (!Directory.Exists(bundleRoot))
+    {
+        Console.Error.WriteLine($"Bundle directory not found: {bundleRoot}");
+        return 1;
+    }
+
+    var outPath = @out ?? Path.Combine(bundleRoot, "viz.html");
+    var displayName = name ?? new DirectoryInfo(bundleRoot).Name;
+
+    try
+    {
+        var stats = BundleVisualizer.Generate(bundleRoot, outPath, displayName);
+        Console.WriteLine($"Wrote {outPath} ({stats.Concepts} concepts, {stats.Edges} edges, {stats.Bytes} bytes).");
+        return 0;
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine(ex.Message);
+        return 1;
+    }
 }
