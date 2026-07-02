@@ -126,7 +126,7 @@ public sealed partial class OKFDocument
 
     static IReadOnlyDictionary<string, object?> ParseYamlMapping(string yaml)
     {
-        var parsed = YamlSerializer.Deserialize(yaml, OkfYamlContext.Default.DictionaryStringObject);
+        var parsed = YamlSerializer.Deserialize(yaml, ConceptDocumentYamlContext.Default.DictionaryStringObject);
         if (parsed is null)
         {
             return new Dictionary<string, object?>(StringComparer.Ordinal);

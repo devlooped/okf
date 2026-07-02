@@ -36,7 +36,7 @@ public class ConceptDocument
     {
         try
         {
-            var yaml = YamlSerializer.Deserialize(frontmatterYaml, OkfYamlContext.Default.ConceptDocumentYaml);
+            var yaml = YamlSerializer.Deserialize(frontmatterYaml, ConceptDocumentYamlContext.Default.ConceptDocumentYaml);
             if (yaml is null || string.IsNullOrWhiteSpace(yaml.Type))
             {
                 document = null;
