@@ -11,6 +11,7 @@ namespace Devlooped;
 [JsonSerializable(typeof(GraphBuilder.Bundle))]
 [JsonSerializable(typeof(GraphBuilder.Node))]
 [JsonSerializable(typeof(GraphBuilder.Edge))]
+[JsonSerializable(typeof(GraphBuilder.NavNode))]
 [JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(Dictionary<string, JsonElement>))]
 public partial class GraphJsonContext : JsonSerializerContext;

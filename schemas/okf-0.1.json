@@ -21,6 +21,10 @@
       "description": "Optional object containing custom properties passed via -p when generating the graph. Only present when such properties were provided.",
       "additionalProperties": true
     },
+    "nav": {
+      "$ref": "#/$defs/navNode",
+      "description": "Index-driven navigation tree reflecting SPEC §6 directory indexes (and synthetic listings when index.md is missing). Present only when the graph was produced with --nav / includeNav. Producer contract: root node has kind \"dir\" and id \"\"; kind \"dir\" always includes body; empty group/orphans nodes are never emitted; directories never appear in nodes[]."
+    },
     "nodes": {
       "type": "array",
       "description": "List of concept nodes in the knowledge graph.",
@@ -140,6 +144,46 @@
         "label": {
           "type": "string",
           "description": "Human-readable label for the edge (often link text or target title)."
+        }
+      },
+      "additionalProperties": true
+    },
+    "navNode": {
+      "type": "object",
+      "description": "A node in the index-driven navigation tree. Directories are not concepts (reserved index.md).",
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["group", "dir", "concept", "orphans"],
+          "description": "group/orphans are non-routeable grouping headers; dir and concept are navigable."
+        },
+        "id": {
+          "type": "string",
+          "description": "Concept id, or directory path relative to bundle root (empty string for root). Omitted for group and orphans."
+        },
+        "label": {
+          "type": "string",
+          "description": "Display label (index link text, section heading, or derived title)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional short description from index entry or concept frontmatter."
+        },
+        "body": {
+          "type": "string",
+          "description": "Index markdown for kind=dir (authored after optional root frontmatter strip, or synthetic listing). Parallel to node.body."
+        },
+        "synthetic": {
+          "type": "boolean",
+          "description": "True when body/children were synthesized because index.md was missing."
+        },
+        "children": {
+          "type": "array",
+          "description": "Child nav nodes (groups, dirs, concepts, trailing orphans).",
+          "items": {
+            "$ref": "#/$defs/navNode"
+          }
         }
       },
       "additionalProperties": true

@@ -8,7 +8,7 @@ namespace Devlooped;
 
 public static partial class GraphBuilder
 {
-    const string IndexName = "index.md";
+    internal const string IndexName = "index.md";
     const string LogName = "log.md";
 
     static readonly TextInfo TitleCasing = CultureInfo.CurrentCulture.TextInfo;
@@ -26,6 +26,10 @@ public static partial class GraphBuilder
         public List<Node> Nodes { get; init; } = [];
         public List<Edge> Edges { get; init; } = [];
 
+        /// <summary>Index-driven nav tree; null when includeNav is false.</summary>
+        [JsonPropertyOrder(-8)]
+        public NavNode? Nav { get; init; }
+
         [JsonPropertyOrder(-10)]
         public string Version { get; init; } = "0.1";
 
@@ -36,6 +40,35 @@ public static partial class GraphBuilder
 
         [JsonExtensionData]
         public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+    }
+
+    /// <summary>
+    /// Index-driven navigation tree node. Directories are not concepts (SPEC §3.1).
+    /// </summary>
+    public sealed record NavNode
+    {
+        /// <summary>"group" | "dir" | "concept" | "orphans"</summary>
+        public required string Kind { get; init; }
+
+        /// <summary>
+        /// Concept id, or directory id (relative path; empty string for root).
+        /// Null for pure groups and orphans wrappers.
+        /// </summary>
+        public string? Id { get; init; }
+
+        public string? Label { get; init; }
+        public string? Description { get; init; }
+
+        /// <summary>
+        /// Index markdown for kind=dir (authored after frontmatter strip, or synthetic).
+        /// Parallel to <see cref="Node.Body"/>.
+        /// </summary>
+        public string? Body { get; init; }
+
+        /// <summary>True when body/children were synthesized because index.md was missing.</summary>
+        public bool? Synthetic { get; init; }
+
+        public IReadOnlyList<NavNode>? Children { get; init; }
     }
 
     public sealed record Bundle
@@ -175,7 +208,8 @@ public static partial class GraphBuilder
     public static KnowledgeGraph Build(
         string bundleRoot,
         bool includeBody = false,
-        IReadOnlyDictionary<string, string>? bundleProperties = null)
+        IReadOnlyDictionary<string, string>? bundleProperties = null,
+        bool includeNav = false)
     {
         bundleRoot = Path.GetFullPath(bundleRoot);
 
@@ -185,7 +219,7 @@ public static partial class GraphBuilder
         }
 
         var concepts = WalkConcepts(bundleRoot, includeBody);
-        var graph = BuildGraph(concepts, bundleRoot, bundleProperties);
+        var graph = BuildGraph(concepts, bundleRoot, bundleProperties, includeNav);
         return graph;
     }
 
@@ -197,9 +231,10 @@ public static partial class GraphBuilder
         string outPath,
         bool includeBody = false,
         IReadOnlyDictionary<string, string>? bundleProperties = null,
-        bool script = false)
+        bool script = false,
+        bool includeNav = false)
     {
-        var graph = Build(bundleRoot, includeBody, bundleProperties);
+        var graph = Build(bundleRoot, includeBody, bundleProperties, includeNav);
 
         var outDir = Path.GetDirectoryName(outPath);
         if (!string.IsNullOrEmpty(outDir))
@@ -318,7 +353,8 @@ public static partial class GraphBuilder
     static KnowledgeGraph BuildGraph(
         List<Concept> concepts,
         string bundleRoot,
-        IReadOnlyDictionary<string, string>? bundleProperties = null)
+        IReadOnlyDictionary<string, string>? bundleProperties = null,
+        bool includeNav = false)
     {
         var ids = concepts.Select(c => c.Id).ToHashSet(StringComparer.Ordinal);
         var idToTitle = concepts.ToDictionary(c => c.Id, c => c.Document.Title ?? c.Id, StringComparer.Ordinal);
@@ -435,16 +471,23 @@ public static partial class GraphBuilder
             ? new Bundle { ExtensionData = bundleExt }
             : null;
 
+        NavNode? nav = null;
+        if (includeNav)
+        {
+            nav = IndexNavBuilder.Build(bundleRoot, finalNodes);
+        }
+
         return new KnowledgeGraph
         {
             Nodes = finalNodes,
             Edges = edges,
+            Nav = nav,
             Timestamp = DateTimeOffset.UtcNow,
             Bundle = bundle,
         };
     }
 
-    static string NormalizeToConceptId(string resolvedRelative)
+    internal static string NormalizeToConceptId(string resolvedRelative)
     {
         var id = resolvedRelative.Replace('\\', '/');
         if (id.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
@@ -547,7 +590,7 @@ public static partial class GraphBuilder
         return labels;
     }
 
-    static string GetIndexBody(string relativePath, string text)
+    internal static string GetIndexBody(string relativePath, string text)
     {
         var isBundleRoot = relativePath.Equals(IndexName, StringComparison.OrdinalIgnoreCase);
         if (isBundleRoot

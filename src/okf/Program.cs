@@ -124,6 +124,7 @@ static int Visualize(
 /// <param name="path">Path to the bundle directory. [Default: .]</param>
 /// <param name="out">-o, Output path for the generated graph file. [Default: okf.json, or okf.js with --js]</param>
 /// <param name="body">-b, Include body content in the graph. [Default: false]</param>
+/// <param name="nav">Include index-driven navigation tree (nav). [Default: false]</param>
 /// <param name="js">Emit a plain JS script that sets window.data (loadable via &lt;script src&gt; on file:// too). [Default: false]</param>
 /// <param name="quiet">-q, Only render errors and warnings. [Default: false]</param>
 /// <param name="json">Output validation issues as JSON instead of human-readable text. [Default: false]</param>
@@ -132,6 +133,7 @@ static int Graph(
     [Argument, DefaultValue(".")] string path = ".",
     [HideDefaultValue] string? @out = null,
     bool body = false,
+    bool nav = false,
     bool js = false,
     bool quiet = false,
     bool json = false,
@@ -170,11 +172,13 @@ static int Graph(
             outPath,
             body,
             bundleProperties,
-            js);
+            js,
+            nav);
 
         if (!json)
         {
-            Console.WriteLine($"Wrote {outPath} ({nodes} nodes, {edges} edges).");
+            var navNote = nav ? ", + nav" : "";
+            Console.WriteLine($"Wrote {outPath} ({nodes} nodes, {edges} edges{navNote}).");
         }
 
         return 0;
