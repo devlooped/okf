@@ -361,7 +361,7 @@ Concept page with tags, backlinks, and neighborhood graph:
 
 ![](https://raw.githubusercontent.com/devlooped/okf/main/assets/img/view-concept.png)
 
-Expanded local graph for a highly connected concept (*Natural Rights*):
+Expanded local graph for a concept (*Lawful Defense*):
 
 ![](https://raw.githubusercontent.com/devlooped/okf/main/assets/img/view-local-graph.png)
 
