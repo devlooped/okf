@@ -14,7 +14,6 @@ if (runArgs.IndexOf("--debug") is var debugIdx and not -1)
 
 var app = ConsoleApp.Create();
 app.Add("check", Check);
-app.Add("viz", Visualize);
 app.Add("graph", Graph);
 app.Add("view", View);
 app.Run([.. runArgs]);
@@ -50,74 +49,6 @@ static void ReportCheckResult(BundleCheckResult result, string bundleRoot, bool 
     if (result.Warnings.Count > 0)
     {
         Console.Error.WriteLine($"{result.Warnings.Count} warning(s).");
-    }
-}
-
-/// <summary>Generate an interactive HTML visualization from a bundle or graph file.</summary>
-/// <param name="path">Path to a bundle directory or .json graph file. [Default: .]</param>
-/// <param name="out">-o, Output path for the generated HTML file. [Default: viz.html]</param>
-/// <param name="name">Display name shown in the visualization title. [Default: directory or file name]</param>
-/// <param name="open">Open the generated HTML in the default browser after writing. [Default: false]</param>
-static int Visualize(
-    [Argument] string path = ".",
-    string? @out = null,
-    string? name = null,
-    bool open = false)
-{
-    var fullPath = Path.GetFullPath(path);
-    GraphBuilder.KnowledgeGraph? graph = null;
-    string displayName;
-    string outputBaseDir;
-
-    try
-    {
-        if (File.Exists(fullPath) &&
-            fullPath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-        {
-            graph = GraphBuilder.Load(fullPath);
-            displayName = name ?? Path.GetFileNameWithoutExtension(fullPath);
-            outputBaseDir = Path.GetDirectoryName(fullPath) ?? ".";
-        }
-        else if (Directory.Exists(fullPath))
-        {
-            var checkResult = new BundleChecker(fullPath).Check();
-            ReportCheckResult(checkResult, fullPath);
-
-            if (checkResult.Errors.Count > 0)
-            {
-                return 1;
-            }
-
-            graph = GraphBuilder.Build(fullPath, includeBody: true);
-            displayName = name ?? new DirectoryInfo(fullPath).Name;
-            outputBaseDir = fullPath;
-        }
-        else
-        {
-            Console.Error.WriteLine($"Path is not a directory or .json graph file: {fullPath}");
-            return 1;
-        }
-
-        var outPath = @out ?? Path.Combine(outputBaseDir, "viz.html");
-
-        var stats = BundleVisualizer.Generate(graph, outPath, displayName);
-        Console.WriteLine($"Wrote {outPath} ({stats.Concepts} concepts, {stats.Edges} edges, {stats.Bytes} bytes).");
-
-        if (open)
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = outPath,
-                UseShellExecute = true,
-            });
-        }
-
-        return 0;
-    }
-    catch (Exception ex)
-    {
-        Console.Error.WriteLine(ex.Message);
-        return 1;
     }
 }
 

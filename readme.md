@@ -24,7 +24,7 @@ OSMF tier. A single fee covers all of [Devlooped packages](https://www.nuget.org
 directories of markdown concepts with YAML frontmatter, linked by relative paths.
 
 It validates bundles, builds a knowledge **graph** (nodes + edges + optional body/nav), and
-emits interactive HTML for reading (`view`) and exploring relationships (`viz`).
+emits an interactive HTML reader (`view`).
 
 Run without installing permanently via [`dnx`](https://learn.microsoft.com/dotnet/core/tools/dotnet-dnx):
 
@@ -43,7 +43,6 @@ dnx okf --prerelease -- check samples/the-law
 | [`check`](#check) | Validate a bundle (structure, frontmatter, links) |
 | [`graph`](#graph) | Emit `okf.json` / `okf.js` knowledge graph |
 | [`view`](#view) | Obsidian-style single-file reader (`index.html` + full graph) |
-| [`viz`](#viz) | Interactive Cytoscape graph HTML |
 
 The sample bundle under [`samples/the-law`](samples/the-law) is used in the screenshots below
 (Frédéric Bastiat’s *The Law* as a knowledge corpus).
@@ -376,35 +375,6 @@ Light theme:
 
 ---
 
-## `viz`
-
-Generate an interactive HTML visualization (Cytoscape) from a **bundle directory** or an
-existing **graph JSON** file.
-
-```bash
-dnx okf -- viz [path] [-o|--out <path>] [--name <title>] [--open]
-```
-
-| Argument / option | Description |
-|-------------------|-------------|
-| `path` | Bundle directory or `.json` graph file (default: `.`) |
-| `-o`, `--out` | Output HTML path (default: `viz.html` next to the input) |
-| `--name` | Display name in the visualization title |
-| `--open` | Open the generated HTML after writing |
-
-When given a directory, `viz` validates the bundle, builds a graph with bodies, then writes HTML.
-When given a `.json` graph, it visualizes that file as-is (handy after `graph --body`).
-
-```bash
-dnx okf -- viz samples/the-law -o samples/the-law/viz.html --open
-dnx okf -- viz samples/the-law/okf.json --name "The Law"
-```
-
-The viz UI supports search, type filter, layout presets (cose, concentric, breadth-first, circle, grid),
-and a detail pane for the selected node (frontmatter + rendered body when present).
-
----
-
 ## Typical workflow
 
 ```bash
@@ -417,9 +387,6 @@ dnx okf -- graph ./my-bundle -o ./my-bundle/okf.json
 
 # 3b. Or ship a human reader
 dnx okf -- view ./my-bundle --open
-
-# 3c. Or explore link topology
-dnx okf -- viz ./my-bundle --open
 ```
 
 ## OKF format (brief)
@@ -431,7 +398,7 @@ A **bundle** is a directory of UTF-8 markdown files:
 - `log.md` — optional chronological update log
 
 Concept **id** = relative path without `.md`. Links between concepts use normal markdown links;
-`graph` / `view` / `viz` turn those into edges.
+`graph` / `view` turn those into edges.
 
 See the full draft specification embedded in the tool package and in
 [`src/okf/SPEC.md`](src/okf/SPEC.md).
