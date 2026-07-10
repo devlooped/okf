@@ -7,6 +7,7 @@ public enum CheckRule
     ConceptType,
     IndexFrontmatter,
     IndexStructure,
+    IndexProse,
     LogFormat,
     InternalLinks,
 }
@@ -26,5 +27,6 @@ public static class CheckRules
     public static readonly IReadOnlyList<(CheckRule Rule, string Description)> Warnings =
     [
         (CheckRule.InternalLinks, "Unresolved internal links"),
+        (CheckRule.IndexProse, "index.md free prose (non-structural lines)"),
     ];
 }
