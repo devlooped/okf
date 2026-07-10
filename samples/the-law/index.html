@@ -1,4 +1,886 @@
-{
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OKF Viewer</title>
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("okf-theme");
+    if (t !== "light" && t !== "dark") {
+      t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    document.documentElement.setAttribute("data-theme", t);
+    document.documentElement.style.colorScheme = t;
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/3d-force-graph@1.73.3/dist/3d-force-graph.min.js"></script>
+<style>
+* { box-sizing: border-box; }
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --bg-surface: #f6f8fa;
+  --bg-hover: #eaeef2;
+  --bg-active: #ddf4ff;
+  --bg-code: #eff1f3;
+  --bg-pre: #f6f8fa;
+  --text: #1f2328;
+  --text-muted: #656d76;
+  --border: #d0d7de;
+  --border-subtle: #d8dee4;
+  --link: #0969da;
+  --link-hover: #0550ae;
+  --chip: #6e7781;
+  --tag-bg: #ddf4ff;
+  --tag-bg-hover: #b6e3ff;
+  --focus: #0969da;
+  --theme-track: #e4e6e9;
+  --theme-thumb: #ffffff;
+  --theme-sun: #e6a817;
+  --theme-moon: #f0f0f0;
+  --theme-track-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+  --theme-thumb-shadow: 0 1px 3px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1e1e1e;
+  --bg-surface: #252525;
+  --bg-hover: #2f2f2f;
+  --bg-active: #263a53;
+  --bg-code: #2d2d2d;
+  --bg-pre: #161616;
+  --text: #dcddde;
+  --text-muted: #98989f;
+  --border: #3a3a3a;
+  --border-subtle: #333333;
+  --link: #6cb6ff;
+  --link-hover: #8fc7ff;
+  --chip: #7d8590;
+  --tag-bg: #1f3a5f;
+  --tag-bg-hover: #2a4a73;
+  --focus: #6cb6ff;
+  --theme-track: #3a3a3a;
+  --theme-thumb: #ffffff;
+  --theme-sun: #e6a817;
+  --theme-moon: #f0f0f0;
+  --theme-track-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --theme-thumb-shadow: 0 1px 3px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+}
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+  flex-shrink: 0;
+}
+.title strong { font-size: 15px; margin-right: 8px; }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.header-link-btn {
+  border: 0;
+  background: transparent;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.header-link-btn:hover {
+  color: var(--link);
+  background: var(--bg-hover);
+}
+.header-link-btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.header-link-btn[aria-expanded="true"] {
+  color: var(--link);
+  background: var(--bg-active);
+}
+.muted { color: var(--text-muted); font-size: 12px; }
+
+/* Obsidian-style light/dark switch */
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  border-radius: 999px;
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.theme-toggle-track {
+  position: relative;
+  display: block;
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--theme-track);
+  box-shadow: var(--theme-track-shadow);
+  transition: background 0.2s ease;
+}
+.theme-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--theme-thumb);
+  box-shadow: var(--theme-thumb-shadow);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 1;
+}
+.theme-toggle-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+.theme-toggle-sun {
+  right: 5px;
+  color: var(--theme-sun);
+  opacity: 1;
+}
+.theme-toggle-moon {
+  left: 5px;
+  color: var(--theme-moon);
+  opacity: 0;
+}
+[data-theme="dark"] .theme-toggle-thumb {
+  transform: translateX(18px);
+}
+[data-theme="dark"] .theme-toggle-sun {
+  opacity: 0;
+}
+[data-theme="dark"] .theme-toggle-moon {
+  opacity: 1;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: minmax(200px, 280px) minmax(0, 1fr) minmax(200px, 280px);
+  height: calc(100vh - 45px);
+  min-height: 0;
+}
+.pane { min-height: 0; overflow: auto; }
+.nav-pane {
+  border-right: 1px solid var(--border);
+  background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 8px;
+}
+#nav-search {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--bg);
+  color: var(--text);
+}
+#nav-search::placeholder {
+  color: var(--text-muted);
+}
+.tree { flex: 1; overflow: auto; font-size: 13px; }
+.tree details { margin-left: 0; }
+.tree details > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 3px 6px;
+  border-radius: 4px;
+  user-select: none;
+}
+.tree details > summary::-webkit-details-marker { display: none; }
+.tree details > summary::before {
+  content: "▸";
+  display: inline-block;
+  width: 1em;
+  color: var(--text-muted);
+}
+.tree details[open] > summary::before { content: "▾"; }
+.tree .children { margin-left: 12px; border-left: 1px solid var(--border-subtle); padding-left: 4px; }
+.tree .item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.tree .item:hover,
+.tree details > summary:hover { background: var(--bg-hover); }
+.tree .item.active,
+.tree details > summary.active { background: var(--bg-active); color: var(--link); font-weight: 600; }
+.tree .group-label {
+  display: block;
+  padding: 6px 6px 2px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+.tree .item.hidden,
+.tree details.hidden { display: none; }
+
+.content-pane {
+  padding: 20px 28px 40px;
+  background: var(--bg);
+}
+.content-header { margin-bottom: 16px; }
+.content-header h1 {
+  margin: 4px 0 6px;
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.type-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--chip);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.meta { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  display: inline-block;
+  padding: 1px 7px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--tag-bg);
+  color: var(--link);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1.4;
+}
+button.tag:hover,
+.tag:hover {
+  background: var(--tag-bg-hover);
+  color: var(--link-hover);
+}
+button.tag:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+/* Tag concept list (content pane when a tag is selected) */
+.tag-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 48rem;
+}
+.tag-results li {
+  margin: 0;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.tag-results li:last-child { border-bottom: 0; }
+.tag-result-title {
+  display: inline;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--link);
+  cursor: pointer;
+  text-align: left;
+}
+.tag-result-title:hover { text-decoration: underline; }
+.tag-result-title:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.tag-result-type {
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--chip);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.tag-result-desc {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.tag-results-empty {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.markdown-body {
+  line-height: 1.6;
+  max-width: 48rem;
+}
+.markdown-body h1, .markdown-body h2, .markdown-body h3 {
+  margin-top: 1.4em;
+  margin-bottom: 0.4em;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.markdown-body h1 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+.markdown-body h2 { font-size: 1.2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.25em; }
+.markdown-body h3 { font-size: 1.05rem; }
+.markdown-body p, .markdown-body ul, .markdown-body ol, .markdown-body table { margin: 0.6em 0; }
+.markdown-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 85%;
+  background: var(--bg-code);
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+}
+.markdown-body pre {
+  background: var(--bg-pre);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  overflow: auto;
+}
+.markdown-body pre code { background: transparent; padding: 0; }
+.markdown-body table { border-collapse: collapse; width: 100%; }
+.markdown-body th, .markdown-body td {
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+}
+.markdown-body th { background: var(--bg-surface); }
+.markdown-body a.internal { color: var(--link); text-decoration: none; }
+.markdown-body a.internal:hover { text-decoration: underline; }
+.markdown-body a.external { color: var(--link); }
+
+#backlinks { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+#backlinks h2 { font-size: 1rem; }
+#backlinks a { color: var(--link); cursor: pointer; text-decoration: none; }
+#backlinks a:hover { text-decoration: underline; }
+
+.right-pane {
+  border-left: 1px solid var(--border);
+  background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+}
+.graph-panel {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 0;
+}
+.graph-panel .panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px 0;
+  flex-shrink: 0;
+}
+.graph-panel .panel-header .placeholder-label {
+  margin-bottom: 0;
+}
+.graph-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.graph-note { font-size: 11px; white-space: nowrap; }
+.graph-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.graph-icon-btn:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+  border-color: var(--border);
+}
+.graph-icon-btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.graph3d {
+  position: relative;
+  height: 260px;
+  width: 100%;
+  background: #1a1a1a;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+/* Avoid inline-canvas baseline gap / CSS stretch that warps spheres into eggs. */
+.graph3d canvas,
+.tag-cloud canvas {
+  display: block;
+  vertical-align: top;
+}
+.graph-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+.graph-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  max-width: 120px;
+  padding: 1px 3px;
+  color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-align: center;
+  /* Soft halo for contrast without muddy multi-axis blur */
+  text-shadow:
+    0 0 4px #1a1a1a,
+    0 1px 3px rgba(0, 0, 0, 0.9),
+    0 0 1px #1a1a1a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  pointer-events: none;
+  user-select: none;
+  /* Outer shell: JS sets translate() every frame — do not transition transform here. */
+  will-change: transform, color, opacity;
+  transition: color 0.2s ease, opacity 0.22s ease;
+}
+/* Inner text: gradual hover size + downward nudge (JS only positions the shell). */
+.graph-label-text {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  transform: translate3d(0, 0, 0) scale(1);
+  transform-origin: top center;
+  will-change: transform, font-size;
+  transition:
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    font-size 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    font-weight 0.28s ease,
+    letter-spacing 0.28s ease;
+}
+.graph-label.focused {
+  color: #f5f5f5;
+}
+.graph-label.focused .graph-label-text {
+  font-weight: 500;
+}
+.graph-label.highlighted {
+  color: #f2f0ff;
+  opacity: 1;
+}
+.graph-label.highlighted .graph-label-text {
+  font-weight: 500;
+  /* Neighbors: mild emphasis */
+  font-size: 12px;
+  transform: translate3d(0, 4px, 0) scale(1.05);
+}
+.graph-label.hover-root {
+  color: #f7f5ff;
+  opacity: 1;
+  z-index: 2;
+}
+.graph-label.hover-root .graph-label-text {
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.015em;
+  /* Primary hover: clearer drop + size bump */
+  transform: translate3d(0, 10px, 0) scale(1.14);
+}
+.graph-label.dimmed {
+  color: #6a6a70;
+  opacity: 0.28;
+}
+.graph-label.dimmed .graph-label-text {
+  font-weight: 400;
+  font-size: 11px;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+/* Hide 3d-force-graph default tooltip (we use always-on labels). */
+.graph-tooltip,
+.scene-tooltip {
+  display: none !important;
+}
+
+/* Floating expanded graph (Obsidian-style) */
+.graph-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(15, 18, 22, 0.55);
+  backdrop-filter: blur(2px);
+}
+body.graph-expanded {
+  overflow: hidden;
+}
+body.graph-expanded .graph-panel {
+  position: fixed;
+  z-index: 910;
+  top: 3vh;
+  left: 4vw;
+  right: 4vw;
+  bottom: 3vh;
+  width: auto;
+  height: auto;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  background: #1a1a1a;
+  overflow: hidden;
+}
+body.graph-expanded .graph-panel .panel-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid #2a2a2a;
+  background: #141414;
+}
+body.graph-expanded .graph-panel .placeholder-label,
+body.graph-expanded .graph-note {
+  color: #8b949e;
+}
+body.graph-expanded .graph-icon-btn {
+  color: #8b949e;
+}
+body.graph-expanded .graph-icon-btn:hover {
+  color: #e6edf3;
+  background: #21262d;
+  border-color: #30363d;
+}
+body.graph-expanded .graph3d {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+}
+body.graph-expanded .graph-label {
+  max-width: 200px;
+}
+body.graph-expanded .graph-label-text {
+  font-size: 13px;
+}
+body.graph-expanded .graph-label.highlighted .graph-label-text {
+  font-size: 14px;
+  transform: translate3d(0, 5px, 0) scale(1.06);
+}
+body.graph-expanded .graph-label.hover-root .graph-label-text {
+  font-size: 16px;
+  transform: translate3d(0, 12px, 0) scale(1.16);
+}
+body.graph-expanded .graph-label.dimmed .graph-label-text {
+  font-size: 13px;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+.graph-icon-btn .icon-collapse { display: none; }
+body.graph-expanded .graph-icon-btn .icon-expand { display: none; }
+body.graph-expanded .graph-icon-btn .icon-collapse { display: block; }
+
+/* Floating tag cloud panel (header-opened; same chrome as expanded local graph) */
+.tag-panel {
+  display: none;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+body.tags-expanded {
+  overflow: hidden;
+}
+body.tags-expanded .tag-panel {
+  display: flex;
+  position: fixed;
+  z-index: 910;
+  top: 3vh;
+  left: 4vw;
+  right: 4vw;
+  bottom: 3vh;
+  width: auto;
+  height: auto;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  background: #1a1a1a;
+}
+body.tags-expanded .tag-panel .panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #2a2a2a;
+  background: #141414;
+  flex-shrink: 0;
+}
+body.tags-expanded .tag-panel .panel-header .placeholder-label {
+  margin-bottom: 0;
+  color: #8b949e;
+}
+body.tags-expanded .tag-panel .graph-note {
+  color: #8b949e;
+}
+body.tags-expanded .tag-panel .graph-icon-btn {
+  color: #8b949e;
+}
+body.tags-expanded .tag-panel .graph-icon-btn:hover {
+  color: #e6edf3;
+  background: #21262d;
+  border-color: #30363d;
+}
+.tag-cloud {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  background: #1a1a1a;
+  overflow: hidden;
+}
+.tag-empty {
+  margin: 0;
+  padding: 48px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #8b949e;
+  flex: 1;
+}
+.tag-cloud .graph-labels { z-index: 1; }
+.tag-cloud .graph-label {
+  max-width: 140px;
+}
+.tag-cloud .graph-label-text {
+  font-size: 11px;
+}
+body.tags-expanded .tag-cloud .graph-label {
+  max-width: 180px;
+}
+body.tags-expanded .tag-cloud .graph-label-text {
+  font-size: 12px;
+}
+
+.toc-panel {
+  flex: 1;
+  padding: 12px 14px;
+  overflow: auto;
+}
+.placeholder-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+#toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+#toc-list li { margin: 4px 0; }
+#toc-list a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 12px;
+}
+#toc-list a:hover { color: var(--link); }
+#toc-list .lvl-2 { padding-left: 10px; }
+#toc-list .lvl-3 { padding-left: 20px; }
+
+@media (max-width: 960px) {
+  .shell { grid-template-columns: 220px minmax(0, 1fr); }
+  .right-pane { display: none; }
+  /* Expanded graph is reparented to body; keep it usable on narrow viewports. */
+  body.graph-expanded .graph-panel,
+  body.tags-expanded .tag-panel {
+    top: 2vh;
+    left: 2vw;
+    right: 2vw;
+    bottom: 2vh;
+  }
+}
+@media (max-width: 700px) {
+  .shell { grid-template-columns: 1fr; }
+  .nav-pane { max-height: 40vh; border-right: 0; border-bottom: 1px solid var(--border); }
+}
+
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="title">
+    <strong id="bundle-name"></strong>
+    <span class="muted">OKF view</span>
+  </div>
+  <div class="header-actions">
+    <button type="button" id="tags-open-btn" class="header-link-btn" aria-label="Open tags" aria-expanded="false" title="Tags">Tags</button>
+    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Switch to dark theme" title="Toggle light/dark theme">
+      <span class="theme-toggle-track" aria-hidden="true">
+        <svg class="theme-toggle-icon theme-toggle-moon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <svg class="theme-toggle-icon theme-toggle-sun" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <span class="theme-toggle-thumb"></span>
+      </span>
+    </button>
+  </div>
+</header>
+
+<main class="shell">
+  <aside id="nav-pane" class="pane nav-pane">
+    <input id="nav-search" type="search" placeholder="Search…" aria-label="Search navigation">
+    <nav id="tree" class="tree" aria-label="Bundle navigation"></nav>
+  </aside>
+
+  <section id="content-pane" class="pane content-pane">
+    <article id="content">
+      <header class="content-header">
+        <span id="content-type" class="type-chip" hidden></span>
+        <h1 id="content-title"></h1>
+        <p id="content-desc" class="muted"></p>
+        <div id="content-meta" class="meta"></div>
+      </header>
+      <div id="content-body" class="markdown-body"></div>
+      <section id="backlinks" hidden>
+        <h2>Linked from</h2>
+        <ul id="backlinks-list"></ul>
+      </section>
+    </article>
+  </section>
+
+  <aside id="right-pane" class="pane right-pane">
+    <div id="graph-panel" class="graph-panel">
+      <div class="panel-header">
+        <span class="placeholder-label muted">Local graph</span>
+        <div class="graph-header-actions">
+          <span id="graph-note" class="muted graph-note"></span>
+          <button type="button" id="graph-expand-btn" class="graph-icon-btn" aria-label="Expand graph" aria-expanded="false" title="Expand graph">
+            <svg class="icon-expand" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <polyline points="9 21 3 21 3 15"></polyline>
+              <line x1="21" y1="3" x2="14" y2="10"></line>
+              <line x1="3" y1="21" x2="10" y2="14"></line>
+            </svg>
+            <svg class="icon-collapse" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="4 14 10 14 10 20"></polyline>
+              <polyline points="20 10 14 10 14 4"></polyline>
+              <line x1="14" y1="10" x2="21" y2="3"></line>
+              <line x1="3" y1="21" x2="10" y2="14"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div id="graph3d" class="graph3d" aria-label="Local relationship graph"></div>
+    </div>
+    <div id="toc" class="toc-panel">
+      <div class="placeholder-label muted">On this page</div>
+      <ul id="toc-list"></ul>
+    </div>
+  </aside>
+</main>
+<div id="graph-backdrop" class="graph-backdrop" hidden></div>
+<div id="tag-backdrop" class="graph-backdrop" hidden></div>
+<div id="tag-panel" class="tag-panel" hidden>
+  <div class="panel-header">
+    <span class="placeholder-label muted">Tags</span>
+    <div class="graph-header-actions">
+      <span id="tag-note" class="muted graph-note"></span>
+      <button type="button" id="tag-close-btn" class="graph-icon-btn" aria-label="Close tags" title="Close tags">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div id="tag-cloud" class="tag-cloud" aria-label="Tag co-occurrence graph"></div>
+  <p id="tag-empty" class="tag-empty muted" hidden>No tags in this bundle</p>
+</div>
+
+<script>
+window.BUNDLE_NAME = "the-law";
+window.GRAPH = {
   "version": "0.1",
   "timestamp": "2026-07-10T05:14:21.0903439+00:00",
   "nav": {
@@ -4420,4 +5302,1692 @@
       "label": "perverted law"
     }
   ]
-}
+};
+</script>
+<script>
+(function () {
+  const graph = window.GRAPH;
+  const bundleName = window.BUNDLE_NAME || "bundle";
+  document.title = `${bundleName} — OKF Viewer`;
+  document.getElementById("bundle-name").textContent = bundleName;
+
+  // ——— Theme (light / dark) — init early so the control works even without nav ———
+
+  const THEME_KEY = "okf-theme";
+  const themeToggle = document.getElementById("theme-toggle");
+
+  function getTheme() {
+    const t = document.documentElement.getAttribute("data-theme");
+    return t === "dark" ? "dark" : "light";
+  }
+
+  function setTheme(theme) {
+    const next = theme === "dark" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", next);
+    document.documentElement.style.colorScheme = next;
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch (_) { /* private mode / blocked storage */ }
+    if (themeToggle) {
+      themeToggle.setAttribute(
+        "aria-label",
+        next === "dark" ? "Switch to light theme" : "Switch to dark theme"
+      );
+    }
+  }
+
+  // Sync control label with FOUC-prevention script (or system preference).
+  setTheme(getTheme());
+
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      setTheme(getTheme() === "dark" ? "light" : "dark");
+    });
+  }
+
+  if (!graph || !graph.nav) {
+    document.getElementById("content-body").textContent =
+      "This viewer requires a graph built with body and nav (okf view).";
+    return;
+  }
+
+  const nodesById = {};
+  for (const n of graph.nodes || []) nodesById[n.id] = n;
+
+  const conceptIds = new Set(Object.keys(nodesById));
+  const dirById = {};
+  const dirIds = new Set();
+
+  function indexDirs(node) {
+    if (!node) return;
+    if (node.kind === "dir") {
+      dirById[node.id ?? ""] = node;
+      dirIds.add(node.id ?? "");
+    }
+    for (const c of node.children || []) indexDirs(c);
+  }
+  indexDirs(graph.nav);
+
+  const backlinks = {};
+  for (const e of graph.edges || []) {
+    (backlinks[e.target] ||= []).push(e.source);
+  }
+
+  // ——— Tag index (count + co-occurrence) ———
+
+  /**
+   * @typedef {{ count: number, members: string[] }} TagEntry
+   * @type {{ byTag: Map<string, TagEntry>, co: Map<string, number>, graphData: { nodes: object[], links: object[] } }}
+   */
+  const tagIndex = buildTagIndex();
+
+  function buildTagIndex() {
+    /** @type {Map<string, TagEntry>} */
+    const byTag = new Map();
+    /** @type {Map<string, number>} */
+    const co = new Map();
+
+    function pairKey(a, b) {
+      return a < b ? a + "\0" + b : b + "\0" + a;
+    }
+
+    for (const n of graph.nodes || []) {
+      const tags = (n.tags || []).filter((t) => t != null && String(t).trim() !== "");
+      if (!tags.length) continue;
+      // de-dupe within a document
+      const unique = [...new Set(tags.map((t) => String(t)))];
+      for (const t of unique) {
+        let entry = byTag.get(t);
+        if (!entry) {
+          entry = { count: 0, members: [] };
+          byTag.set(t, entry);
+        }
+        entry.count++;
+        entry.members.push(n.id);
+      }
+      for (let i = 0; i < unique.length; i++) {
+        for (let j = i + 1; j < unique.length; j++) {
+          const k = pairKey(unique[i], unique[j]);
+          co.set(k, (co.get(k) || 0) + 1);
+        }
+      }
+    }
+
+    const nodes = [];
+    for (const [tag, entry] of byTag) {
+      // Log-scale size so hub tags (e.g. bastiat) do not dominate completely.
+      const val = 1.2 + Math.log2(entry.count + 1) * 1.8;
+      nodes.push({
+        id: tag,
+        name: tag,
+        val,
+        count: entry.count,
+        focused: false,
+      });
+    }
+
+    const links = [];
+    for (const [k, coCount] of co) {
+      const sep = k.indexOf("\0");
+      const a = k.slice(0, sep);
+      const b = k.slice(sep + 1);
+      const ca = byTag.get(a)?.count || 1;
+      const cb = byTag.get(b)?.count || 1;
+      const jaccard = coCount / (ca + cb - coCount);
+      links.push({
+        source: a,
+        target: b,
+        co: coCount,
+        jaccard,
+        // Width / visual weight from co-count; force strength uses Jaccard.
+        value: coCount,
+      });
+    }
+
+    return {
+      byTag,
+      co,
+      graphData: { nodes, links },
+    };
+  }
+
+  function tagExists(tag) {
+    return tagIndex.byTag.has(tag);
+  }
+
+  /** @type {{ kind: 'dir'|'concept'|'tag', id: string }} */
+  let selected = { kind: "dir", id: "" };
+
+  const treeEl = document.getElementById("tree");
+  const searchEl = document.getElementById("nav-search");
+
+  // ——— Link resolution (mirrors MarkdownLinks + NormalizeToConceptId) ———
+
+  function isInternalLink(target) {
+    if (!target || target[0] === "#") return false;
+    const lower = target.toLowerCase();
+    if (lower.startsWith("http://") || lower.startsWith("https://") || lower.startsWith("mailto:"))
+      return false;
+    if (lower.startsWith("javascript:") || lower.startsWith("data:")) return false;
+    return true;
+  }
+
+  function dirname(path) {
+    const i = path.lastIndexOf("/");
+    return i <= 0 ? "" : path.slice(0, i);
+  }
+
+  function normalizePath(parts) {
+    const out = [];
+    for (const p of parts) {
+      if (!p || p === ".") continue;
+      if (p === "..") {
+        if (out.length) out.pop();
+        continue;
+      }
+      out.push(p);
+    }
+    return out.join("/");
+  }
+
+  function resolveHref(href, basePath) {
+    let pathPart = href.split("#", 2)[0];
+    if (!pathPart) return null;
+    pathPart = pathPart.trim();
+
+    let candidate;
+    if (pathPart.startsWith("/")) {
+      candidate = pathPart.replace(/^\/+/, "");
+    } else {
+      const baseDir = dirname(basePath);
+      const joined = (baseDir ? baseDir + "/" : "") + pathPart;
+      candidate = normalizePath(joined.split("/"));
+    }
+
+    if (pathPart.endsWith("/")) {
+      candidate = (candidate ? candidate.replace(/\/?$/, "") + "/" : "") + "index.md";
+      candidate = candidate.replace(/^\//, "");
+    }
+
+    return candidate.replace(/\\/g, "/");
+  }
+
+  function normalizeToId(resolved) {
+    let id = resolved.replace(/\\/g, "/");
+    if (id.toLowerCase().endsWith(".md")) id = id.slice(0, -3);
+    if (id.toLowerCase().endsWith("/index")) id = id.slice(0, -6);
+    id = id.replace(/\/+$/, "");
+    return id;
+  }
+
+  function basePathForSelection() {
+    if (selected.kind === "concept") {
+      const n = nodesById[selected.id];
+      return (n && n.path) || selected.id + ".md";
+    }
+    return selected.id === "" ? "index.md" : selected.id + "/index.md";
+  }
+
+  function tryNavigateHref(href) {
+    if (href == null) return false;
+    const raw = href.trim();
+    if (raw.startsWith("#")) return false; // fragment-only: let browser/TOC handle
+    if (!isInternalLink(raw)) return false;
+
+    const resolved = resolveHref(raw, basePathForSelection());
+    if (resolved == null) return false;
+    const id = normalizeToId(resolved);
+
+    if (conceptIds.has(id)) {
+      select({ kind: "concept", id });
+      return true;
+    }
+    if (dirIds.has(id)) {
+      select({ kind: "dir", id });
+      return true;
+    }
+    return false;
+  }
+
+  // ——— Tree ———
+
+  function renderTree(filter) {
+    treeEl.innerHTML = "";
+    const q = (filter || "").trim().toLowerCase();
+    const root = document.createElement("div");
+    appendNavChildren(root, graph.nav.children || [], q, 0);
+    // Also allow selecting the root dir
+    const rootBtn = document.createElement("button");
+    rootBtn.type = "button";
+    rootBtn.className = "item" + (selected.kind === "dir" && selected.id === "" ? " active" : "");
+    rootBtn.textContent = graph.nav.label || bundleName;
+    rootBtn.dataset.kind = "dir";
+    rootBtn.dataset.id = "";
+    rootBtn.addEventListener("click", () => select({ kind: "dir", id: "" }));
+    treeEl.appendChild(rootBtn);
+    treeEl.appendChild(root);
+  }
+
+  function textMatch(node, q) {
+    if (!q) return true;
+    const hay = [
+      node.label || "",
+      node.id || "",
+      node.description || "",
+    ].join(" ").toLowerCase();
+    if (hay.includes(q)) return true;
+    if (node.kind === "concept" && nodesById[node.id]) {
+      const n = nodesById[node.id];
+      const t = ((n.tags || []).join(" ") + " " + (n.title || "")).toLowerCase();
+      if (t.includes(q)) return true;
+    }
+    return false;
+  }
+
+  function subtreeMatches(node, q) {
+    if (textMatch(node, q)) return true;
+    return (node.children || []).some((c) => subtreeMatches(c, q));
+  }
+
+  function appendNavChildren(container, children, q, depth) {
+    for (const node of children) {
+      if (q && !subtreeMatches(node, q)) continue;
+
+      if (node.kind === "group" || node.kind === "orphans") {
+        const label = document.createElement("div");
+        label.className = "group-label";
+        label.textContent = node.label || (node.kind === "orphans" ? "Other" : "Group");
+        container.appendChild(label);
+        const wrap = document.createElement("div");
+        wrap.className = "children";
+        appendNavChildren(wrap, node.children || [], q, depth + 1);
+        container.appendChild(wrap);
+        continue;
+      }
+
+      if (node.kind === "dir") {
+        const details = document.createElement("details");
+        details.open = shouldExpandDir(node.id, q);
+        const summary = document.createElement("summary");
+        summary.textContent = node.label || node.id || "/";
+        if (selected.kind === "dir" && selected.id === (node.id || "")) {
+          summary.classList.add("active");
+        }
+        summary.addEventListener("click", (e) => {
+          // allow toggle; also select on click
+          select({ kind: "dir", id: node.id || "" });
+        });
+        details.appendChild(summary);
+        const kids = document.createElement("div");
+        kids.className = "children";
+        appendNavChildren(kids, node.children || [], q, depth + 1);
+        details.appendChild(kids);
+        container.appendChild(details);
+        continue;
+      }
+
+      if (node.kind === "concept") {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "item" + (selected.kind === "concept" && selected.id === node.id ? " active" : "");
+        btn.textContent = node.label || node.id;
+        btn.title = node.description || node.id;
+        btn.addEventListener("click", () => select({ kind: "concept", id: node.id }));
+        container.appendChild(btn);
+      }
+    }
+  }
+
+  function shouldExpandDir(dirId, q) {
+    if (q) return true;
+    if (selected.kind === "dir" && (selected.id === dirId || selected.id.startsWith(dirId + "/")))
+      return true;
+    if (selected.kind === "concept" && selected.id.startsWith((dirId ? dirId + "/" : "")))
+      return true;
+    // expand first level by default
+    return !dirId || !dirId.includes("/");
+  }
+
+  // ——— Content ———
+
+  function select(next, opts) {
+    selected = next;
+    if (!(opts && opts.skipHash)) updateHash();
+    renderTree(searchEl.value);
+    renderContent();
+    updateLocalGraph();
+    if (tagsExpanded) updateTagCloudHighlight();
+  }
+
+  // ——— Hash routing (#c/id, #d/id, #t/tag) ———
+
+  function updateHash() {
+    try {
+      let prefix;
+      if (selected.kind === "dir") prefix = "d/";
+      else if (selected.kind === "tag") prefix = "t/";
+      else prefix = "c/";
+      const id = selected.id === "" && selected.kind === "dir" ? "" : selected.id;
+      const hash = "#" + prefix + encodeURIComponent(id).replace(/%2F/gi, "/");
+      if (location.hash !== hash) history.replaceState(null, "", hash);
+    } catch (_) {}
+  }
+
+  function selectFromHash() {
+    const h = location.hash || "";
+    if (!h || h === "#") return false;
+    let raw;
+    try {
+      raw = decodeURIComponent(h.slice(1));
+    } catch (_) {
+      raw = h.slice(1);
+    }
+    if (raw.startsWith("c/")) {
+      const id = raw.slice(2);
+      if (conceptIds.has(id)) {
+        select({ kind: "concept", id }, { skipHash: true });
+        return true;
+      }
+      // slug fallback
+      for (const n of graph.nodes || []) {
+        if (n.slug === id) {
+          select({ kind: "concept", id: n.id }, { skipHash: true });
+          return true;
+        }
+      }
+    } else if (raw.startsWith("d/")) {
+      const id = raw.slice(2);
+      if (dirIds.has(id)) {
+        select({ kind: "dir", id }, { skipHash: true });
+        return true;
+      }
+    } else if (raw.startsWith("t/")) {
+      const id = raw.slice(2);
+      if (tagExists(id)) {
+        select({ kind: "tag", id }, { skipHash: true });
+        return true;
+      }
+    } else if (conceptIds.has(raw)) {
+      select({ kind: "concept", id: raw }, { skipHash: true });
+      return true;
+    }
+    return false;
+  }
+
+  // ——— Local 3D graph (Obsidian-like monochrome styling) ———
+
+  const GRAPH_CAP = 75;
+  /** Max co-tags in the local ego graph (focus + neighbors). */
+  const TAG_EGO_CAP = 40;
+  const NODE_COLOR = "#b8b8b8";
+  const NODE_COLOR_FOCUSED = "#e8e8e8";
+  const NODE_COLOR_HIGHLIGHT = "#e4e0ff";
+  const NODE_COLOR_DIM = "#3a3a40";
+  const LINK_COLOR = "rgba(175, 180, 190, 0.55)";
+  const LINK_COLOR_HIGHLIGHT = "rgba(124, 108, 245, 0.92)";
+  const LINK_COLOR_DIM = "rgba(90, 90, 100, 0.12)";
+  /** Delay before hover highlight applies (Obsidian-style, avoids flicker). */
+  const GRAPH_HOVER_DELAY_MS = 220;
+  /** nodeRelSize used for world-radius → screen offset estimates. */
+  const GRAPH_NODE_REL_SIZE = 3.5;
+  /** linkWidth 0 → THREE.Line (hairline); >0 draws thick cylinders. */
+  const GRAPH_LINK_WIDTH = 0;
+
+  let forceGraph = null;
+  let labelsLayer = null;
+  let graphExpanded = false;
+  /** @type {string | null} currently applied highlight root (after delay) */
+  let graphHoverId = null;
+  /** @type {string | null} node under cursor (may differ until delay fires) */
+  let graphHoverPendingId = null;
+  /** @type {ReturnType<typeof setTimeout> | null} */
+  let graphHoverTimer = null;
+  /** @type {Set<string>} */
+  let graphHoverNodeIds = new Set();
+  /** @type {Set<string>} */
+  let graphHoverLinkKeys = new Set();
+  /** @type {Map<string, HTMLElement>} */
+  const labelEls = new Map();
+  const graphEl = document.getElementById("graph3d");
+  const graphNote = document.getElementById("graph-note");
+  const graphPanel = document.getElementById("graph-panel");
+  const graphBackdrop = document.getElementById("graph-backdrop");
+  const graphExpandBtn = document.getElementById("graph-expand-btn");
+  const graphPanelHome = graphPanel?.parentElement || null;
+  const tocEl = document.getElementById("toc");
+
+  function linkEndpoints(link) {
+    const s = typeof link.source === "object" ? link.source.id : link.source;
+    const t = typeof link.target === "object" ? link.target.id : link.target;
+    return [s, t];
+  }
+
+  function undirectedLinkKey(a, b) {
+    return a < b ? a + "\0" + b : b + "\0" + a;
+  }
+
+  /**
+   * Estimate node sphere radius in screen px so labels clear the mesh.
+   * Projects center and a world-space offset along the camera's local up.
+   */
+  function nodeScreenRadiusPx(node) {
+    if (!forceGraph || node.x == null || node.y == null || node.z == null) {
+      return 12 + Math.cbrt(node?.val || 1) * 8;
+    }
+    const worldR = GRAPH_NODE_REL_SIZE * Math.cbrt(node.val || 1);
+    const c = forceGraph.graph2ScreenCoords(node.x, node.y, node.z);
+    // Offset along world +Y (camera often looks from +Z; +Y is a stable axis).
+    const e = forceGraph.graph2ScreenCoords(node.x, node.y + worldR, node.z);
+    if (
+      c &&
+      e &&
+      Number.isFinite(c.x) &&
+      Number.isFinite(c.y) &&
+      Number.isFinite(e.x) &&
+      Number.isFinite(e.y)
+    ) {
+      const d = Math.hypot(e.x - c.x, e.y - c.y);
+      if (d > 2 && d < 200) return d;
+    }
+    return 12 + Math.cbrt(node.val || 1) * 8;
+  }
+
+  /** Screen-space Y offset: label sits just under the sphere (Obsidian-style). */
+  function labelOffsetBelow(node) {
+    return nodeScreenRadiusPx(node) + 4;
+  }
+
+  function ensureLabelsLayer() {
+    if (!graphEl || labelsLayer) return;
+    labelsLayer = document.createElement("div");
+    labelsLayer.className = "graph-labels";
+    labelsLayer.setAttribute("aria-hidden", "true");
+    graphEl.appendChild(labelsLayer);
+  }
+
+  /** Outer shell is positioned by JS; inner .graph-label-text animates size/nudge via CSS. */
+  function createGraphLabelEl() {
+    const el = document.createElement("div");
+    el.className = "graph-label";
+    const textEl = document.createElement("span");
+    textEl.className = "graph-label-text";
+    el.appendChild(textEl);
+    return el;
+  }
+
+  function setGraphLabelText(el, text) {
+    const textEl = el.querySelector(".graph-label-text");
+    if (textEl) {
+      if (textEl.textContent !== text) textEl.textContent = text;
+    } else if (el.textContent !== text) {
+      el.textContent = text;
+    }
+  }
+
+  function applyLabelHighlightState(el, id, focused) {
+    const hovering = graphHoverId != null;
+    const hi = hovering && graphHoverNodeIds.has(id);
+    const root = hovering && graphHoverId === id;
+    el.classList.toggle("focused", !!focused && !hovering);
+    el.classList.toggle("highlighted", hi);
+    el.classList.toggle("hover-root", root);
+    el.classList.toggle("dimmed", hovering && !hi);
+  }
+
+  function syncGraphLabels() {
+    if (!forceGraph || !labelsLayer) return;
+    const nodes = forceGraph.graphData()?.nodes || [];
+    const seen = new Set();
+
+    for (const n of nodes) {
+      const id = n.id;
+      if (id == null) continue;
+      seen.add(id);
+      let el = labelEls.get(id);
+      if (!el) {
+        el = createGraphLabelEl();
+        labelsLayer.appendChild(el);
+        labelEls.set(id, el);
+      }
+      setGraphLabelText(el, n.name || n.id || "");
+      applyLabelHighlightState(el, id, n.focused);
+    }
+
+    for (const [id, el] of labelEls) {
+      if (!seen.has(id)) {
+        el.remove();
+        labelEls.delete(id);
+      }
+    }
+
+    positionGraphLabels();
+  }
+
+  function positionGraphLabels() {
+    if (!forceGraph || !labelsLayer) return;
+    const nodes = forceGraph.graphData()?.nodes || [];
+    for (const n of nodes) {
+      const el = labelEls.get(n.id);
+      if (!el) continue;
+      if (n.x == null || n.y == null || n.z == null) {
+        el.style.visibility = "hidden";
+        continue;
+      }
+      const coords = forceGraph.graph2ScreenCoords(n.x, n.y, n.z);
+      if (!coords || !Number.isFinite(coords.x) || !Number.isFinite(coords.y)) {
+        el.style.visibility = "hidden";
+        continue;
+      }
+      el.style.visibility = "visible";
+      // Position only — hover size/nudge is CSS on .graph-label-text (gradual transition).
+      const y = coords.y + labelOffsetBelow(n);
+      el.style.transform = `translate(${coords.x}px, ${y}px) translate(-50%, 0)`;
+    }
+  }
+
+  function graphNodeColor(n) {
+    if (graphHoverId != null) {
+      return graphHoverNodeIds.has(n.id) ? NODE_COLOR_HIGHLIGHT : NODE_COLOR_DIM;
+    }
+    return n.focused ? NODE_COLOR_FOCUSED : NODE_COLOR;
+  }
+
+  function graphLinkColor(l) {
+    if (graphHoverId != null) {
+      const [s, t] = linkEndpoints(l);
+      if (s != null && t != null && graphHoverLinkKeys.has(undirectedLinkKey(s, t))) {
+        return LINK_COLOR_HIGHLIGHT;
+      }
+      return LINK_COLOR_DIM;
+    }
+    // Co-tag ego graph: opacity encodes Jaccard togetherness.
+    if (l.jaccard != null) {
+      const j = Math.min(Math.max(l.jaccard, 0), 1);
+      const a = 0.25 + j * 0.55;
+      return `rgba(175, 180, 190, ${a})`;
+    }
+    return LINK_COLOR;
+  }
+
+  function refreshGraphHighlightMaterials() {
+    if (!forceGraph) return;
+    // Re-apply accessors so three-forcegraph rebuilds node/link materials.
+    // Do not touch linkWidth — width stays constant (hairline); only colors change.
+    forceGraph.nodeColor(forceGraph.nodeColor()).linkColor(forceGraph.linkColor());
+  }
+
+  function applyGraphHover(node) {
+    const id = node && node.id != null ? node.id : null;
+    if (id === graphHoverId) return;
+
+    graphHoverId = id;
+    graphHoverNodeIds = new Set();
+    graphHoverLinkKeys = new Set();
+
+    if (id != null && forceGraph) {
+      graphHoverNodeIds.add(id);
+      for (const l of forceGraph.graphData()?.links || []) {
+        const [s, t] = linkEndpoints(l);
+        if (s === id || t === id) {
+          if (s != null) graphHoverNodeIds.add(s);
+          if (t != null) graphHoverNodeIds.add(t);
+          if (s != null && t != null) graphHoverLinkKeys.add(undirectedLinkKey(s, t));
+        }
+      }
+    }
+
+    refreshGraphHighlightMaterials();
+    // Class toggles drive CSS transitions on .graph-label-text (move + size).
+    for (const n of forceGraph?.graphData()?.nodes || []) {
+      const el = labelEls.get(n.id);
+      if (el) applyLabelHighlightState(el, n.id, n.focused);
+    }
+  }
+
+  function clearGraphHoverTimer() {
+    if (graphHoverTimer != null) {
+      clearTimeout(graphHoverTimer);
+      graphHoverTimer = null;
+    }
+  }
+
+  /**
+   * Schedule hover highlight. Entering a node waits briefly (anti-flicker);
+   * leaving clears promptly. Moving between nodes resets the delay.
+   */
+  function onGraphNodeHover(node) {
+    const id = node && node.id != null ? node.id : null;
+    if (graphEl) graphEl.style.cursor = id != null ? "pointer" : null;
+
+    if (id === graphHoverPendingId) return;
+    graphHoverPendingId = id;
+    clearGraphHoverTimer();
+
+    if (id == null) {
+      // Leave: clear soon so highlight doesn't stick while still scanning.
+      graphHoverTimer = setTimeout(() => {
+        graphHoverTimer = null;
+        applyGraphHover(null);
+      }, 60);
+      return;
+    }
+
+    // Already highlighting this node (e.g. re-enter after brief leave cancel).
+    if (id === graphHoverId) return;
+
+    graphHoverTimer = setTimeout(() => {
+      graphHoverTimer = null;
+      if (graphHoverPendingId !== id) return;
+      // Re-resolve in case graphData was swapped during the delay.
+      const live =
+        (forceGraph?.graphData()?.nodes || []).find((n) => n.id === id) || { id };
+      applyGraphHover(live);
+    }, GRAPH_HOVER_DELAY_MS);
+  }
+
+  function clearGraphHover() {
+    clearGraphHoverTimer();
+    graphHoverPendingId = null;
+    if (graphHoverId == null && graphHoverNodeIds.size === 0) return;
+    applyGraphHover(null);
+  }
+
+  function nodeCentroid(nodes) {
+    let cx = 0;
+    let cy = 0;
+    let cz = 0;
+    let n = 0;
+    for (const node of nodes) {
+      if (node.x == null || node.y == null || node.z == null) continue;
+      cx += node.x;
+      cy += node.y;
+      cz += node.z;
+      n++;
+    }
+    if (!n) return { x: 0, y: 0, z: 0 };
+    return { x: cx / n, y: cy / n, z: cz / n };
+  }
+
+  /** Axis-aligned screen footprint of nodes (px), or null if unusable. */
+  function nodeScreenBounds(nodes, graphInstance, el) {
+    if (!graphInstance || !nodes.length) return null;
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    let count = 0;
+    for (const node of nodes) {
+      if (node.x == null || node.y == null || node.z == null) continue;
+      const c = graphInstance.graph2ScreenCoords(node.x, node.y, node.z);
+      if (!c || !Number.isFinite(c.x) || !Number.isFinite(c.y)) continue;
+      if (c.x < minX) minX = c.x;
+      if (c.x > maxX) maxX = c.x;
+      if (c.y < minY) minY = c.y;
+      if (c.y > maxY) maxY = c.y;
+      count++;
+    }
+    if (!count || minX === Infinity) return null;
+    return { minX, minY, maxX, maxY, w: maxX - minX, h: maxY - minY };
+  }
+
+  /**
+   * Frame the graph to the current canvas. In expanded mode, zoomToFit alone
+   * leaves a large empty margin (3D sphere fit is conservative), so we measure
+   * the actual screen footprint and pull the camera closer until the cluster
+   * fills most of the panel.
+   */
+  function fitGraphCamera(ms) {
+    if (!forceGraph) return;
+    const nodes = forceGraph.graphData()?.nodes || [];
+    if (!nodes.length) return;
+
+    const duration = ms == null ? (graphExpanded ? 350 : 400) : ms;
+    const padPx = graphExpanded ? 28 : 24;
+
+    const finish = () => {
+      const after = () => positionGraphLabels();
+      if (duration > 0) setTimeout(after, duration + 30);
+      else requestAnimationFrame(after);
+    };
+
+    if (!graphExpanded) {
+      try {
+        forceGraph.zoomToFit(duration, padPx);
+      } catch (_) {}
+      finish();
+      return;
+    }
+
+    // Baseline frame, then tighten using measured screen footprint.
+    try {
+      forceGraph.zoomToFit(0, padPx);
+    } catch (_) {}
+
+    // Wait a frame so camera matrices match zoomToFit before projecting.
+    requestAnimationFrame(() => {
+      try {
+        // Leave room for node spheres + labels below nodes (not just centers).
+        const targetFill = 0.78;
+        const bounds = nodeScreenBounds(nodes, forceGraph, graphEl);
+        const cw = graphEl.clientWidth || 1;
+        const ch = graphEl.clientHeight || 1;
+        if (bounds && bounds.w > 1 && bounds.h > 1) {
+          const fill = Math.max(bounds.w / cw, bounds.h / ch);
+          if (fill > 0.02 && fill < targetFill) {
+            // Perspective: screen size ∝ 1/distance → scale distance by fill/target.
+            const scale = fill / targetFill;
+            const center = nodeCentroid(nodes);
+            const pos = forceGraph.cameraPosition();
+            forceGraph.cameraPosition(
+              {
+                x: center.x + (pos.x - center.x) * scale,
+                y: center.y + (pos.y - center.y) * scale,
+                z: center.z + (pos.z - center.z) * scale,
+              },
+              center,
+              duration
+            );
+          }
+        }
+      } catch (_) {}
+      finish();
+    });
+  }
+
+  function resizeGraph(fit) {
+    if (!forceGraph || !graphEl) return;
+    const w = Math.max(1, graphEl.clientWidth || 260);
+    const h = Math.max(1, graphEl.clientHeight || 260);
+    forceGraph.width(w).height(h);
+    // Keep projection aspect in sync — mismatched aspect stretches spheres into eggs.
+    try {
+      const cam = forceGraph.camera();
+      if (cam) {
+        cam.aspect = w / h;
+        cam.updateProjectionMatrix();
+      }
+    } catch (_) {}
+    positionGraphLabels();
+    if (fit) fitGraphCamera();
+  }
+
+  function setGraphExpanded(expanded) {
+    if (!graphPanel || graphExpanded === expanded) return;
+    if (expanded) setTagsExpanded(false);
+    graphExpanded = expanded;
+    document.body.classList.toggle("graph-expanded", expanded);
+
+    if (expanded) {
+      // Reparent so the floating panel works even when the right rail is hidden.
+      document.body.appendChild(graphPanel);
+      if (graphBackdrop) graphBackdrop.hidden = false;
+    } else if (graphPanelHome) {
+      if (tocEl && tocEl.parentElement === graphPanelHome) {
+        graphPanelHome.insertBefore(graphPanel, tocEl);
+      } else {
+        graphPanelHome.appendChild(graphPanel);
+      }
+      if (graphBackdrop) graphBackdrop.hidden = true;
+    }
+
+    if (graphExpandBtn) {
+      graphExpandBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
+      graphExpandBtn.setAttribute(
+        "aria-label",
+        expanded ? "Collapse graph" : "Expand graph"
+      );
+      graphExpandBtn.title = expanded ? "Collapse graph" : "Expand graph";
+    }
+
+    // Wait for CSS layout of the floating panel, then resize canvas + reframe.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        resizeGraph(false);
+        fitGraphCamera(0);
+        // Second pass after flex/WebGL settle — common when panel just reparented.
+        setTimeout(() => {
+          resizeGraph(false);
+          fitGraphCamera(300);
+        }, 60);
+      });
+    });
+  }
+
+  function initForceGraph() {
+    if (typeof ForceGraph3D !== "function" || !graphEl) return;
+    forceGraph = ForceGraph3D()(graphEl)
+      .backgroundColor("#1a1a1a")
+      .showNavInfo(false)
+      // Always-on HTML labels replace the default hover tooltip (avoids text on the sphere).
+      .nodeLabel(() => null)
+      .nodeRelSize(GRAPH_NODE_REL_SIZE)
+      .nodeResolution(48) // smoother spheres (default 8 is faceted / egg-looking)
+      .nodeOpacity(0.95)
+      .nodeVal((n) => n.val || 1)
+      .nodeColor(graphNodeColor)
+      .linkColor(graphLinkColor)
+      .linkOpacity(0.85)
+      // 0 → THREE.Line (hairline). Non-zero draws thick cylinders.
+      .linkWidth(GRAPH_LINK_WIDTH)
+      .linkDirectionalArrowLength(0)
+      .onNodeClick((n) => {
+        if (!n || n.id == null) return;
+        // Tag ego graph nodes use kind:"tag" (ids may collide with concept paths).
+        if (n.kind === "tag") {
+          if (tagExists(n.id)) select({ kind: "tag", id: n.id });
+          return;
+        }
+        if (conceptIds.has(n.id)) {
+          select({ kind: "concept", id: n.id });
+        }
+      })
+      .onNodeHover(onGraphNodeHover)
+      .onEngineTick(positionGraphLabels);
+
+    // Link forces: Jaccard-weighted for co-tag edges; defaults for concept links.
+    try {
+      const linkForce = forceGraph.d3Force("link");
+      if (linkForce) {
+        linkForce
+          .distance((l) => {
+            if (l.jaccard != null) {
+              const j = Math.min(Math.max(l.jaccard, 0), 1);
+              return 28 + (1 - j) * 90;
+            }
+            return 30;
+          })
+          .strength((l) => {
+            if (l.jaccard != null) {
+              const j = Math.min(Math.max(l.jaccard, 0), 1);
+              return 0.05 + j * 0.55;
+            }
+            return 1;
+          });
+      }
+    } catch (_) {}
+
+    // Overlay after the canvas so labels paint on top (Obsidian-style always-on text).
+    ensureLabelsLayer();
+    // Keep labels aligned while orbiting / zooming after the sim cools.
+    try {
+      forceGraph.controls()?.addEventListener("change", positionGraphLabels);
+    } catch (_) {}
+    resizeGraph(false);
+  }
+
+  if (graphExpandBtn) {
+    graphExpandBtn.addEventListener("click", () => setGraphExpanded(!graphExpanded));
+  }
+  if (graphBackdrop) {
+    graphBackdrop.addEventListener("click", () => setGraphExpanded(false));
+  }
+
+  function collectDirConceptIds(dirId) {
+    const prefix = dirId ? dirId + "/" : "";
+    const ids = [];
+    for (const id of conceptIds) {
+      if (!dirId) {
+        // root: all concepts (capped later)
+        ids.push(id);
+      } else if (id === dirId || id.startsWith(prefix)) {
+        ids.push(id);
+      }
+    }
+    return ids;
+  }
+
+  /**
+   * Ego co-tag graph: selected tag at center, neighbors sized by togetherness
+   * (Jaccard + co-count). Includes neighbor–neighbor links when they co-occur.
+   */
+  function buildTagEgoGraphData(focusTag) {
+    const entry = tagIndex.byTag.get(focusTag);
+    if (!entry) {
+      return { nodes: [], links: [], note: "Unknown tag" };
+    }
+
+    /** @type {{ id: string, co: number, jaccard: number }[]} */
+    const neighborScores = [];
+    for (const l of tagIndex.graphData.links) {
+      const s = typeof l.source === "object" ? l.source.id : l.source;
+      const t = typeof l.target === "object" ? l.target.id : l.target;
+      if (s === focusTag) {
+        neighborScores.push({ id: t, co: l.co || 0, jaccard: l.jaccard || 0 });
+      } else if (t === focusTag) {
+        neighborScores.push({ id: s, co: l.co || 0, jaccard: l.jaccard || 0 });
+      }
+    }
+
+    neighborScores.sort((a, b) => {
+      if (b.jaccard !== a.jaccard) return b.jaccard - a.jaccard;
+      return b.co - a.co;
+    });
+
+    let note = "";
+    let neighbors = neighborScores;
+    if (neighbors.length > TAG_EGO_CAP) {
+      note = `Top ${TAG_EGO_CAP} of ${neighbors.length} co-tags`;
+      neighbors = neighbors.slice(0, TAG_EGO_CAP);
+    }
+
+    const keep = new Set(neighbors.map((n) => n.id));
+    keep.add(focusTag);
+
+    /** @type {object[]} */
+    const nodes = [];
+    const focusCount = entry.count;
+    // Focus slightly larger; log of usage so hubs read as hubs.
+    nodes.push({
+      id: focusTag,
+      name: focusTag,
+      val: 2.6 + Math.log2(focusCount + 1) * 1.1,
+      focused: true,
+      kind: "tag",
+      count: focusCount,
+    });
+
+    for (const n of neighbors) {
+      const j = Math.min(Math.max(n.jaccard, 0), 1);
+      // Size primarily by togetherness with focus; slight co-count boost.
+      const val = 1.2 + j * 3.4 + Math.log2(n.co + 1) * 0.4;
+      nodes.push({
+        id: n.id,
+        name: n.id,
+        val,
+        focused: false,
+        kind: "tag",
+        count: tagIndex.byTag.get(n.id)?.count || 0,
+        co: n.co,
+        jaccard: n.jaccard,
+      });
+    }
+
+    /** @type {object[]} */
+    const links = [];
+    for (const l of tagIndex.graphData.links) {
+      const s = typeof l.source === "object" ? l.source.id : l.source;
+      const t = typeof l.target === "object" ? l.target.id : l.target;
+      if (keep.has(s) && keep.has(t)) {
+        links.push({
+          source: s,
+          target: t,
+          co: l.co,
+          jaccard: l.jaccard,
+          value: l.value != null ? l.value : l.co,
+        });
+      }
+    }
+
+    if (!note) {
+      if (neighbors.length === 0) {
+        note = "No co-occurring tags";
+      } else {
+        note = `${neighbors.length} co-tags · ${links.length} links`;
+      }
+    }
+
+    return { nodes, links, note };
+  }
+
+  function buildLocalGraphData() {
+    if (selected.kind === "tag") {
+      return buildTagEgoGraphData(selected.id);
+    }
+
+    let focusIds = new Set();
+    let note = "";
+
+    if (selected.kind === "concept") {
+      focusIds.add(selected.id);
+      for (const e of graph.edges || []) {
+        if (e.source === selected.id) focusIds.add(e.target);
+        if (e.target === selected.id) focusIds.add(e.source);
+      }
+    } else {
+      const under = collectDirConceptIds(selected.id);
+      if (under.length > GRAPH_CAP) {
+        // keep highest weight
+        under.sort((a, b) => (nodesById[b]?.weight || 0) - (nodesById[a]?.weight || 0));
+        note = `Showing top ${GRAPH_CAP} of ${under.length}`;
+        for (const id of under.slice(0, GRAPH_CAP)) focusIds.add(id);
+      } else {
+        for (const id of under) focusIds.add(id);
+      }
+    }
+
+    const nodes = [];
+    for (const id of focusIds) {
+      const n = nodesById[id];
+      if (!n) continue;
+      const w = n.weight || 0;
+      const focused = selected.kind === "concept" && id === selected.id;
+      // Modest size variation (Obsidian is nearly uniform; focus a bit larger).
+      const val = (focused ? 2.4 : 1.15) + Math.min(w, 1) * 1.6;
+      nodes.push({
+        id,
+        name: n.title || n.label || id,
+        val,
+        focused,
+        kind: "concept",
+      });
+    }
+
+    const links = [];
+    for (const e of graph.edges || []) {
+      if (focusIds.has(e.source) && focusIds.has(e.target)) {
+        links.push({ source: e.source, target: e.target });
+      }
+    }
+
+    if (!note && selected.kind === "concept") {
+      note = `${nodes.length} nodes · ${links.length} links`;
+    } else if (!note) {
+      note = `${nodes.length} concepts`;
+    }
+
+    return { nodes, links, note };
+  }
+
+  function updateLocalGraph() {
+    if (!forceGraph) {
+      if (typeof ForceGraph3D === "function") initForceGraph();
+      else return;
+    }
+    if (!forceGraph) return;
+
+    clearGraphHover();
+    const data = buildLocalGraphData();
+    if (graphNote) graphNote.textContent = data.note;
+    forceGraph.graphData({ nodes: data.nodes, links: data.links });
+    syncGraphLabels();
+
+    // re-fit after layout settles a bit
+    setTimeout(() => resizeGraph(true), 350);
+  }
+
+  // ——— Tag cloud floating panel ———
+
+  let tagForceGraph = null;
+  let tagLabelsLayer = null;
+  let tagsExpanded = false;
+  /** @type {Map<string, HTMLElement>} */
+  const tagLabelEls = new Map();
+  const tagPanel = document.getElementById("tag-panel");
+  const tagCloudEl = document.getElementById("tag-cloud");
+  const tagNote = document.getElementById("tag-note");
+  const tagBackdrop = document.getElementById("tag-backdrop");
+  const tagOpenBtn = document.getElementById("tags-open-btn");
+  const tagCloseBtn = document.getElementById("tag-close-btn");
+  const tagEmptyEl = document.getElementById("tag-empty");
+
+  function ensureTagLabelsLayer() {
+    if (!tagCloudEl || tagLabelsLayer) return;
+    tagLabelsLayer = document.createElement("div");
+    tagLabelsLayer.className = "graph-labels";
+    tagLabelsLayer.setAttribute("aria-hidden", "true");
+    tagCloudEl.appendChild(tagLabelsLayer);
+  }
+
+  function syncTagLabels() {
+    if (!tagForceGraph || !tagLabelsLayer) return;
+    const nodes = tagForceGraph.graphData()?.nodes || [];
+    const seen = new Set();
+
+    for (const n of nodes) {
+      const id = n.id;
+      if (id == null) continue;
+      seen.add(id);
+      let el = tagLabelEls.get(id);
+      if (!el) {
+        el = createGraphLabelEl();
+        tagLabelsLayer.appendChild(el);
+        tagLabelEls.set(id, el);
+      }
+      setGraphLabelText(el, n.name || n.id || "");
+      el.classList.toggle("focused", !!n.focused);
+    }
+
+    for (const [id, el] of tagLabelEls) {
+      if (!seen.has(id)) {
+        el.remove();
+        tagLabelEls.delete(id);
+      }
+    }
+
+    positionTagLabels();
+  }
+
+  function positionTagLabels() {
+    if (!tagForceGraph || !tagLabelsLayer) return;
+    const nodes = tagForceGraph.graphData()?.nodes || [];
+    for (const n of nodes) {
+      const el = tagLabelEls.get(n.id);
+      if (!el) continue;
+      if (n.x == null || n.y == null || n.z == null) {
+        el.style.visibility = "hidden";
+        continue;
+      }
+      const coords = tagForceGraph.graph2ScreenCoords(n.x, n.y, n.z);
+      if (!coords || !Number.isFinite(coords.x) || !Number.isFinite(coords.y)) {
+        el.style.visibility = "hidden";
+        continue;
+      }
+      el.style.visibility = "visible";
+      const y = coords.y + labelOffsetBelow(n);
+      el.style.transform = `translate(${coords.x}px, ${y}px) translate(-50%, 0)`;
+    }
+  }
+
+  function fitTagCamera(ms) {
+    if (!tagForceGraph) return;
+    const nodes = tagForceGraph.graphData()?.nodes || [];
+    if (!nodes.length) return;
+
+    const duration = ms == null ? 350 : ms;
+    const padPx = 28;
+
+    try {
+      tagForceGraph.zoomToFit(0, padPx);
+    } catch (_) {}
+
+    requestAnimationFrame(() => {
+      try {
+        const targetFill = 0.78;
+        const bounds = nodeScreenBounds(nodes, tagForceGraph, tagCloudEl);
+        const cw = tagCloudEl.clientWidth || 1;
+        const ch = tagCloudEl.clientHeight || 1;
+        if (bounds && bounds.w > 1 && bounds.h > 1) {
+          const fill = Math.max(bounds.w / cw, bounds.h / ch);
+          if (fill > 0.02 && fill < targetFill) {
+            const scale = fill / targetFill;
+            const center = nodeCentroid(nodes);
+            const pos = tagForceGraph.cameraPosition();
+            tagForceGraph.cameraPosition(
+              {
+                x: center.x + (pos.x - center.x) * scale,
+                y: center.y + (pos.y - center.y) * scale,
+                z: center.z + (pos.z - center.z) * scale,
+              },
+              center,
+              duration
+            );
+          }
+        }
+      } catch (_) {}
+      const after = () => positionTagLabels();
+      if (duration > 0) setTimeout(after, duration + 30);
+      else requestAnimationFrame(after);
+    });
+  }
+
+  function resizeTagGraph(fit) {
+    if (!tagForceGraph || !tagCloudEl) return;
+    const w = Math.max(1, tagCloudEl.clientWidth || 400);
+    const h = Math.max(1, tagCloudEl.clientHeight || 400);
+    tagForceGraph.width(w).height(h);
+    try {
+      const cam = tagForceGraph.camera();
+      if (cam) {
+        cam.aspect = w / h;
+        cam.updateProjectionMatrix();
+      }
+    } catch (_) {}
+    positionTagLabels();
+    if (fit) fitTagCamera();
+  }
+
+  function buildTagGraphPayload() {
+    const focusedTag = selected.kind === "tag" ? selected.id : null;
+    const nodes = tagIndex.graphData.nodes.map((n) => ({
+      ...n,
+      focused: focusedTag != null && n.id === focusedTag,
+    }));
+    // Fresh link objects so force-graph can rebind source/target refs.
+    const links = tagIndex.graphData.links.map((l) => ({
+      source: typeof l.source === "object" ? l.source.id : l.source,
+      target: typeof l.target === "object" ? l.target.id : l.target,
+      co: l.co,
+      jaccard: l.jaccard,
+      value: l.value,
+    }));
+    return { nodes, links };
+  }
+
+  function updateTagCloudHighlight() {
+    if (!tagForceGraph) return;
+    const data = buildTagGraphPayload();
+    // Preserve simulation positions by matching existing nodes when possible.
+    const prev = tagForceGraph.graphData();
+    const prevById = new Map((prev.nodes || []).map((n) => [n.id, n]));
+    for (const n of data.nodes) {
+      const old = prevById.get(n.id);
+      if (old) {
+        if (old.x != null) n.x = old.x;
+        if (old.y != null) n.y = old.y;
+        if (old.z != null) n.z = old.z;
+        if (old.vx != null) n.vx = old.vx;
+        if (old.vy != null) n.vy = old.vy;
+        if (old.vz != null) n.vz = old.vz;
+      }
+    }
+    tagForceGraph.graphData({ nodes: data.nodes, links: data.links });
+    syncTagLabels();
+  }
+
+  function initTagForceGraph() {
+    if (typeof ForceGraph3D !== "function" || !tagCloudEl) return;
+    if (tagForceGraph) return;
+
+    tagForceGraph = ForceGraph3D()(tagCloudEl)
+      .backgroundColor("#1a1a1a")
+      .showNavInfo(false)
+      .nodeLabel(() => null)
+      .nodeRelSize(4)
+      .nodeResolution(48)
+      .nodeOpacity(0.95)
+      .nodeVal((n) => n.val || 1)
+      .nodeColor((n) => (n.focused ? NODE_COLOR_FOCUSED : NODE_COLOR))
+      .linkColor((l) => {
+        const j = l.jaccard != null ? l.jaccard : 0.2;
+        const a = 0.25 + Math.min(j, 1) * 0.55;
+        return `rgba(175, 180, 190, ${a})`;
+      })
+      .linkOpacity(0.85)
+      // Hairline lines (width 0); co-occurrence strength is color-only, not thickness.
+      .linkWidth(0)
+      .linkDirectionalArrowLength(0)
+      .onNodeClick((n) => {
+        if (n && n.id && tagExists(n.id)) {
+          select({ kind: "tag", id: n.id });
+          // Keep panel open so proximity remains visible while browsing tags.
+        }
+      })
+      .onEngineTick(positionTagLabels);
+
+    // Link distance / strength from Jaccard (hub tags pull less universally).
+    try {
+      const linkForce = tagForceGraph.d3Force("link");
+      if (linkForce) {
+        linkForce
+          .distance((l) => {
+            const j = l.jaccard != null ? l.jaccard : 0.1;
+            return 28 + (1 - Math.min(j, 1)) * 90;
+          })
+          .strength((l) => {
+            const j = l.jaccard != null ? l.jaccard : 0.05;
+            return 0.05 + Math.min(j, 1) * 0.55;
+          });
+      }
+      const charge = tagForceGraph.d3Force("charge");
+      if (charge && typeof charge.strength === "function") {
+        charge.strength(-45);
+      }
+    } catch (_) {}
+
+    ensureTagLabelsLayer();
+    try {
+      tagForceGraph.controls()?.addEventListener("change", positionTagLabels);
+    } catch (_) {}
+
+    const data = buildTagGraphPayload();
+    tagForceGraph.graphData({ nodes: data.nodes, links: data.links });
+    syncTagLabels();
+  }
+
+  function setTagsExpanded(expanded) {
+    if (!tagPanel || tagsExpanded === expanded) return;
+    if (expanded) setGraphExpanded(false);
+    tagsExpanded = expanded;
+    document.body.classList.toggle("tags-expanded", expanded);
+    tagPanel.hidden = !expanded;
+    if (tagBackdrop) tagBackdrop.hidden = !expanded;
+
+    if (tagOpenBtn) {
+      tagOpenBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
+    }
+
+    if (!expanded) return;
+
+    const hasTags = tagIndex.byTag.size > 0;
+    if (tagEmptyEl) tagEmptyEl.hidden = hasTags;
+    if (tagCloudEl) tagCloudEl.hidden = !hasTags;
+    if (tagNote) {
+      if (!hasTags) {
+        tagNote.textContent = "0 tags";
+      } else {
+        const n = tagIndex.graphData.nodes.length;
+        const m = tagIndex.graphData.links.length;
+        tagNote.textContent = `${n} tags · ${m} links`;
+      }
+    }
+
+    if (!hasTags) return;
+
+    if (!tagForceGraph && typeof ForceGraph3D === "function") {
+      initTagForceGraph();
+    } else if (tagForceGraph) {
+      updateTagCloudHighlight();
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        resizeTagGraph(false);
+        fitTagCamera(0);
+        setTimeout(() => {
+          resizeTagGraph(false);
+          fitTagCamera(300);
+        }, 60);
+      });
+    });
+  }
+
+  if (tagOpenBtn) {
+    tagOpenBtn.addEventListener("click", () => setTagsExpanded(!tagsExpanded));
+  }
+  if (tagCloseBtn) {
+    tagCloseBtn.addEventListener("click", () => setTagsExpanded(false));
+  }
+  if (tagBackdrop) {
+    tagBackdrop.addEventListener("click", () => setTagsExpanded(false));
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (tagsExpanded) {
+      e.preventDefault();
+      setTagsExpanded(false);
+      return;
+    }
+    if (graphExpanded) {
+      e.preventDefault();
+      setGraphExpanded(false);
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    resizeGraph(false);
+    if (tagsExpanded) resizeTagGraph(false);
+  });
+
+  function renderTagContent(tag) {
+    const titleEl = document.getElementById("content-title");
+    const descEl = document.getElementById("content-desc");
+    const typeEl = document.getElementById("content-type");
+    const metaEl = document.getElementById("content-meta");
+    const bodyEl = document.getElementById("content-body");
+    const blSection = document.getElementById("backlinks");
+    const blList = document.getElementById("backlinks-list");
+
+    metaEl.innerHTML = "";
+    blList.innerHTML = "";
+    blSection.hidden = true;
+
+    const entry = tagIndex.byTag.get(tag);
+    titleEl.textContent = tag;
+    typeEl.hidden = false;
+    typeEl.textContent = "Tag";
+
+    const count = entry ? entry.count : 0;
+    descEl.textContent =
+      count === 1 ? "Used on 1 concept" : `Used on ${count} concepts`;
+
+    bodyEl.innerHTML = "";
+    if (!entry || !entry.members.length) {
+      const p = document.createElement("p");
+      p.className = "tag-results-empty";
+      p.textContent = "No concepts use this tag.";
+      bodyEl.appendChild(p);
+      buildToc(bodyEl);
+      return;
+    }
+
+    const members = entry.members.slice().sort((a, b) => {
+      const ta = (nodesById[a]?.title || nodesById[a]?.label || a).toLowerCase();
+      const tb = (nodesById[b]?.title || nodesById[b]?.label || b).toLowerCase();
+      return ta.localeCompare(tb);
+    });
+
+    const ul = document.createElement("ul");
+    ul.className = "tag-results";
+    for (const id of members) {
+      const n = nodesById[id];
+      const li = document.createElement("li");
+
+      const titleBtn = document.createElement("button");
+      titleBtn.type = "button";
+      titleBtn.className = "tag-result-title";
+      titleBtn.textContent = n?.title || n?.label || id;
+      titleBtn.addEventListener("click", () => select({ kind: "concept", id }));
+      li.appendChild(titleBtn);
+
+      if (n?.type) {
+        const chip = document.createElement("span");
+        chip.className = "tag-result-type";
+        chip.textContent = n.type;
+        li.appendChild(chip);
+      }
+
+      if (n?.description) {
+        const d = document.createElement("p");
+        d.className = "tag-result-desc";
+        d.textContent = n.description;
+        li.appendChild(d);
+      }
+
+      ul.appendChild(li);
+    }
+    bodyEl.appendChild(ul);
+    buildToc(bodyEl);
+  }
+
+  function renderContent() {
+    const titleEl = document.getElementById("content-title");
+    const descEl = document.getElementById("content-desc");
+    const typeEl = document.getElementById("content-type");
+    const metaEl = document.getElementById("content-meta");
+    const bodyEl = document.getElementById("content-body");
+    const blSection = document.getElementById("backlinks");
+    const blList = document.getElementById("backlinks-list");
+
+    metaEl.innerHTML = "";
+    blList.innerHTML = "";
+
+    if (selected.kind === "tag") {
+      renderTagContent(selected.id);
+      return;
+    }
+
+    let md = "";
+    if (selected.kind === "dir") {
+      const d = dirById[selected.id] || graph.nav;
+      titleEl.textContent = d.label || selected.id || bundleName;
+      descEl.textContent = d.description || (d.synthetic ? "Synthetic directory listing" : "");
+      typeEl.hidden = true;
+      md = d.body || "";
+      blSection.hidden = true;
+    } else {
+      const n = nodesById[selected.id];
+      if (!n) {
+        titleEl.textContent = "Not found";
+        bodyEl.textContent = "";
+        return;
+      }
+      titleEl.textContent = n.title || n.label || n.id;
+      descEl.textContent = n.description || "";
+      typeEl.hidden = false;
+      typeEl.textContent = n.type || "Concept";
+      if (n.tags && n.tags.length) {
+        for (const t of n.tags) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "tag";
+          btn.textContent = t;
+          btn.title = `Show concepts tagged “${t}”`;
+          btn.addEventListener("click", () => select({ kind: "tag", id: t }));
+          metaEl.appendChild(btn);
+        }
+      }
+      if (n.resource) {
+        const a = document.createElement("a");
+        a.href = n.resource;
+        a.textContent = n.resource;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.className = "external";
+        metaEl.appendChild(a);
+      }
+      md = n.body || "";
+
+      const bl = backlinks[selected.id] || [];
+      if (bl.length) {
+        blSection.hidden = false;
+        for (const src of bl) {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.textContent = nodesById[src]?.title || nodesById[src]?.label || src;
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            select({ kind: "concept", id: src });
+          });
+          li.appendChild(a);
+          blList.appendChild(li);
+        }
+      } else {
+        blSection.hidden = true;
+      }
+    }
+
+    const rawHtml = marked.parse(md || "", { breaks: false, gfm: true });
+    const clean = DOMPurify.sanitize(rawHtml, { USE_PROFILES: { html: true } });
+    bodyEl.innerHTML = clean;
+    slugifyHeadings(bodyEl);
+    wireContentLinks(bodyEl);
+    buildToc(bodyEl);
+  }
+
+  function slugifyHeadings(root) {
+    const used = new Set();
+    root.querySelectorAll("h1, h2, h3").forEach((h) => {
+      let base = (h.textContent || "section")
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "-");
+      if (!base) base = "section";
+      let id = base;
+      let i = 2;
+      while (used.has(id)) {
+        id = base + "-" + i++;
+      }
+      used.add(id);
+      h.id = id;
+    });
+  }
+
+  function wireContentLinks(root) {
+    root.querySelectorAll("a[href]").forEach((a) => {
+      const href = a.getAttribute("href");
+      if (!href) return;
+
+      if (href.startsWith("#")) {
+        a.addEventListener("click", (e) => {
+          const id = href.slice(1);
+          const el = document.getElementById(id);
+          if (el) {
+            e.preventDefault();
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+        return;
+      }
+
+      if (!isInternalLink(href)) {
+        a.classList.add("external");
+        a.setAttribute("target", "_blank");
+        a.setAttribute("rel", "noopener");
+        if (href.toLowerCase().startsWith("javascript:")) {
+          a.addEventListener("click", (e) => e.preventDefault());
+          a.removeAttribute("href");
+        }
+        return;
+      }
+
+      a.classList.add("internal");
+      a.addEventListener("click", (e) => {
+        if (tryNavigateHref(href)) {
+          e.preventDefault();
+        }
+      });
+    });
+  }
+
+  function buildToc(root) {
+    const list = document.getElementById("toc-list");
+    list.innerHTML = "";
+    root.querySelectorAll("h1, h2, h3").forEach((h) => {
+      const li = document.createElement("li");
+      const level = h.tagName === "H1" ? 1 : h.tagName === "H2" ? 2 : 3;
+      li.className = "lvl-" + level;
+      const a = document.createElement("a");
+      a.href = "#" + h.id;
+      a.textContent = h.textContent || h.id;
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        h.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+  }
+
+  searchEl.addEventListener("input", () => renderTree(searchEl.value));
+  window.addEventListener("hashchange", () => {
+    selectFromHash();
+  });
+
+  // Expose for tests
+  window.__okfView = {
+    select,
+    tryNavigateHref,
+    resolveHref,
+    normalizeToId,
+    buildLocalGraphData,
+    buildTagEgoGraphData,
+    buildTagIndex,
+    fitGraphCamera,
+    resizeGraph,
+    setGraphExpanded,
+    setTagsExpanded,
+    setTheme,
+    getTheme,
+    get graphExpanded() {
+      return graphExpanded;
+    },
+    get tagsExpanded() {
+      return tagsExpanded;
+    },
+    get forceGraph() {
+      return forceGraph;
+    },
+    get tagForceGraph() {
+      return tagForceGraph;
+    },
+    get tagIndex() {
+      return tagIndex;
+    },
+    get selected() {
+      return selected;
+    },
+    basePathForSelection,
+  };
+
+  initForceGraph();
+  renderTree("");
+  if (!selectFromHash()) {
+    select({ kind: "dir", id: "" });
+  }
+})();
+
+</script>
+</body>
+</html>
