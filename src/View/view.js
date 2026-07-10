@@ -378,11 +378,31 @@
   const GRAPH_CAP = 75;
   const NODE_COLOR = "#b8b8b8";
   const NODE_COLOR_FOCUSED = "#e8e8e8";
-  const LINK_COLOR = "rgba(175, 180, 190, 0.72)";
+  const NODE_COLOR_HIGHLIGHT = "#e4e0ff";
+  const NODE_COLOR_DIM = "#3a3a40";
+  const LINK_COLOR = "rgba(175, 180, 190, 0.55)";
+  const LINK_COLOR_HIGHLIGHT = "rgba(124, 108, 245, 0.92)";
+  const LINK_COLOR_DIM = "rgba(90, 90, 100, 0.12)";
+  /** Delay before hover highlight applies (Obsidian-style, avoids flicker). */
+  const GRAPH_HOVER_DELAY_MS = 220;
+  /** nodeRelSize used for world-radius → screen offset estimates. */
+  const GRAPH_NODE_REL_SIZE = 3.5;
+  /** linkWidth 0 → THREE.Line (hairline); >0 draws thick cylinders. */
+  const GRAPH_LINK_WIDTH = 0;
 
   let forceGraph = null;
   let labelsLayer = null;
   let graphExpanded = false;
+  /** @type {string | null} currently applied highlight root (after delay) */
+  let graphHoverId = null;
+  /** @type {string | null} node under cursor (may differ until delay fires) */
+  let graphHoverPendingId = null;
+  /** @type {ReturnType<typeof setTimeout> | null} */
+  let graphHoverTimer = null;
+  /** @type {Set<string>} */
+  let graphHoverNodeIds = new Set();
+  /** @type {Set<string>} */
+  let graphHoverLinkKeys = new Set();
   /** @type {Map<string, HTMLElement>} */
   const labelEls = new Map();
   const graphEl = document.getElementById("graph3d");
@@ -393,12 +413,82 @@
   const graphPanelHome = graphPanel?.parentElement || null;
   const tocEl = document.getElementById("toc");
 
+  function linkEndpoints(link) {
+    const s = typeof link.source === "object" ? link.source.id : link.source;
+    const t = typeof link.target === "object" ? link.target.id : link.target;
+    return [s, t];
+  }
+
+  function undirectedLinkKey(a, b) {
+    return a < b ? a + "\0" + b : b + "\0" + a;
+  }
+
+  /**
+   * Estimate node sphere radius in screen px so labels clear the mesh.
+   * Projects center and a world-space offset along the camera's local up.
+   */
+  function nodeScreenRadiusPx(node) {
+    if (!forceGraph || node.x == null || node.y == null || node.z == null) {
+      return 12 + Math.cbrt(node?.val || 1) * 8;
+    }
+    const worldR = GRAPH_NODE_REL_SIZE * Math.cbrt(node.val || 1);
+    const c = forceGraph.graph2ScreenCoords(node.x, node.y, node.z);
+    // Offset along world +Y (camera often looks from +Z; +Y is a stable axis).
+    const e = forceGraph.graph2ScreenCoords(node.x, node.y + worldR, node.z);
+    if (
+      c &&
+      e &&
+      Number.isFinite(c.x) &&
+      Number.isFinite(c.y) &&
+      Number.isFinite(e.x) &&
+      Number.isFinite(e.y)
+    ) {
+      const d = Math.hypot(e.x - c.x, e.y - c.y);
+      if (d > 2 && d < 200) return d;
+    }
+    return 12 + Math.cbrt(node.val || 1) * 8;
+  }
+
+  /** Screen-space Y offset: label sits just under the sphere (Obsidian-style). */
+  function labelOffsetBelow(node) {
+    return nodeScreenRadiusPx(node) + 4;
+  }
+
   function ensureLabelsLayer() {
     if (!graphEl || labelsLayer) return;
     labelsLayer = document.createElement("div");
     labelsLayer.className = "graph-labels";
     labelsLayer.setAttribute("aria-hidden", "true");
     graphEl.appendChild(labelsLayer);
+  }
+
+  /** Outer shell is positioned by JS; inner .graph-label-text animates size/nudge via CSS. */
+  function createGraphLabelEl() {
+    const el = document.createElement("div");
+    el.className = "graph-label";
+    const textEl = document.createElement("span");
+    textEl.className = "graph-label-text";
+    el.appendChild(textEl);
+    return el;
+  }
+
+  function setGraphLabelText(el, text) {
+    const textEl = el.querySelector(".graph-label-text");
+    if (textEl) {
+      if (textEl.textContent !== text) textEl.textContent = text;
+    } else if (el.textContent !== text) {
+      el.textContent = text;
+    }
+  }
+
+  function applyLabelHighlightState(el, id, focused) {
+    const hovering = graphHoverId != null;
+    const hi = hovering && graphHoverNodeIds.has(id);
+    const root = hovering && graphHoverId === id;
+    el.classList.toggle("focused", !!focused && !hovering);
+    el.classList.toggle("highlighted", hi);
+    el.classList.toggle("hover-root", root);
+    el.classList.toggle("dimmed", hovering && !hi);
   }
 
   function syncGraphLabels() {
@@ -412,14 +502,12 @@
       seen.add(id);
       let el = labelEls.get(id);
       if (!el) {
-        el = document.createElement("div");
-        el.className = "graph-label";
+        el = createGraphLabelEl();
         labelsLayer.appendChild(el);
         labelEls.set(id, el);
       }
-      const text = n.name || n.id || "";
-      if (el.textContent !== text) el.textContent = text;
-      el.classList.toggle("focused", !!n.focused);
+      setGraphLabelText(el, n.name || n.id || "");
+      applyLabelHighlightState(el, id, n.focused);
     }
 
     for (const [id, el] of labelEls) {
@@ -448,8 +536,111 @@
         continue;
       }
       el.style.visibility = "visible";
-      el.style.transform = `translate(${coords.x}px, ${coords.y}px) translate(-50%, -120%)`;
+      // Position only — hover size/nudge is CSS on .graph-label-text (gradual transition).
+      const y = coords.y + labelOffsetBelow(n);
+      el.style.transform = `translate(${coords.x}px, ${y}px) translate(-50%, 0)`;
     }
+  }
+
+  function graphNodeColor(n) {
+    if (graphHoverId != null) {
+      return graphHoverNodeIds.has(n.id) ? NODE_COLOR_HIGHLIGHT : NODE_COLOR_DIM;
+    }
+    return n.focused ? NODE_COLOR_FOCUSED : NODE_COLOR;
+  }
+
+  function graphLinkColor(l) {
+    if (graphHoverId != null) {
+      const [s, t] = linkEndpoints(l);
+      if (s != null && t != null && graphHoverLinkKeys.has(undirectedLinkKey(s, t))) {
+        return LINK_COLOR_HIGHLIGHT;
+      }
+      return LINK_COLOR_DIM;
+    }
+    return LINK_COLOR;
+  }
+
+  function refreshGraphHighlightMaterials() {
+    if (!forceGraph) return;
+    // Re-apply accessors so three-forcegraph rebuilds node/link materials.
+    // Do not touch linkWidth — width stays constant (hairline); only colors change.
+    forceGraph.nodeColor(forceGraph.nodeColor()).linkColor(forceGraph.linkColor());
+  }
+
+  function applyGraphHover(node) {
+    const id = node && node.id != null ? node.id : null;
+    if (id === graphHoverId) return;
+
+    graphHoverId = id;
+    graphHoverNodeIds = new Set();
+    graphHoverLinkKeys = new Set();
+
+    if (id != null && forceGraph) {
+      graphHoverNodeIds.add(id);
+      for (const l of forceGraph.graphData()?.links || []) {
+        const [s, t] = linkEndpoints(l);
+        if (s === id || t === id) {
+          if (s != null) graphHoverNodeIds.add(s);
+          if (t != null) graphHoverNodeIds.add(t);
+          if (s != null && t != null) graphHoverLinkKeys.add(undirectedLinkKey(s, t));
+        }
+      }
+    }
+
+    refreshGraphHighlightMaterials();
+    // Class toggles drive CSS transitions on .graph-label-text (move + size).
+    for (const n of forceGraph?.graphData()?.nodes || []) {
+      const el = labelEls.get(n.id);
+      if (el) applyLabelHighlightState(el, n.id, n.focused);
+    }
+  }
+
+  function clearGraphHoverTimer() {
+    if (graphHoverTimer != null) {
+      clearTimeout(graphHoverTimer);
+      graphHoverTimer = null;
+    }
+  }
+
+  /**
+   * Schedule hover highlight. Entering a node waits briefly (anti-flicker);
+   * leaving clears promptly. Moving between nodes resets the delay.
+   */
+  function onGraphNodeHover(node) {
+    const id = node && node.id != null ? node.id : null;
+    if (graphEl) graphEl.style.cursor = id != null ? "pointer" : null;
+
+    if (id === graphHoverPendingId) return;
+    graphHoverPendingId = id;
+    clearGraphHoverTimer();
+
+    if (id == null) {
+      // Leave: clear soon so highlight doesn't stick while still scanning.
+      graphHoverTimer = setTimeout(() => {
+        graphHoverTimer = null;
+        applyGraphHover(null);
+      }, 60);
+      return;
+    }
+
+    // Already highlighting this node (e.g. re-enter after brief leave cancel).
+    if (id === graphHoverId) return;
+
+    graphHoverTimer = setTimeout(() => {
+      graphHoverTimer = null;
+      if (graphHoverPendingId !== id) return;
+      // Re-resolve in case graphData was swapped during the delay.
+      const live =
+        (forceGraph?.graphData()?.nodes || []).find((n) => n.id === id) || { id };
+      applyGraphHover(live);
+    }, GRAPH_HOVER_DELAY_MS);
+  }
+
+  function clearGraphHover() {
+    clearGraphHoverTimer();
+    graphHoverPendingId = null;
+    if (graphHoverId == null && graphHoverNodeIds.size === 0) return;
+    applyGraphHover(null);
   }
 
   function nodeCentroid(nodes) {
@@ -526,7 +717,7 @@
     // Wait a frame so camera matrices match zoomToFit before projecting.
     requestAnimationFrame(() => {
       try {
-        // Leave room for node spheres + labels above nodes (not just centers).
+        // Leave room for node spheres + labels below nodes (not just centers).
         const targetFill = 0.78;
         const bounds = nodeScreenBounds(nodes, forceGraph, graphEl);
         const cw = graphEl.clientWidth || 1;
@@ -556,9 +747,17 @@
 
   function resizeGraph(fit) {
     if (!forceGraph || !graphEl) return;
-    const w = graphEl.clientWidth || 260;
-    const h = graphEl.clientHeight || 260;
+    const w = Math.max(1, graphEl.clientWidth || 260);
+    const h = Math.max(1, graphEl.clientHeight || 260);
     forceGraph.width(w).height(h);
+    // Keep projection aspect in sync — mismatched aspect stretches spheres into eggs.
+    try {
+      const cam = forceGraph.camera();
+      if (cam) {
+        cam.aspect = w / h;
+        cam.updateProjectionMatrix();
+      }
+    } catch (_) {}
     positionGraphLabels();
     if (fit) fitGraphCamera();
   }
@@ -610,21 +809,24 @@
     forceGraph = ForceGraph3D()(graphEl)
       .backgroundColor("#1a1a1a")
       .showNavInfo(false)
-      .nodeLabel((n) => n.name || n.id)
-      .nodeRelSize(3.5)
-      .nodeResolution(32) // smooth spheres (default 8 is faceted)
+      // Always-on HTML labels replace the default hover tooltip (avoids text on the sphere).
+      .nodeLabel(() => null)
+      .nodeRelSize(GRAPH_NODE_REL_SIZE)
+      .nodeResolution(48) // smoother spheres (default 8 is faceted / egg-looking)
       .nodeOpacity(0.95)
       .nodeVal((n) => n.val || 1)
-      .nodeColor((n) => (n.focused ? NODE_COLOR_FOCUSED : NODE_COLOR))
-      .linkColor(() => LINK_COLOR)
-      .linkOpacity(0.75)
-      .linkWidth(0.3)
+      .nodeColor(graphNodeColor)
+      .linkColor(graphLinkColor)
+      .linkOpacity(0.85)
+      // 0 → THREE.Line (hairline). Non-zero draws thick cylinders.
+      .linkWidth(GRAPH_LINK_WIDTH)
       .linkDirectionalArrowLength(0)
       .onNodeClick((n) => {
         if (n && n.id && conceptIds.has(n.id)) {
           select({ kind: "concept", id: n.id });
         }
       })
+      .onNodeHover(onGraphNodeHover)
       .onEngineTick(positionGraphLabels);
     // Overlay after the canvas so labels paint on top (Obsidian-style always-on text).
     ensureLabelsLayer();
@@ -721,6 +923,7 @@
     }
     if (!forceGraph) return;
 
+    clearGraphHover();
     const data = buildLocalGraphData();
     if (graphNote) graphNote.textContent = data.note;
     forceGraph.graphData({ nodes: data.nodes, links: data.links });
@@ -764,13 +967,11 @@
       seen.add(id);
       let el = tagLabelEls.get(id);
       if (!el) {
-        el = document.createElement("div");
-        el.className = "graph-label";
+        el = createGraphLabelEl();
         tagLabelsLayer.appendChild(el);
         tagLabelEls.set(id, el);
       }
-      const text = n.name || n.id || "";
-      if (el.textContent !== text) el.textContent = text;
+      setGraphLabelText(el, n.name || n.id || "");
       el.classList.toggle("focused", !!n.focused);
     }
 
@@ -800,7 +1001,8 @@
         continue;
       }
       el.style.visibility = "visible";
-      el.style.transform = `translate(${coords.x}px, ${coords.y}px) translate(-50%, -120%)`;
+      const y = coords.y + labelOffsetBelow(n);
+      el.style.transform = `translate(${coords.x}px, ${y}px) translate(-50%, 0)`;
     }
   }
 
@@ -848,9 +1050,16 @@
 
   function resizeTagGraph(fit) {
     if (!tagForceGraph || !tagCloudEl) return;
-    const w = tagCloudEl.clientWidth || 400;
-    const h = tagCloudEl.clientHeight || 400;
+    const w = Math.max(1, tagCloudEl.clientWidth || 400);
+    const h = Math.max(1, tagCloudEl.clientHeight || 400);
     tagForceGraph.width(w).height(h);
+    try {
+      const cam = tagForceGraph.camera();
+      if (cam) {
+        cam.aspect = w / h;
+        cam.updateProjectionMatrix();
+      }
+    } catch (_) {}
     positionTagLabels();
     if (fit) fitTagCamera();
   }
@@ -897,14 +1106,12 @@
     if (typeof ForceGraph3D !== "function" || !tagCloudEl) return;
     if (tagForceGraph) return;
 
-    const maxCo = tagIndex.graphData.links.reduce((m, l) => Math.max(m, l.co || 0), 1);
-
     tagForceGraph = ForceGraph3D()(tagCloudEl)
       .backgroundColor("#1a1a1a")
       .showNavInfo(false)
-      .nodeLabel((n) => `${n.name || n.id} (${n.count || 0})`)
+      .nodeLabel(() => null)
       .nodeRelSize(4)
-      .nodeResolution(32)
+      .nodeResolution(48)
       .nodeOpacity(0.95)
       .nodeVal((n) => n.val || 1)
       .nodeColor((n) => (n.focused ? NODE_COLOR_FOCUSED : NODE_COLOR))
@@ -914,7 +1121,8 @@
         return `rgba(175, 180, 190, ${a})`;
       })
       .linkOpacity(0.85)
-      .linkWidth((l) => 0.2 + ((l.co || 1) / maxCo) * 1.4)
+      // Hairline lines (width 0); co-occurrence strength is color-only, not thickness.
+      .linkWidth(0)
       .linkDirectionalArrowLength(0)
       .onNodeClick((n) => {
         if (n && n.id && tagExists(n.id)) {

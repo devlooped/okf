@@ -326,6 +326,12 @@ button.tag:focus-visible {
   overflow: hidden;
   flex-shrink: 0;
 }
+/* Avoid inline-canvas baseline gap / CSS stretch that warps spheres into eggs. */
+.graph3d canvas,
+.tag-cloud canvas {
+  display: block;
+  vertical-align: top;
+}
 .graph-labels {
   position: absolute;
   inset: 0;
@@ -337,28 +343,90 @@ button.tag:focus-visible {
   position: absolute;
   left: 0;
   top: 0;
-  max-width: 110px;
-  padding: 0 2px;
-  color: #d4d4d4;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1.2;
+  max-width: 120px;
+  padding: 1px 3px;
+  color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: center;
+  /* Soft halo for contrast without muddy multi-axis blur */
   text-shadow:
-    0 0 3px #1a1a1a,
-    0 1px 2px #1a1a1a,
-    0 0 8px #1a1a1a,
-    1px 0 2px #1a1a1a,
-    -1px 0 2px #1a1a1a;
+    0 0 4px #1a1a1a,
+    0 1px 3px rgba(0, 0, 0, 0.9),
+    0 0 1px #1a1a1a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   pointer-events: none;
   user-select: none;
-  will-change: transform;
+  /* Outer shell: JS sets translate() every frame — do not transition transform here. */
+  will-change: transform, color, opacity;
+  transition: color 0.2s ease, opacity 0.22s ease;
+}
+/* Inner text: gradual hover size + downward nudge (JS only positions the shell). */
+.graph-label-text {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  transform: translate3d(0, 0, 0) scale(1);
+  transform-origin: top center;
+  will-change: transform, font-size;
+  transition:
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    font-size 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    font-weight 0.28s ease,
+    letter-spacing 0.28s ease;
 }
 .graph-label.focused {
-  color: #f0f0f0;
+  color: #f5f5f5;
+}
+.graph-label.focused .graph-label-text {
+  font-weight: 500;
+}
+.graph-label.highlighted {
+  color: #f2f0ff;
+  opacity: 1;
+}
+.graph-label.highlighted .graph-label-text {
+  font-weight: 500;
+  /* Neighbors: mild emphasis */
+  font-size: 12px;
+  transform: translate3d(0, 4px, 0) scale(1.05);
+}
+.graph-label.hover-root {
+  color: #f7f5ff;
+  opacity: 1;
+  z-index: 2;
+}
+.graph-label.hover-root .graph-label-text {
   font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.015em;
+  /* Primary hover: clearer drop + size bump */
+  transform: translate3d(0, 10px, 0) scale(1.14);
+}
+.graph-label.dimmed {
+  color: #6a6a70;
+  opacity: 0.28;
+}
+.graph-label.dimmed .graph-label-text {
+  font-weight: 400;
+  font-size: 11px;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+/* Hide 3d-force-graph default tooltip (we use always-on labels). */
+.graph-tooltip,
+.scene-tooltip {
+  display: none !important;
 }
 
 /* Floating expanded graph (Obsidian-style) */
@@ -410,8 +478,22 @@ body.graph-expanded .graph3d {
   min-height: 0;
 }
 body.graph-expanded .graph-label {
-  font-size: 12px;
-  max-width: 180px;
+  max-width: 200px;
+}
+body.graph-expanded .graph-label-text {
+  font-size: 13px;
+}
+body.graph-expanded .graph-label.highlighted .graph-label-text {
+  font-size: 14px;
+  transform: translate3d(0, 5px, 0) scale(1.06);
+}
+body.graph-expanded .graph-label.hover-root .graph-label-text {
+  font-size: 16px;
+  transform: translate3d(0, 12px, 0) scale(1.16);
+}
+body.graph-expanded .graph-label.dimmed .graph-label-text {
+  font-size: 13px;
+  transform: translate3d(0, 0, 0) scale(1);
 }
 .graph-icon-btn .icon-collapse { display: none; }
 body.graph-expanded .graph-icon-btn .icon-expand { display: none; }
@@ -486,11 +568,15 @@ body.tags-expanded .tag-panel .graph-icon-btn:hover {
 .tag-cloud .graph-labels { z-index: 1; }
 .tag-cloud .graph-label {
   max-width: 140px;
+}
+.tag-cloud .graph-label-text {
   font-size: 11px;
 }
 body.tags-expanded .tag-cloud .graph-label {
-  font-size: 12px;
   max-width: 180px;
+}
+body.tags-expanded .tag-cloud .graph-label-text {
+  font-size: 12px;
 }
 
 .toc-panel {
