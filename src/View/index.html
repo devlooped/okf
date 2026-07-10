@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OKF Viewer</title>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<style>
+/*__VIEW_CSS__*/
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="title">
+    <strong id="bundle-name"></strong>
+    <span class="muted">OKF view</span>
+  </div>
+</header>
+
+<main class="shell">
+  <aside id="nav-pane" class="pane nav-pane">
+    <input id="nav-search" type="search" placeholder="Search…" aria-label="Search navigation">
+    <nav id="tree" class="tree" aria-label="Bundle navigation"></nav>
+  </aside>
+
+  <section id="content-pane" class="pane content-pane">
+    <article id="content">
+      <header class="content-header">
+        <span id="content-type" class="type-chip" hidden></span>
+        <h1 id="content-title"></h1>
+        <p id="content-desc" class="muted"></p>
+        <div id="content-meta" class="meta"></div>
+      </header>
+      <div id="content-body" class="markdown-body"></div>
+      <section id="backlinks" hidden>
+        <h2>Linked from</h2>
+        <ul id="backlinks-list"></ul>
+      </section>
+    </article>
+  </section>
+
+  <aside id="right-pane" class="pane right-pane">
+    <div id="graph3d" class="graph-placeholder" aria-label="Local graph (coming soon)">
+      <div class="placeholder-label muted">Local graph</div>
+    </div>
+    <div id="toc" class="toc-placeholder">
+      <div class="placeholder-label muted">On this page</div>
+      <ul id="toc-list"></ul>
+    </div>
+  </aside>
+</main>
+
+<script>
+window.BUNDLE_NAME = __BUNDLE_NAME__;
+window.GRAPH = __GRAPH_DATA__;
+</script>
+<script>
+/*__VIEW_JS__*/
+</script>
+</body>
+</html>

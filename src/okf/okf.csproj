@@ -18,6 +18,9 @@
     <EmbeddedResource Include="..\Google\viz.html" Link="Google/viz-template.html" Kind="Text" />
     <EmbeddedResource Include="..\Google\viz.css" Link="Google/viz-styles.css" Kind="Text" />
     <EmbeddedResource Include="..\Google\viz.js" Link="Google/viz-script.js" Kind="Text" />
+    <EmbeddedResource Include="..\View\index.html" Link="View/view-template.html" Kind="Text" />
+    <EmbeddedResource Include="..\View\view.css" Link="View/view-styles.css" Kind="Text" />
+    <EmbeddedResource Include="..\View\view.js" Link="View/view-script.js" Kind="Text" />
     <EmbeddedResource Include="SPEC.md" Kind="Text" />
   </ItemGroup>
 </Project>
