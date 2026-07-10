@@ -31,6 +31,11 @@ public class BundleViewerTests
             Assert.Contains("setGraphExpanded", html);
             Assert.Contains("buildLocalGraphData", html);
             Assert.Contains("#c/", html);
+            Assert.Contains("tags-open-btn", html);
+            Assert.Contains("tag-panel", html);
+            Assert.Contains("setTagsExpanded", html);
+            Assert.Contains("buildTagIndex", html);
+            Assert.Contains("#t/", html);
             Assert.DoesNotContain("__GRAPH_DATA__", html);
             Assert.DoesNotContain("/*__VIEW_JS__*/", html);
         }
