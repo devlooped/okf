@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.1.2](https://github.com/devlooped/okf/tree/v0.1.2) (2026-07-10)
+
+[Full Changelog](https://github.com/devlooped/okf/compare/v0.1.1...v0.1.2)
+
+:sparkles: Implemented enhancements:
+
+- Add brainy icon for CLI [\#21](https://github.com/devlooped/okf/pull/21) (@kzu)
+
 ## [v0.1.1](https://github.com/devlooped/okf/tree/v0.1.1) (2026-07-10)
 
 [Full Changelog](https://github.com/devlooped/okf/compare/v0.1.0...v0.1.1)
