@@ -16,6 +16,7 @@ var app = ConsoleApp.Create();
 app.Add("check", Check);
 app.Add("viz", Visualize);
 app.Add("graph", Graph);
+app.Add("view", View);
 app.Run([.. runArgs]);
 
 /// <summary>Validate an OKF bundle directory for structural and content issues.</summary>
@@ -107,6 +108,67 @@ static int Visualize(
             Process.Start(new ProcessStartInfo
             {
                 FileName = outPath,
+                UseShellExecute = true,
+            });
+        }
+
+        return 0;
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine(ex.Message);
+        return 1;
+    }
+}
+
+/// <summary>
+/// Generate an Obsidian-style single-file reader (index.html) plus a full body+nav okf.json.
+/// Always builds with concept bodies and the index-driven nav tree.
+/// Default writes both files into the bundle root (overwrites an existing compact okf.json).
+/// </summary>
+/// <param name="path">Path to the bundle directory. [Default: .]</param>
+/// <param name="out">-o, Output directory, or path to index.html / okf.json (see design). Extension-less paths are directories. [Default: bundle root]</param>
+/// <param name="name">Display name in the HTML title. [Default: directory name]</param>
+/// <param name="open">Open the generated index.html in the default browser. [Default: false]</param>
+static int View(
+    [Argument] string path = ".",
+    string? @out = null,
+    string? name = null,
+    bool open = false)
+{
+    var bundleRoot = Path.GetFullPath(path);
+
+    if (!Directory.Exists(bundleRoot))
+    {
+        Console.Error.WriteLine($"Bundle directory not found: {bundleRoot}");
+        return 1;
+    }
+
+    var checkResult = new BundleChecker(bundleRoot).Check();
+    ReportCheckResult(checkResult, bundleRoot);
+
+    if (checkResult.Errors.Count > 0)
+    {
+        return 1;
+    }
+
+    try
+    {
+        var graph = GraphBuilder.Build(bundleRoot, includeBody: true, includeNav: true);
+        var displayName = name ?? new DirectoryInfo(bundleRoot).Name;
+        var paths = ViewOutputPaths.Resolve(bundleRoot, @out);
+
+        GraphBuilder.WriteGraph(graph, paths.JsonPath);
+        var stats = BundleViewer.Generate(graph, paths.HtmlPath, displayName);
+
+        Console.WriteLine(
+            $"Wrote {paths.JsonPath} ({stats.Concepts} concepts, {stats.Edges} edges, + nav) and {paths.HtmlPath} ({stats.Bytes} bytes).");
+
+        if (open)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = paths.HtmlPath,
                 UseShellExecute = true,
             });
         }

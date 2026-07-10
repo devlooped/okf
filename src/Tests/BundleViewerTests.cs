@@ -1,0 +1,37 @@
+using Devlooped;
+
+namespace Tests;
+
+public class BundleViewerTests
+{
+    static string FixturePath(string name)
+        => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Fixtures", name));
+
+    [Fact]
+    public void Generate_embeds_graph_and_bundle_name()
+    {
+        var graph = GraphBuilder.Build(FixturePath("nav-basic"), includeBody: true, includeNav: true);
+        var outPath = Path.Combine(Path.GetTempPath(), "okf-view-" + Guid.NewGuid().ToString("N") + ".html");
+        try
+        {
+            var stats = BundleViewer.Generate(graph, outPath, "Nav Basic");
+            Assert.True(File.Exists(outPath));
+            Assert.True(stats.Bytes > 0);
+            Assert.Equal(graph.Nodes.Count, stats.Concepts);
+
+            var html = File.ReadAllText(outPath);
+            Assert.Contains("Nav Basic", html);
+            Assert.Contains("\"nav\"", html);
+            Assert.Contains("DOMPurify", html);
+            Assert.Contains("marked@12.0.0", html);
+            Assert.Contains("dompurify@3.1.6", html);
+            Assert.DoesNotContain("__GRAPH_DATA__", html);
+            Assert.DoesNotContain("/*__VIEW_JS__*/", html);
+        }
+        finally
+        {
+            if (File.Exists(outPath))
+                File.Delete(outPath);
+        }
+    }
+}
