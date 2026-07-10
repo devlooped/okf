@@ -410,6 +410,8 @@
   // ——— Local 3D graph (Obsidian-like monochrome styling) ———
 
   const GRAPH_CAP = 75;
+  /** Max co-tags in the local ego graph (focus + neighbors). */
+  const TAG_EGO_CAP = 40;
   const NODE_COLOR = "#b8b8b8";
   const NODE_COLOR_FOCUSED = "#e8e8e8";
   const NODE_COLOR_HIGHLIGHT = "#e4e0ff";
@@ -590,6 +592,12 @@
         return LINK_COLOR_HIGHLIGHT;
       }
       return LINK_COLOR_DIM;
+    }
+    // Co-tag ego graph: opacity encodes Jaccard togetherness.
+    if (l.jaccard != null) {
+      const j = Math.min(Math.max(l.jaccard, 0), 1);
+      const a = 0.25 + j * 0.55;
+      return `rgba(175, 180, 190, ${a})`;
     }
     return LINK_COLOR;
   }
@@ -856,12 +864,41 @@
       .linkWidth(GRAPH_LINK_WIDTH)
       .linkDirectionalArrowLength(0)
       .onNodeClick((n) => {
-        if (n && n.id && conceptIds.has(n.id)) {
+        if (!n || n.id == null) return;
+        // Tag ego graph nodes use kind:"tag" (ids may collide with concept paths).
+        if (n.kind === "tag") {
+          if (tagExists(n.id)) select({ kind: "tag", id: n.id });
+          return;
+        }
+        if (conceptIds.has(n.id)) {
           select({ kind: "concept", id: n.id });
         }
       })
       .onNodeHover(onGraphNodeHover)
       .onEngineTick(positionGraphLabels);
+
+    // Link forces: Jaccard-weighted for co-tag edges; defaults for concept links.
+    try {
+      const linkForce = forceGraph.d3Force("link");
+      if (linkForce) {
+        linkForce
+          .distance((l) => {
+            if (l.jaccard != null) {
+              const j = Math.min(Math.max(l.jaccard, 0), 1);
+              return 28 + (1 - j) * 90;
+            }
+            return 30;
+          })
+          .strength((l) => {
+            if (l.jaccard != null) {
+              const j = Math.min(Math.max(l.jaccard, 0), 1);
+              return 0.05 + j * 0.55;
+            }
+            return 1;
+          });
+      }
+    } catch (_) {}
+
     // Overlay after the canvas so labels paint on top (Obsidian-style always-on text).
     ensureLabelsLayer();
     // Keep labels aligned while orbiting / zooming after the sim cools.
@@ -892,13 +929,106 @@
     return ids;
   }
 
+  /**
+   * Ego co-tag graph: selected tag at center, neighbors sized by togetherness
+   * (Jaccard + co-count). Includes neighbor–neighbor links when they co-occur.
+   */
+  function buildTagEgoGraphData(focusTag) {
+    const entry = tagIndex.byTag.get(focusTag);
+    if (!entry) {
+      return { nodes: [], links: [], note: "Unknown tag" };
+    }
+
+    /** @type {{ id: string, co: number, jaccard: number }[]} */
+    const neighborScores = [];
+    for (const l of tagIndex.graphData.links) {
+      const s = typeof l.source === "object" ? l.source.id : l.source;
+      const t = typeof l.target === "object" ? l.target.id : l.target;
+      if (s === focusTag) {
+        neighborScores.push({ id: t, co: l.co || 0, jaccard: l.jaccard || 0 });
+      } else if (t === focusTag) {
+        neighborScores.push({ id: s, co: l.co || 0, jaccard: l.jaccard || 0 });
+      }
+    }
+
+    neighborScores.sort((a, b) => {
+      if (b.jaccard !== a.jaccard) return b.jaccard - a.jaccard;
+      return b.co - a.co;
+    });
+
+    let note = "";
+    let neighbors = neighborScores;
+    if (neighbors.length > TAG_EGO_CAP) {
+      note = `Top ${TAG_EGO_CAP} of ${neighbors.length} co-tags`;
+      neighbors = neighbors.slice(0, TAG_EGO_CAP);
+    }
+
+    const keep = new Set(neighbors.map((n) => n.id));
+    keep.add(focusTag);
+
+    /** @type {object[]} */
+    const nodes = [];
+    const focusCount = entry.count;
+    // Focus slightly larger; log of usage so hubs read as hubs.
+    nodes.push({
+      id: focusTag,
+      name: focusTag,
+      val: 2.6 + Math.log2(focusCount + 1) * 1.1,
+      focused: true,
+      kind: "tag",
+      count: focusCount,
+    });
+
+    for (const n of neighbors) {
+      const j = Math.min(Math.max(n.jaccard, 0), 1);
+      // Size primarily by togetherness with focus; slight co-count boost.
+      const val = 1.2 + j * 3.4 + Math.log2(n.co + 1) * 0.4;
+      nodes.push({
+        id: n.id,
+        name: n.id,
+        val,
+        focused: false,
+        kind: "tag",
+        count: tagIndex.byTag.get(n.id)?.count || 0,
+        co: n.co,
+        jaccard: n.jaccard,
+      });
+    }
+
+    /** @type {object[]} */
+    const links = [];
+    for (const l of tagIndex.graphData.links) {
+      const s = typeof l.source === "object" ? l.source.id : l.source;
+      const t = typeof l.target === "object" ? l.target.id : l.target;
+      if (keep.has(s) && keep.has(t)) {
+        links.push({
+          source: s,
+          target: t,
+          co: l.co,
+          jaccard: l.jaccard,
+          value: l.value != null ? l.value : l.co,
+        });
+      }
+    }
+
+    if (!note) {
+      if (neighbors.length === 0) {
+        note = "No co-occurring tags";
+      } else {
+        note = `${neighbors.length} co-tags · ${links.length} links`;
+      }
+    }
+
+    return { nodes, links, note };
+  }
+
   function buildLocalGraphData() {
+    if (selected.kind === "tag") {
+      return buildTagEgoGraphData(selected.id);
+    }
+
     let focusIds = new Set();
     let note = "";
-
-    if (selected.kind === "tag") {
-      return { nodes: [], links: [], note: "Select a concept" };
-    }
 
     if (selected.kind === "concept") {
       focusIds.add(selected.id);
@@ -931,6 +1061,7 @@
         name: n.title || n.label || id,
         val,
         focused,
+        kind: "concept",
       });
     }
 
@@ -1514,6 +1645,7 @@
     resolveHref,
     normalizeToId,
     buildLocalGraphData,
+    buildTagEgoGraphData,
     buildTagIndex,
     fitGraphCamera,
     resizeGraph,

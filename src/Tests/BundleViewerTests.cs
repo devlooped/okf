@@ -30,6 +30,8 @@ public class BundleViewerTests
             Assert.Contains("graph-expand-btn", html);
             Assert.Contains("setGraphExpanded", html);
             Assert.Contains("buildLocalGraphData", html);
+            Assert.Contains("buildTagEgoGraphData", html);
+            Assert.Contains("co-tags", html);
             Assert.Contains("#c/", html);
             Assert.Contains("tags-open-btn", html);
             Assert.Contains("theme-toggle", html);
