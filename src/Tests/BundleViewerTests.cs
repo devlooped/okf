@@ -25,6 +25,9 @@ public class BundleViewerTests
             Assert.Contains("DOMPurify", html);
             Assert.Contains("marked@12.0.0", html);
             Assert.Contains("dompurify@3.1.6", html);
+            Assert.Contains("3d-force-graph@1.73.3", html);
+            Assert.Contains("buildLocalGraphData", html);
+            Assert.Contains("#c/", html);
             Assert.DoesNotContain("__GRAPH_DATA__", html);
             Assert.DoesNotContain("/*__VIEW_JS__*/", html);
         }

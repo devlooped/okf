@@ -169,15 +169,26 @@ html, body {
   display: flex;
   flex-direction: column;
 }
-.graph-placeholder {
-  height: 240px;
+.graph-panel {
   border-bottom: 1px solid #d0d7de;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: #fff;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
 }
-.toc-placeholder {
+.graph-panel .panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 8px 12px 0;
+}
+.graph-note { font-size: 11px; }
+.graph3d {
+  height: 260px;
+  width: 100%;
+  background: #0d1117;
+}
+.toc-panel {
   flex: 1;
   padding: 12px 14px;
   overflow: auto;

@@ -227,11 +227,191 @@
 
   // ——— Content ———
 
-  function select(next) {
+  function select(next, opts) {
     selected = next;
+    if (!(opts && opts.skipHash)) updateHash();
     renderTree(searchEl.value);
     renderContent();
+    updateLocalGraph();
   }
+
+  // ——— Hash routing (#c/id, #d/id) ———
+
+  function updateHash() {
+    try {
+      const prefix = selected.kind === "dir" ? "d/" : "c/";
+      const id = selected.id === "" && selected.kind === "dir" ? "" : selected.id;
+      const hash = "#" + prefix + encodeURIComponent(id).replace(/%2F/gi, "/");
+      if (location.hash !== hash) history.replaceState(null, "", hash);
+    } catch (_) {}
+  }
+
+  function selectFromHash() {
+    const h = location.hash || "";
+    if (!h || h === "#") return false;
+    let raw;
+    try {
+      raw = decodeURIComponent(h.slice(1));
+    } catch (_) {
+      raw = h.slice(1);
+    }
+    if (raw.startsWith("c/")) {
+      const id = raw.slice(2);
+      if (conceptIds.has(id)) {
+        select({ kind: "concept", id }, { skipHash: true });
+        return true;
+      }
+      // slug fallback
+      for (const n of graph.nodes || []) {
+        if (n.slug === id) {
+          select({ kind: "concept", id: n.id }, { skipHash: true });
+          return true;
+        }
+      }
+    } else if (raw.startsWith("d/")) {
+      const id = raw.slice(2);
+      if (dirIds.has(id)) {
+        select({ kind: "dir", id }, { skipHash: true });
+        return true;
+      }
+    } else if (conceptIds.has(raw)) {
+      select({ kind: "concept", id: raw }, { skipHash: true });
+      return true;
+    }
+    return false;
+  }
+
+  // ——— Local 3D graph ———
+
+  const GRAPH_CAP = 75;
+  const typeColors = {};
+  const palette = [
+    "#58a6ff", "#3fb950", "#d2a8ff", "#f778ba", "#ffa657",
+    "#79c0ff", "#56d364", "#ff7b72", "#e3b341", "#a5d6ff",
+  ];
+  let colorIdx = 0;
+  function colorForType(t) {
+    const key = t || "Concept";
+    if (!typeColors[key]) typeColors[key] = palette[colorIdx++ % palette.length];
+    return typeColors[key];
+  }
+
+  let forceGraph = null;
+  const graphEl = document.getElementById("graph3d");
+  const graphNote = document.getElementById("graph-note");
+
+  function initForceGraph() {
+    if (typeof ForceGraph3D !== "function" || !graphEl) return;
+    forceGraph = ForceGraph3D()(graphEl)
+      .backgroundColor("#0d1117")
+      .showNavInfo(false)
+      .nodeLabel((n) => n.name || n.id)
+      .nodeVal((n) => n.val || 1)
+      .nodeColor((n) => (n.focused ? "#f0c14b" : n.color || "#58a6ff"))
+      .linkColor(() => "rgba(139,148,158,0.45)")
+      .linkDirectionalArrowLength(2.5)
+      .linkDirectionalArrowRelPos(1)
+      .linkWidth(0.6)
+      .onNodeClick((n) => {
+        if (n && n.id && conceptIds.has(n.id)) {
+          select({ kind: "concept", id: n.id });
+        }
+      });
+    // Fit container
+    const w = graphEl.clientWidth || 260;
+    const h = graphEl.clientHeight || 260;
+    forceGraph.width(w).height(h);
+  }
+
+  function collectDirConceptIds(dirId) {
+    const prefix = dirId ? dirId + "/" : "";
+    const ids = [];
+    for (const id of conceptIds) {
+      if (!dirId) {
+        // root: all concepts (capped later)
+        ids.push(id);
+      } else if (id === dirId || id.startsWith(prefix)) {
+        ids.push(id);
+      }
+    }
+    return ids;
+  }
+
+  function buildLocalGraphData() {
+    let focusIds = new Set();
+    let note = "";
+
+    if (selected.kind === "concept") {
+      focusIds.add(selected.id);
+      for (const e of graph.edges || []) {
+        if (e.source === selected.id) focusIds.add(e.target);
+        if (e.target === selected.id) focusIds.add(e.source);
+      }
+    } else {
+      const under = collectDirConceptIds(selected.id);
+      if (under.length > GRAPH_CAP) {
+        // keep highest weight
+        under.sort((a, b) => (nodesById[b]?.weight || 0) - (nodesById[a]?.weight || 0));
+        note = `Showing top ${GRAPH_CAP} of ${under.length}`;
+        for (const id of under.slice(0, GRAPH_CAP)) focusIds.add(id);
+      } else {
+        for (const id of under) focusIds.add(id);
+      }
+    }
+
+    const nodes = [];
+    for (const id of focusIds) {
+      const n = nodesById[id];
+      if (!n) continue;
+      const w = n.weight || 0;
+      nodes.push({
+        id,
+        name: n.title || n.label || id,
+        color: colorForType(n.type),
+        val: 1 + w * 40,
+        focused: selected.kind === "concept" && id === selected.id,
+      });
+    }
+
+    const links = [];
+    for (const e of graph.edges || []) {
+      if (focusIds.has(e.source) && focusIds.has(e.target)) {
+        links.push({ source: e.source, target: e.target });
+      }
+    }
+
+    if (!note && selected.kind === "concept") {
+      note = `${nodes.length} nodes · ${links.length} links`;
+    } else if (!note) {
+      note = `${nodes.length} concepts`;
+    }
+
+    return { nodes, links, note };
+  }
+
+  function updateLocalGraph() {
+    if (!forceGraph) {
+      if (typeof ForceGraph3D === "function") initForceGraph();
+      else return;
+    }
+    if (!forceGraph) return;
+
+    const data = buildLocalGraphData();
+    if (graphNote) graphNote.textContent = data.note;
+    forceGraph.graphData({ nodes: data.nodes, links: data.links });
+
+    // re-fit after layout settles a bit
+    setTimeout(() => {
+      try {
+        forceGraph.zoomToFit(400, 20);
+      } catch (_) {}
+    }, 350);
+  }
+
+  window.addEventListener("resize", () => {
+    if (!forceGraph || !graphEl) return;
+    forceGraph.width(graphEl.clientWidth || 260).height(graphEl.clientHeight || 260);
+  });
 
   function renderContent() {
     const titleEl = document.getElementById("content-title");
@@ -386,19 +566,26 @@
   }
 
   searchEl.addEventListener("input", () => renderTree(searchEl.value));
+  window.addEventListener("hashchange", () => {
+    selectFromHash();
+  });
 
-  // Expose for tests / PR3
+  // Expose for tests
   window.__okfView = {
     select,
     tryNavigateHref,
     resolveHref,
     normalizeToId,
+    buildLocalGraphData,
     get selected() {
       return selected;
     },
     basePathForSelection,
   };
 
+  initForceGraph();
   renderTree("");
-  select({ kind: "dir", id: "" });
+  if (!selectFromHash()) {
+    select({ kind: "dir", id: "" });
+  }
 })();
