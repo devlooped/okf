@@ -4,6 +4,40 @@
   document.title = `${bundleName} — OKF Viewer`;
   document.getElementById("bundle-name").textContent = bundleName;
 
+  // ——— Theme (light / dark) — init early so the control works even without nav ———
+
+  const THEME_KEY = "okf-theme";
+  const themeToggle = document.getElementById("theme-toggle");
+
+  function getTheme() {
+    const t = document.documentElement.getAttribute("data-theme");
+    return t === "dark" ? "dark" : "light";
+  }
+
+  function setTheme(theme) {
+    const next = theme === "dark" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", next);
+    document.documentElement.style.colorScheme = next;
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch (_) { /* private mode / blocked storage */ }
+    if (themeToggle) {
+      themeToggle.setAttribute(
+        "aria-label",
+        next === "dark" ? "Switch to light theme" : "Switch to dark theme"
+      );
+    }
+  }
+
+  // Sync control label with FOUC-prevention script (or system preference).
+  setTheme(getTheme());
+
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      setTheme(getTheme() === "dark" ? "light" : "dark");
+    });
+  }
+
   if (!graph || !graph.nav) {
     document.getElementById("content-body").textContent =
       "This viewer requires a graph built with body and nav (okf view).";
@@ -1485,6 +1519,8 @@
     resizeGraph,
     setGraphExpanded,
     setTagsExpanded,
+    setTheme,
+    getTheme,
     get graphExpanded() {
       return graphExpanded;
     },

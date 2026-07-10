@@ -32,6 +32,9 @@ public class BundleViewerTests
             Assert.Contains("buildLocalGraphData", html);
             Assert.Contains("#c/", html);
             Assert.Contains("tags-open-btn", html);
+            Assert.Contains("theme-toggle", html);
+            Assert.Contains("okf-theme", html);
+            Assert.Contains("setTheme", html);
             Assert.Contains("tag-panel", html);
             Assert.Contains("setTagsExpanded", html);
             Assert.Contains("buildTagIndex", html);
