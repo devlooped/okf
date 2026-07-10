@@ -160,6 +160,21 @@ public sealed partial class BundleChecker
             {
                 AddError(CheckRule.IndexStructure, relativePath, "Index entry must use the form '* [Title](url) - description'.", new IssueLocation(lineNumber));
             }
+            else if (MarkdownHeadingRegex().IsMatch(line))
+            {
+                // ## / ### headings are structural for prose detection (SPEC examples use #;
+                // producers may use ## under a title H1). They do not alone satisfy hasSection
+                // when no `# ` H1-style section exists — hasSection still uses SectionHeadingRegex.
+            }
+            else if (!string.IsNullOrWhiteSpace(line))
+            {
+                // SPEC §6 indexes are headings + list entries only; free prose is a soft warning.
+                AddWarning(
+                    CheckRule.IndexProse,
+                    relativePath,
+                    "index.md should only contain section headings and list entries ('* [Title](url) - description'); free prose is not part of the index structure.",
+                    new IssueLocation(lineNumber));
+            }
 
             lineNumber++;
         }
@@ -267,6 +282,10 @@ public sealed partial class BundleChecker
 
     [GeneratedRegex(@"^# .+", RegexOptions.Compiled)]
     private static partial Regex SectionHeadingRegex();
+
+    /// <summary>Any ATX heading (#–######); used to avoid flagging ## groups as free prose.</summary>
+    [GeneratedRegex(@"^#{1,6}\s+\S", RegexOptions.Compiled)]
+    private static partial Regex MarkdownHeadingRegex();
 
     [GeneratedRegex(@"^\* \[.+?\]\(.+?\)(?: .+)?$", RegexOptions.Compiled)]
     private static partial Regex IndexEntryRegex();

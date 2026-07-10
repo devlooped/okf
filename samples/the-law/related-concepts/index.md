@@ -8,8 +8,3 @@
 * [Voluntary Philanthropy](philanthropy-vs-coercion.md)
 * [Spontaneous Order](spontaneous-order.md)
 * [Limited vs Activist State](limited-vs-activist-state.md)
-
-## Cross-References
-* [Root](/index.md)
-* [/the-law.md](/the-law.md)
-* [/legal-plunder/definition.md](/legal-plunder/definition.md)

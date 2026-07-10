@@ -8,8 +8,3 @@
 * [Justice](justice.md)
 * [Order and Stability](order-and-stability.md)
 * [Non-Aggression](non-aggression-principle.md)
-
-## Cross-References
-* [Root](/index.md)
-* [/the-law.md](/the-law.md)
-* [/legal-plunder/definition.md](/legal-plunder/definition.md)

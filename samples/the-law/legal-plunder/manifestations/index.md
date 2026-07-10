@@ -10,8 +10,4 @@
 * [Usury Laws](usury-laws.md)
 * [Monopolies](monopolies.md)
 * [Forced Labor](forced-labor.md)
-
-## Cross-References
-* [Root](/index.md)
-* [/the-law.md](/the-law.md)
-* [/legal-plunder/definition.md](/legal-plunder/definition.md)
+* [Deeper Analysis](deeper/) - Tariff effects and political economy.

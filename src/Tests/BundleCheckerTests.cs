@@ -55,6 +55,26 @@ public class BundleCheckerTests
         var result = new BundleChecker(FixturePath("invalid-log")).Check();
         Assert.Contains(result.Errors, issue => issue.File.EndsWith("log.md"));
     }
+
+    [Fact]
+    public void Index_free_prose_is_reported_as_warning()
+    {
+        var result = new BundleChecker(FixturePath("index-prose")).Check();
+        Assert.Empty(result.Errors);
+        Assert.Contains(
+            result.Warnings,
+            issue => issue.Rule == CheckRule.IndexProse
+                && issue.File.EndsWith("index.md")
+                && issue.Message.Contains("free prose"));
+    }
+
+    [Fact]
+    public void Compliant_index_with_h2_sections_has_no_prose_warning()
+    {
+        var result = new BundleChecker(FixturePath("nav-compat")).Check();
+        Assert.Empty(result.Errors);
+        Assert.DoesNotContain(result.Warnings, issue => issue.Rule == CheckRule.IndexProse);
+    }
 }
 
 public class OKFDocumentTests

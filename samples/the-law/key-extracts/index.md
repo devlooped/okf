@@ -10,8 +10,3 @@
 * [Socialists](extract-socialists.md)
 * [Government Role](extract-government-role.md)
 * [Conclusion](extract-conclusion.md)
-
-## Cross-References
-* [Root](/index.md)
-* [/the-law.md](/the-law.md)
-* [/legal-plunder/definition.md](/legal-plunder/definition.md)

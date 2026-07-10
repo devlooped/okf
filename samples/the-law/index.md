@@ -4,8 +4,6 @@ okf_version: "0.1"
 
 # The Law — Knowledge Bundle
 
-Frédéric Bastiat's 1850 essay: natural rights, the true purpose of law, and how law is perverted into legal plunder.
-
 ## Primary Documents
 * [The Law](/the-law.md) - Complete overview and analysis
 * [Foreword](/foreword.md) - Thomas DiLorenzo

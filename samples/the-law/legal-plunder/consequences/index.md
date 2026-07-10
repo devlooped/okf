@@ -9,8 +9,3 @@
 * [Economic Impoverishment](economic-impoverishment.md)
 * [Instability](instability-and-revolution.md)
 * [Demoralization](demoralization-of-citizens.md)
-
-## Cross-References
-* [Root](/index.md)
-* [/the-law.md](/the-law.md)
-* [/legal-plunder/definition.md](/legal-plunder/definition.md)
