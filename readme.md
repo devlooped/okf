@@ -18,8 +18,423 @@ OSMF tier. A single fee covers all of [Devlooped packages](https://www.nuget.org
 
 <!-- https://github.com/devlooped/.github/raw/main/osmf.md -->
 <!-- #content -->
-## Usage
-*okf*
+## Overview
+
+**okf** is a .NET tool for working with [Open Knowledge Format](src/okf/SPEC.md) (OKF) bundles —
+directories of markdown concepts with YAML frontmatter, linked by relative paths.
+
+It validates bundles, builds a knowledge **graph** (nodes + edges + optional body/nav), and
+emits interactive HTML for reading (`view`) and exploring relationships (`viz`).
+
+Run without installing permanently via [`dnx`](https://learn.microsoft.com/dotnet/core/tools/dotnet-dnx):
+
+```bash
+dnx okf -- --help
+```
+
+While the package is pre-release, pass `--prerelease` to `dnx` (before the tool args):
+
+```bash
+dnx okf --prerelease -- check samples/the-law
+```
+
+| Command | Purpose |
+|---------|---------|
+| [`check`](#check) | Validate a bundle (structure, frontmatter, links) |
+| [`graph`](#graph) | Emit `okf.json` / `okf.js` knowledge graph |
+| [`view`](#view) | Obsidian-style single-file reader (`index.html` + full graph) |
+| [`viz`](#viz) | Interactive Cytoscape graph HTML |
+
+The sample bundle under [`samples/the-law`](samples/the-law) is used in the screenshots below
+(Frédéric Bastiat’s *The Law* as a knowledge corpus).
+
+## Install / run
+
+```bash
+# One-shot (downloads tool package as needed)
+dnx okf -- check samples/the-law
+
+# Or install as a local/global tool
+dotnet tool install okf --prerelease
+okf check samples/the-law
+```
+
+Use `--` after `dnx okf` when you need to pass flags that might otherwise be parsed by `dnx`
+itself (for example `dnx okf -- --help`).
+
+---
+
+## `check`
+
+Validate an OKF bundle directory for structural and content issues.
+
+```bash
+dnx okf -- check [path] [--json]
+```
+
+| Argument / option | Description |
+|-------------------|-------------|
+| `path` | Bundle directory (default: `.`) |
+| `--json` | Emit issues as JSON instead of human-readable text |
+
+**What it checks (errors):**
+
+- Bundle directory exists
+- Concept files have valid YAML frontmatter
+- Concept files declare a non-empty `type`
+- `index.md` frontmatter is valid (root index may only use `okf_version`)
+- `index.md` structure and list entries are valid
+- `log.md` format is valid
+
+**Warnings:**
+
+- Unresolved internal links
+- Free prose lines in `index.md` (non-structural)
+
+Exit code is `1` when any errors are reported, `0` otherwise.
+
+```bash
+dnx okf -- check samples/the-law
+# ✓ Bundle directory exists
+# ✓ Concept files have valid YAML frontmatter
+# …
+
+dnx okf -- check samples/check-failures
+# intentionally invalid showcase (see samples/README.md)
+```
+
+---
+
+## `graph`
+
+Generate an OKF graph file for the bundle. Runs validation first; generation is skipped if
+there are errors.
+
+```bash
+dnx okf -- graph [path] [-o|--out <path>] [-b|--body] [--nav] [--js] [-q|--quiet] [--json] [-p|--properties Key=Value]
+```
+
+| Argument / option | Description |
+|-------------------|-------------|
+| `path` | Bundle directory (default: `.`) |
+| `-o`, `--out` | Output path (default: `okf.json`, or `okf.js` with `--js`) |
+| `-b`, `--body` | Include markdown body text on each node |
+| `--nav` | Include the index-driven navigation tree |
+| `--js` | Emit a script that sets `window.data` (loadable via `<script src>` on `file://`) |
+| `-q`, `--quiet` | Only render validation errors and warnings |
+| `--json` | Print validation issues as JSON |
+| `-p`, `--properties` | Extra bundle-level properties (`Key=Value`, repeatable) |
+
+Examples:
+
+```bash
+# Compact graph (metadata + link edges + PageRank metrics)
+dnx okf -- graph samples/the-law -o samples/the-law/okf.json
+
+# Full graph for offline consumers / custom UIs
+dnx okf -- graph samples/the-law --body --nav -o samples/the-law/okf-full.json
+
+# JS global for file:// hosting
+dnx okf -- graph samples/the-law --js -o samples/the-law/okf.js
+```
+
+### Graph schema
+
+Top-level shape:
+
+```json
+{
+  "version": "0.1",
+  "timestamp": "2026-07-10T05:21:13.1336661+00:00",
+  "nav": { },
+  "nodes": [ ],
+  "edges": [ ],
+  "bundle": { }
+}
+```
+
+| Field | When present | Description |
+|-------|--------------|-------------|
+| `version` | always | Graph format version (`0.1`) |
+| `timestamp` | always | Generation time (UTC offset) |
+| `nodes` | always | Concept nodes (one per concept `.md`) |
+| `edges` | always | Directed links from markdown references |
+| `nav` | `--nav` | Index-driven tree for progressive disclosure |
+| `bundle` | `-p` used | Producer-defined key/value properties |
+
+#### Nodes
+
+Each concept becomes a node. Concept **id** is the path within the bundle without `.md`
+(for example `fundamental-principles/natural-rights`).
+
+| Field | Source | Description |
+|-------|--------|-------------|
+| `id` | path | Stable concept id |
+| `slug` | derived | Short unique abbreviation (edge ids / fragments) |
+| `type` | frontmatter | Required concept type |
+| `title` | frontmatter | Display title |
+| `label` | frontmatter / title | Short label (nav, graph UI) |
+| `description` | frontmatter | One-line summary |
+| `resource` | frontmatter | Optional canonical URI for an underlying asset |
+| `tags` | frontmatter | Optional tag list |
+| `timestamp` | frontmatter | Optional last-modified |
+| `path` | file | Relative path to the `.md` file |
+| `body` | file (`--body`) | Markdown body after frontmatter |
+| `degree` / `in` / `out` | graph | Link counts |
+| `weight` / `rank` | PageRank | Importance score and dense rank (1 = highest) |
+
+Plus any other frontmatter keys are preserved as extension data on the node.
+
+**Sample nodes** (from `samples/the-law`, compact graph — no `body`):
+
+```json
+{
+  "version": "0.1",
+  "timestamp": "2026-07-10T05:21:13.1336661+00:00",
+  "nodes": [
+    {
+      "id": "foreword",
+      "slug": "f",
+      "type": "Foreword",
+      "title": "Foreword by Thomas J. DiLorenzo",
+      "label": "Foreword",
+      "description": "Places the essay in the tradition of the Declaration of Independence and warns against modern forms of legal plunder.",
+      "tags": ["bastiat", "foreword", "legal-philosophy", "the-law"],
+      "timestamp": "2026-07-02T12:00:00+00:00",
+      "path": "foreword.md",
+      "degree": 5,
+      "in": 0,
+      "out": 5,
+      "weight": 0.0018987341772151902,
+      "rank": 10
+    },
+    {
+      "id": "fundamental-principles/natural-rights",
+      "slug": "fna",
+      "type": "Core Principle",
+      "title": "Natural Rights",
+      "label": "Natural Rights",
+      "description": "Life, liberty and property are God-given and exist prior to any legislation.",
+      "tags": ["bastiat", "legal-philosophy", "natural-rights", "the-law"],
+      "timestamp": "2026-07-02T12:00:00+00:00",
+      "path": "fundamental-principles/natural-rights.md",
+      "degree": 70,
+      "in": 62,
+      "out": 8,
+      "weight": 0.11198154345997116,
+      "rank": 5
+    }
+  ],
+  "edges": [
+    {
+      "source": "foreword",
+      "target": "the-law",
+      "id": "f_t",
+      "label": "The Law"
+    },
+    {
+      "source": "foreword",
+      "target": "fundamental-principles/natural-rights",
+      "id": "f_fna",
+      "label": "Natural Rights"
+    },
+    {
+      "source": "foreword",
+      "target": "fundamental-principles/law-as-organization-of-defense",
+      "id": "f_flaw-",
+      "label": "the definition of law"
+    }
+  ]
+}
+```
+
+With `--body`, nodes also include the markdown body:
+
+```json
+{
+  "id": "foreword",
+  "slug": "f",
+  "type": "Foreword",
+  "title": "Foreword by Thomas J. DiLorenzo",
+  "body": "# Foreword\n\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\n…",
+  "path": "foreword.md",
+  "degree": 5,
+  "in": 0,
+  "out": 5,
+  "weight": 0.0018987341772151902,
+  "rank": 10
+}
+```
+
+#### Edges
+
+Edges are directed links discovered in concept markdown (relative and bundle-rooted `/…` paths).
+External URLs are ignored.
+
+| Field | Description |
+|-------|-------------|
+| `source` | Concept id of the linking document |
+| `target` | Concept id of the linked document |
+| `id` | Short edge id from source/target slugs |
+| `label` | Link text when available |
+
+#### Nav (`--nav`)
+
+Index-driven tree used by `view`. Node kinds:
+
+| `kind` | Meaning |
+|--------|---------|
+| `dir` | Directory (has optional `body` from `index.md`) |
+| `group` | Section heading group inside an index |
+| `concept` | Leaf pointing at a concept `id` |
+| `orphans` | Concepts not listed from any index |
+
+```json
+{
+  "kind": "dir",
+  "id": "",
+  "label": "The Law — Knowledge Bundle",
+  "body": "\n# The Law — Knowledge Bundle\n\n## Primary Documents\n…",
+  "children": [
+    {
+      "kind": "group",
+      "label": "Primary Documents",
+      "children": [
+        {
+          "kind": "concept",
+          "id": "the-law",
+          "label": "The Law",
+          "description": "Complete overview and analysis"
+        },
+        {
+          "kind": "concept",
+          "id": "foreword",
+          "label": "Foreword",
+          "description": "Thomas DiLorenzo"
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## `view`
+
+Generate an Obsidian-style single-file reader (`index.html`) plus a full body+nav `okf.json`.
+Always builds with concept bodies and the index-driven nav tree. Default writes both files into
+the bundle root (overwrites an existing compact `okf.json`).
+
+```bash
+dnx okf -- view [path] [-o|--out <path>] [--name <title>] [--open]
+```
+
+| Argument / option | Description |
+|-------------------|-------------|
+| `path` | Bundle directory (default: `.`) |
+| `-o`, `--out` | Output directory, or path to `index.html` / `okf.json` (extension-less paths are directories) |
+| `--name` | Display name in the HTML title (default: directory name) |
+| `--open` | Open the generated `index.html` in the default browser |
+
+```bash
+dnx okf -- view samples/the-law --name "The Law" --open
+```
+
+### Reader features
+
+The generated viewer is a self-contained HTML app (marked + DOMPurify + 3d-force-graph):
+
+- **Navigation tree** from `index.md` groups and directories, with search
+- **Concept reader** — type chip, title, description, tags, rendered markdown
+- **Backlinks** — “Linked from” list derived from graph edges
+- **Local graph** — force-directed neighborhood of the current concept (expandable)
+- **Tags panel** — co-occurrence graph across the corpus
+- **Light / dark theme** (persisted in `localStorage`)
+
+Screenshots from [`samples/the-law/index.html`](samples/the-law/index.html):
+
+Bundle home (dark theme) — nav, index body, local graph, on-this-page:
+
+![](https://raw.githubusercontent.com/devlooped/okf/main/assets/img/view-overview.png)
+
+Concept page with tags, backlinks, and neighborhood graph:
+
+![](https://raw.githubusercontent.com/devlooped/okf/main/assets/img/view-concept.png)
+
+Expanded local graph for a highly connected concept (*Natural Rights*):
+
+![](https://raw.githubusercontent.com/devlooped/okf/main/assets/img/view-local-graph.png)
+
+Tags panel — tag co-occurrence force graph:
+
+![](https://raw.githubusercontent.com/devlooped/okf/main/assets/img/view-tags.png)
+
+Light theme:
+
+![](https://raw.githubusercontent.com/devlooped/okf/main/assets/img/view-overview-light.png)
+
+---
+
+## `viz`
+
+Generate an interactive HTML visualization (Cytoscape) from a **bundle directory** or an
+existing **graph JSON** file.
+
+```bash
+dnx okf -- viz [path] [-o|--out <path>] [--name <title>] [--open]
+```
+
+| Argument / option | Description |
+|-------------------|-------------|
+| `path` | Bundle directory or `.json` graph file (default: `.`) |
+| `-o`, `--out` | Output HTML path (default: `viz.html` next to the input) |
+| `--name` | Display name in the visualization title |
+| `--open` | Open the generated HTML after writing |
+
+When given a directory, `viz` validates the bundle, builds a graph with bodies, then writes HTML.
+When given a `.json` graph, it visualizes that file as-is (handy after `graph --body`).
+
+```bash
+dnx okf -- viz samples/the-law -o samples/the-law/viz.html --open
+dnx okf -- viz samples/the-law/okf.json --name "The Law"
+```
+
+The viz UI supports search, type filter, layout presets (cose, concentric, breadth-first, circle, grid),
+and a detail pane for the selected node (frontmatter + rendered body when present).
+
+---
+
+## Typical workflow
+
+```bash
+# 1. Author markdown concepts under a bundle directory
+# 2. Validate
+dnx okf -- check ./my-bundle
+
+# 3a. Ship a compact graph for agents / APIs
+dnx okf -- graph ./my-bundle -o ./my-bundle/okf.json
+
+# 3b. Or ship a human reader
+dnx okf -- view ./my-bundle --open
+
+# 3c. Or explore link topology
+dnx okf -- viz ./my-bundle --open
+```
+
+## OKF format (brief)
+
+A **bundle** is a directory of UTF-8 markdown files:
+
+- Concept files: YAML frontmatter (`type` required) + free-form body
+- `index.md` — optional directory listing (progressive disclosure)
+- `log.md` — optional chronological update log
+
+Concept **id** = relative path without `.md`. Links between concepts use normal markdown links;
+`graph` / `view` / `viz` turn those into edges.
+
+See the full draft specification embedded in the tool package and in
+[`src/okf/SPEC.md`](src/okf/SPEC.md).
 <!-- #content -->
 ---
 <!-- include https://github.com/devlooped/sponsors/raw/main/footer.md -->
