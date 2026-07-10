@@ -1,624 +1,6 @@
-{
+﻿{
   "version": "0.1",
-  "timestamp": "2026-07-10T03:51:34.2443991+00:00",
-  "nav": {
-    "kind": "dir",
-    "id": "",
-    "label": "The Law — Knowledge Bundle",
-    "body": "# The Law — Knowledge Bundle\n\n## Primary Documents\n* [The Law](/the-law.md) - Complete overview and analysis\n* [Foreword](/foreword.md) - Thomas DiLorenzo\n\n## Sections\n* [fundamental-principles/](/fundamental-principles/) - Life, liberty, property and lawful defense\n* [perversion-of-law/](/perversion-of-law/) - How and why law is corrupted\n* [legal-plunder/](/legal-plunder/) - Definition, manifestations, consequences\n* [socialism/](/socialism/) - Critique of coercive social engineering\n* [true-law/](/true-law/) - The limited, proper function of law and government\n* [political-mechanisms/](/political-mechanisms/) - Suffrage and incentives\n* [historical-context/](/historical-context/) - 19th century setting\n* [modern-relevance/](/modern-relevance/) - Enduring lessons\n* [key-extracts/](/key-extracts/) - Important passages\n* [related-concepts/](/related-concepts/) - Adjacent ideas\n* [key-figures/](/key-figures/) - Bastiat and commentators\n",
-    "children": [
-      {
-        "kind": "group",
-        "label": "Primary Documents",
-        "children": [
-          {
-            "kind": "concept",
-            "id": "the-law",
-            "label": "The Law",
-            "description": "Complete overview and analysis"
-          },
-          {
-            "kind": "concept",
-            "id": "foreword",
-            "label": "Foreword",
-            "description": "Thomas DiLorenzo"
-          }
-        ]
-      },
-      {
-        "kind": "group",
-        "label": "Sections",
-        "children": [
-          {
-            "kind": "dir",
-            "id": "fundamental-principles",
-            "label": "fundamental-principles/",
-            "description": "Life, liberty, property and lawful defense",
-            "body": "# Fundamental Principles\r\n\r\n* [Natural Rights](natural-rights.md)\r\n* [Personality, Liberty, Property](personality-liberty-property.md)\r\n* [Lawful Defense](lawful-defense.md)\r\n* [Collective Force](collective-force.md)\r\n* [Law Defined as Organized Defense](law-as-organization-of-defense.md)\r\n* [Justice](justice.md)\r\n* [Order and Stability](order-and-stability.md)\r\n* [Non-Aggression](non-aggression-principle.md)\n",
-            "children": [
-              {
-                "kind": "concept",
-                "id": "fundamental-principles/natural-rights",
-                "label": "Natural Rights",
-                "description": "Life, liberty and property are God-given and exist prior to any legislation."
-              },
-              {
-                "kind": "concept",
-                "id": "fundamental-principles/personality-liberty-property",
-                "label": "Personality, Liberty, Property",
-                "description": "The three constitutive elements of man."
-              },
-              {
-                "kind": "concept",
-                "id": "fundamental-principles/lawful-defense",
-                "label": "Lawful Defense",
-                "description": "Every person has a natural right to defend life, liberty and property."
-              },
-              {
-                "kind": "concept",
-                "id": "fundamental-principles/collective-force",
-                "label": "Collective Force",
-                "description": "Individuals may combine their right of defense into a regular common force."
-              },
-              {
-                "kind": "concept",
-                "id": "fundamental-principles/law-as-organization-of-defense",
-                "label": "Law Defined as Organized Defense",
-                "description": "Law is the substitution of collective force for individual force for the sole purpose of protecting persons, liberties and property."
-              },
-              {
-                "kind": "concept",
-                "id": "fundamental-principles/justice",
-                "label": "Justice",
-                "description": "Law's mission is to cause justice to reign by protecting rights equally."
-              },
-              {
-                "kind": "concept",
-                "id": "fundamental-principles/order-and-stability",
-                "label": "Order and Stability",
-                "description": "A government that only protects produces the most stable and natural social order."
-              },
-              {
-                "kind": "concept",
-                "id": "fundamental-principles/non-aggression-principle",
-                "label": "Non-Aggression",
-                "description": "Force has not been given us to annihilate the equal rights of others."
-              }
-            ]
-          },
-          {
-            "kind": "dir",
-            "id": "perversion-of-law",
-            "label": "perversion-of-law/",
-            "description": "How and why law is corrupted",
-            "body": "# Perversion of Law\r\n\r\n* [The Law Perverted](introduction-to-perversion.md)\r\n* [Causes](causes-of-perversion.md)\r\n* [Greed](greed.md)\r\n* [False Philanthropy](false-philanthropy.md)\r\n* [Law as Instrument of Plunder](law-as-instrument-of-plunder.md)\n",
-            "children": [
-              {
-                "kind": "concept",
-                "id": "perversion-of-law/introduction-to-perversion",
-                "label": "The Law Perverted",
-                "description": "Law diverted from protection to predation."
-              },
-              {
-                "kind": "concept",
-                "id": "perversion-of-law/causes-of-perversion",
-                "label": "Causes",
-                "description": "Naked greed and misconceived philanthropy."
-              },
-              {
-                "kind": "concept",
-                "id": "perversion-of-law/greed",
-                "label": "Greed",
-                "description": "Legislators using power to live at others' expense."
-              },
-              {
-                "kind": "concept",
-                "id": "perversion-of-law/false-philanthropy",
-                "label": "False Philanthropy",
-                "description": "The desire to do good to some by robbing others via law."
-              },
-              {
-                "kind": "concept",
-                "id": "perversion-of-law/law-as-instrument-of-plunder",
-                "label": "Law as Instrument of Plunder",
-                "description": "Law protects plunderers instead of the plundered."
-              }
-            ]
-          },
-          {
-            "kind": "dir",
-            "id": "legal-plunder",
-            "label": "legal-plunder/",
-            "description": "Definition, manifestations, consequences",
-            "body": "# Legal Plunder\r\n\r\n* [Definition](definition.md)\r\n* [Universal Plunder](universal-plunder.md)\r\n* [Manifestations](manifestations/)\r\n* [Consequences](consequences/)\n",
-            "children": [
-              {
-                "kind": "concept",
-                "id": "legal-plunder/definition",
-                "label": "Definition",
-                "description": "Law used to take the property of some and give it to others without consent."
-              },
-              {
-                "kind": "concept",
-                "id": "legal-plunder/universal-plunder",
-                "label": "Universal Plunder",
-                "description": "When the principle is accepted, plunder becomes the equilibrium state of politics."
-              },
-              {
-                "kind": "dir",
-                "id": "legal-plunder/manifestations",
-                "label": "Manifestations",
-                "body": "# Manifestations of Legal Plunder\r\n\r\n* [Protectionism & Tariffs](protectionism-and-tariffs.md)\r\n* [Subsidies](subsidies.md)\r\n* [Progressive Taxation](progressive-taxation.md)\r\n* [Public Schools](public-schools.md)\r\n* [Government Jobs Programs](government-jobs-programs.md)\r\n* [Minimum Wage Laws](minimum-wage-laws.md)\r\n* [Welfare](welfare.md)\r\n* [Usury Laws](usury-laws.md)\r\n* [Monopolies](monopolies.md)\r\n* [Forced Labor](forced-labor.md)\n* [Deeper Analysis](deeper/) - Tariff effects and political economy.\n",
-                "children": [
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/manifestations/protectionism-and-tariffs",
-                    "label": "Protectionism & Tariffs",
-                    "description": "Tariffs force consumers to subsidize producers."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/manifestations/subsidies",
-                    "label": "Subsidies",
-                    "description": "Tax money given to favored groups."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/manifestations/progressive-taxation",
-                    "label": "Progressive Taxation",
-                    "description": "Using the tax code to redistribute."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/manifestations/public-schools",
-                    "label": "Public Schools",
-                    "description": "Tax funded schooling used for indoctrination."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/manifestations/government-jobs-programs",
-                    "label": "Government Jobs Programs",
-                    "description": "Make-work at taxpayer expense."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/manifestations/minimum-wage-laws",
-                    "label": "Minimum Wage Laws",
-                    "description": "Price floor on labor that creates unemployment."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/manifestations/welfare",
-                    "label": "Welfare",
-                    "description": "Organized transfer presented as the poor's right to plunder."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/manifestations/usury-laws",
-                    "label": "Usury Laws",
-                    "description": "Interest caps that reduce credit for the poor."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/manifestations/monopolies",
-                    "label": "Monopolies",
-                    "description": "State-granted exclusive privileges."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/manifestations/forced-labor",
-                    "label": "Forced Labor",
-                    "description": "Compulsory service extracted by the state."
-                  },
-                  {
-                    "kind": "dir",
-                    "id": "legal-plunder/manifestations/deeper",
-                    "label": "Deeper Analysis",
-                    "description": "Tariff effects and political economy.",
-                    "body": "# Deeper Analysis\r\n\r\n* [Effects on Consumers](tariff-effects-on-consumers.md)\r\n* [Political Economy](political-economy-of-tariffs.md)\n",
-                    "children": [
-                      {
-                        "kind": "concept",
-                        "id": "legal-plunder/manifestations/deeper/tariff-effects-on-consumers",
-                        "label": "Effects on Consumers",
-                        "description": "Consumers pay the hidden tax of protection."
-                      },
-                      {
-                        "kind": "concept",
-                        "id": "legal-plunder/manifestations/deeper/political-economy-of-tariffs",
-                        "label": "Political Economy",
-                        "description": "Concentrated interests lobby; consumers stay ignorant."
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "kind": "dir",
-                "id": "legal-plunder/consequences",
-                "label": "Consequences",
-                "body": "# Consequences\r\n\r\n* [Effacing Justice](effacing-justice.md)\r\n* [Politicization](politicization-of-society.md)\r\n* [Rent Seeking](rent-seeking.md)\r\n* [Corruption of Education](corruption-of-education.md)\r\n* [Loss of Moral Sense](loss-of-moral-sense.md)\r\n* [Class Conflict](class-conflict.md)\r\n* [Economic Impoverishment](economic-impoverishment.md)\r\n* [Instability](instability-and-revolution.md)\r\n* [Demoralization](demoralization-of-citizens.md)\n",
-                "children": [
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/consequences/effacing-justice",
-                    "label": "Effacing Justice",
-                    "description": "Law that sanctions plunder destroys the distinction between justice and injustice."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/consequences/politicization-of-society",
-                    "label": "Politicization",
-                    "description": "When law = plunder, politics becomes the main arena of life."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/consequences/rent-seeking",
-                    "label": "Rent Seeking",
-                    "description": "Resources spent obtaining political transfers rather than producing value."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/consequences/corruption-of-education",
-                    "label": "Corruption of Education",
-                    "description": "State-paid teachers will not criticize the laws that pay them."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/consequences/loss-of-moral-sense",
-                    "label": "Loss of Moral Sense",
-                    "description": "Citizens must choose between conscience and respect for law."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/consequences/class-conflict",
-                    "label": "Class Conflict",
-                    "description": "Every group organizes to plunder or to defend against plunder."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/consequences/economic-impoverishment",
-                    "label": "Economic Impoverishment",
-                    "description": "Legal plunder reduces total wealth even for many of its beneficiaries."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/consequences/instability-and-revolution",
-                    "label": "Instability",
-                    "description": "Generalized plunder produces constant pressure for upheaval."
-                  },
-                  {
-                    "kind": "concept",
-                    "id": "legal-plunder/consequences/demoralization-of-citizens",
-                    "label": "Demoralization",
-                    "description": "When law commands injustice citizens become cynics or accomplices."
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "kind": "dir",
-            "id": "socialism",
-            "label": "socialism/",
-            "description": "Critique of coercive social engineering",
-            "body": "# Socialism\r\n\r\n* [Socialist Doctrine](socialist-doctrine.md)\r\n* [Playing God](playing-god.md)\r\n* [Forced Conformity](forced-conformity.md)\r\n* [Critique of Coercive Charity](critique-of-charity.md)\r\n* [Education as Indoctrination](education-as-indoctrination.md)\n",
-            "children": [
-              {
-                "kind": "concept",
-                "id": "socialism/socialist-doctrine",
-                "label": "Socialist Doctrine",
-                "description": "The program of systematized legal plunder under philanthropic slogans."
-              },
-              {
-                "kind": "concept",
-                "id": "socialism/playing-god",
-                "label": "Playing God",
-                "description": "Socialists want to remake man and society according to their plan."
-              },
-              {
-                "kind": "concept",
-                "id": "socialism/forced-conformity",
-                "label": "Forced Conformity",
-                "description": "Regulation and regimentation imposed on the whole population."
-              },
-              {
-                "kind": "concept",
-                "id": "socialism/critique-of-charity",
-                "label": "Critique of Coercive Charity",
-                "description": "Taking by taxation is not charity."
-              },
-              {
-                "kind": "concept",
-                "id": "socialism/education-as-indoctrination",
-                "label": "Education as Indoctrination",
-                "description": "State schools serve the state that funds them."
-              }
-            ]
-          },
-          {
-            "kind": "dir",
-            "id": "true-law",
-            "label": "true-law/",
-            "description": "The limited, proper function of law and government",
-            "body": "# True Law\r\n\r\n* [Proper Sphere](proper-sphere.md)\r\n* [Protection of Rights](protection-of-rights.md)\r\n* [Negative Role](negative-role.md)\r\n* [Non-Intervention](non-intervention.md)\r\n* [Limited Government](limited-government.md)\n",
-            "children": [
-              {
-                "kind": "concept",
-                "id": "true-law/proper-sphere",
-                "label": "Proper Sphere",
-                "description": "Law confined to protecting persons, liberties and properties."
-              },
-              {
-                "kind": "concept",
-                "id": "true-law/protection-of-rights",
-                "label": "Protection of Rights",
-                "description": "The only legitimate end of collective force."
-              },
-              {
-                "kind": "concept",
-                "id": "true-law/negative-role",
-                "label": "Negative Role",
-                "description": "Law represses injustice; it does not positively organize society."
-              },
-              {
-                "kind": "concept",
-                "id": "true-law/non-intervention",
-                "label": "Non-Intervention",
-                "description": "Wants and satisfactions develop in their natural order."
-              },
-              {
-                "kind": "concept",
-                "id": "true-law/limited-government",
-                "label": "Limited Government",
-                "description": "The most restrained government is the most just and stable."
-              }
-            ]
-          },
-          {
-            "kind": "dir",
-            "id": "political-mechanisms",
-            "label": "political-mechanisms/",
-            "description": "Suffrage and incentives",
-            "body": "# Political Mechanisms\r\n\r\n* [Universal Suffrage](universal-suffrage.md)\r\n* [Law Manufacturing](law-manufacturing.md)\r\n* [Political Struggle](political-struggle.md)\n",
-            "children": [
-              {
-                "kind": "concept",
-                "id": "political-mechanisms/universal-suffrage",
-                "label": "Universal Suffrage",
-                "description": "When law can plunder, the fight over who may vote becomes ferocious."
-              },
-              {
-                "kind": "concept",
-                "id": "political-mechanisms/law-manufacturing",
-                "label": "Law Manufacturing",
-                "description": "Plundered classes try to enter the business of making law."
-              },
-              {
-                "kind": "concept",
-                "id": "political-mechanisms/political-struggle",
-                "label": "Political Struggle",
-                "description": "Politics receives exaggerated importance precisely because it controls plunder."
-              }
-            ]
-          },
-          {
-            "kind": "dir",
-            "id": "historical-context",
-            "label": "historical-context/",
-            "description": "19th century setting",
-            "body": "# Historical Context\r\n\r\n* [France 1850](1850-france.md)\r\n* [The American Ideal](american-ideal.md)\r\n* [Exceptions in America](slavery-and-tariffs-exception.md)\n",
-            "children": [
-              {
-                "kind": "concept",
-                "id": "historical-context/1850-france",
-                "label": "France 1850",
-                "description": "Revolution, national workshops, socialist agitation in the legislature."
-              },
-              {
-                "kind": "concept",
-                "id": "historical-context/american-ideal",
-                "label": "The American Ideal",
-                "description": "Bastiat saw the early United States as the closest real-world approximation of proper law."
-              },
-              {
-                "kind": "concept",
-                "id": "historical-context/slavery-and-tariffs-exception",
-                "label": "Exceptions in America",
-                "description": "Bastiat explicitly excepted these two evils from his praise of America."
-              }
-            ]
-          },
-          {
-            "kind": "dir",
-            "id": "modern-relevance",
-            "label": "modern-relevance/",
-            "description": "Enduring lessons",
-            "body": "# Modern Relevance\r\n\r\n* [Contemporary Legal Plunder](contemporary-plunder.md)\r\n* [Lessons for Today](lessons-for-today.md)\r\n* [Rent Seeking Today](rent-seeking-today.md)\r\n* [Influence on Libertarianism](influence-on-libertarianism.md)\r\n* [Influence on Austrian Economics](influence-on-austrian-economics.md)\n",
-            "children": [
-              {
-                "kind": "concept",
-                "id": "modern-relevance/contemporary-plunder",
-                "label": "Contemporary Legal Plunder",
-                "description": "Tariffs, subsidies, entitlements, regulatory capture, occupational licensing all fit the pattern."
-              },
-              {
-                "kind": "concept",
-                "id": "modern-relevance/lessons-for-today",
-                "label": "Lessons for Today",
-                "description": "Confine law to defense. Reject the fatal principle that law may take from one to give to another."
-              },
-              {
-                "kind": "concept",
-                "id": "modern-relevance/rent-seeking-today",
-                "label": "Rent Seeking Today",
-                "description": "Industries and interest groups compete for favors instead of serving customers."
-              },
-              {
-                "kind": "concept",
-                "id": "modern-relevance/influence-on-libertarianism",
-                "label": "Influence on Libertarianism",
-                "description": "Foundational text for natural-rights and limited-government thought."
-              },
-              {
-                "kind": "concept",
-                "id": "modern-relevance/influence-on-austrian-economics",
-                "label": "Influence on Austrian Economics",
-                "description": "Precursor emphasis on spontaneous order and critique of intervention."
-              }
-            ]
-          },
-          {
-            "kind": "dir",
-            "id": "key-extracts",
-            "label": "key-extracts/",
-            "description": "Important passages",
-            "body": "# Key Extracts\r\n\r\n* [Three Gifts](extract-three-gifts.md)\r\n* [Law Definition](extract-law-definition.md)\r\n* [Origin of Plunder](extract-plunder-origin.md)\r\n* [Causes](extract-perversion-causes.md)\r\n* [Justice vs Law](extract-consequences1.md)\r\n* [Politics](extract-consequences2.md)\r\n* [Suffrage](extract-suffrage.md)\r\n* [Socialists](extract-socialists.md)\r\n* [Government Role](extract-government-role.md)\r\n* [Conclusion](extract-conclusion.md)\n",
-            "children": [
-              {
-                "kind": "concept",
-                "id": "key-extracts/extract-three-gifts",
-                "label": "Three Gifts",
-                "description": "Direct quotation: Three Gifts."
-              },
-              {
-                "kind": "concept",
-                "id": "key-extracts/extract-law-definition",
-                "label": "Law Definition",
-                "description": "Direct quotation: Law Definition."
-              },
-              {
-                "kind": "concept",
-                "id": "key-extracts/extract-plunder-origin",
-                "label": "Origin of Plunder",
-                "description": "Direct quotation: Origin of Plunder."
-              },
-              {
-                "kind": "concept",
-                "id": "key-extracts/extract-perversion-causes",
-                "label": "Causes",
-                "description": "Direct quotation: Causes."
-              },
-              {
-                "kind": "concept",
-                "id": "key-extracts/extract-consequences1",
-                "label": "Justice vs Law",
-                "description": "Direct quotation: Justice vs Law."
-              },
-              {
-                "kind": "concept",
-                "id": "key-extracts/extract-consequences2",
-                "label": "Politics",
-                "description": "Direct quotation: Politics."
-              },
-              {
-                "kind": "concept",
-                "id": "key-extracts/extract-suffrage",
-                "label": "Suffrage",
-                "description": "Direct quotation: Suffrage."
-              },
-              {
-                "kind": "concept",
-                "id": "key-extracts/extract-socialists",
-                "label": "Socialists",
-                "description": "Direct quotation: Socialists."
-              },
-              {
-                "kind": "concept",
-                "id": "key-extracts/extract-government-role",
-                "label": "Government Role",
-                "description": "Direct quotation: Government Role."
-              },
-              {
-                "kind": "concept",
-                "id": "key-extracts/extract-conclusion",
-                "label": "Conclusion",
-                "description": "Direct quotation: Conclusion."
-              }
-            ]
-          },
-          {
-            "kind": "dir",
-            "id": "related-concepts",
-            "label": "related-concepts/",
-            "description": "Adjacent ideas",
-            "body": "# Related Concepts\r\n\r\n* [Natural Law](natural-law.md)\r\n* [Rule of Law](rule-of-law.md)\r\n* [Individual Rights](individual-rights.md)\r\n* [Property Rights](property-rights.md)\r\n* [Free Trade](free-trade.md)\r\n* [Voluntary Philanthropy](philanthropy-vs-coercion.md)\r\n* [Spontaneous Order](spontaneous-order.md)\r\n* [Limited vs Activist State](limited-vs-activist-state.md)\n",
-            "children": [
-              {
-                "kind": "concept",
-                "id": "related-concepts/natural-law",
-                "label": "Natural Law",
-                "description": "Rights inhere in human nature; positive law is valid only insofar as it recognizes them."
-              },
-              {
-                "kind": "concept",
-                "id": "related-concepts/rule-of-law",
-                "label": "Rule of Law",
-                "description": "Law must be general and equal. Targeting specific groups for plunder violates the rule of law."
-              },
-              {
-                "kind": "concept",
-                "id": "related-concepts/individual-rights",
-                "label": "Individual Rights",
-                "description": "The moral unit is the individual; collective force exists only to protect individuals."
-              },
-              {
-                "kind": "concept",
-                "id": "related-concepts/property-rights",
-                "label": "Property Rights",
-                "description": "Property is the extension of faculties. Attacks on property are attacks on liberty and personality."
-              },
-              {
-                "kind": "concept",
-                "id": "related-concepts/free-trade",
-                "label": "Free Trade",
-                "description": "Exchange is production. Barriers are plunder."
-              },
-              {
-                "kind": "concept",
-                "id": "related-concepts/philanthropy-vs-coercion",
-                "label": "Voluntary Philanthropy",
-                "description": "True giving requires a willing giver. Coercion destroys the moral act."
-              },
-              {
-                "kind": "concept",
-                "id": "related-concepts/spontaneous-order",
-                "label": "Spontaneous Order",
-                "description": "When law stays within its sphere, order emerges naturally."
-              },
-              {
-                "kind": "concept",
-                "id": "related-concepts/limited-vs-activist-state",
-                "label": "Limited vs Activist State",
-                "description": "The activist state that tries to organize everything becomes the central plunderer."
-              }
-            ]
-          },
-          {
-            "kind": "dir",
-            "id": "key-figures",
-            "label": "key-figures/",
-            "description": "Bastiat and commentators",
-            "body": "# Key Figures\r\n\r\n* [Frédéric Bastiat](frederic-bastiat.md)\r\n* [Thomas J. DiLorenzo](thomas-dilorenzo.md)\n",
-            "children": [
-              {
-                "kind": "concept",
-                "id": "key-figures/frederic-bastiat",
-                "label": "Frédéric Bastiat",
-                "description": "1801-1850. French economist, free-trader, and author of The Law and Economic Harmonies."
-              },
-              {
-                "kind": "concept",
-                "id": "key-figures/thomas-dilorenzo",
-                "label": "Thomas J. DiLorenzo",
-                "description": "Economist, author of the foreword in the Mises Institute edition."
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
+  "timestamp": "2026-07-03T02:14:15.7885232+00:00",
   "nodes": [
     {
       "id": "foreword",
@@ -634,7 +16,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Foreword\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nDiLorenzo emphasizes Bastiat's anticipation of rent-seeking and the corruption of education and charity by the state. America came closest to the ideal except for slavery and tariffs.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Government's only legitimate end is protection of life, liberty, and property. (see Natural Rights).\r\n- Legal plunder includes tariffs, subsidies, progressive taxes, public schooling, welfare. (see legal plunder).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "foreword.md",
       "degree": 5,
       "in": 0,
@@ -656,7 +37,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Collective Force\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nIndividuals may combine their right of defense into a regular common force. See the [central definition](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- The common force inherits exactly the same moral limits as individual force.\r\n- It cannot lawfully be used for plunder. The opposite occurs through the [causes of perversion](/perversion-of-law/causes-of-perversion.md). (see legal plunder).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "fundamental-principles/collective-force.md",
       "degree": 6,
       "in": 0,
@@ -678,7 +58,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Justice\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nLaw's mission is to cause justice to reign by protecting rights equally. See the [central definition](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- When law sanctions plunder the distinction between justice and injustice disappears. The opposite occurs through the [causes of perversion](/perversion-of-law/causes-of-perversion.md). (see legal plunder).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "fundamental-principles/justice.md",
       "degree": 6,
       "in": 0,
@@ -701,7 +80,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Law Defined\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nThis is the central thesis. Law has no other legitimate mission. When it goes beyond defense it becomes plunder. This definition is referenced from almost every other concept in the bundle.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Collective force may only do what the individual may lawfully do. (see Natural Rights).\r\n- Results in minimal, just, stable government. The opposite occurs through the [causes of perversion](/perversion-of-law/causes-of-perversion.md). (see Natural Rights).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "fundamental-principles/law-as-organization-of-defense.md",
       "degree": 58,
       "in": 53,
@@ -723,7 +101,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Lawful Defense\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nEvery person has a natural right to defend life, liberty and property. See the [central definition](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Defense is the origin of legitimate force. (see Natural Rights).\r\n- Collective right derives directly from it. The opposite occurs through the [causes of perversion](/perversion-of-law/causes-of-perversion.md). (see Natural Rights).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "fundamental-principles/lawful-defense.md",
       "degree": 6,
       "in": 0,
@@ -745,7 +122,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Natural Rights\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nThese three gifts precede and justify law. Any statute violating them is illegitimate. See how they ground the [definition of law](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Three elements: personality (individuality), liberty, property. (see Natural Rights).\r\n- Legislation must serve them, not create or destroy them. The opposite occurs through the [causes of perversion](/perversion-of-law/causes-of-perversion.md). (see Natural Rights).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md). Related consequences appear in the discussion of [rent-seeking behavior](/legal-plunder/consequences/rent-seeking.md). Related consequences appear in the discussion of [modern examples](/modern-relevance/contemporary-plunder.md). Related consequences appear in the discussion of [false philanthropy](/perversion-of-law/false-philanthropy.md).\r\n",
       "path": "fundamental-principles/natural-rights.md",
       "degree": 70,
       "in": 62,
@@ -767,7 +143,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Non-Aggression\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nForce has not been given us to annihilate the equal rights of others. See the [central definition](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- This limit applies equally to the state.\r\n- Foundation of limited government. The opposite occurs through the [causes of perversion](/perversion-of-law/causes-of-perversion.md). (see Natural Rights).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "fundamental-principles/non-aggression-principle.md",
       "degree": 6,
       "in": 0,
@@ -789,7 +164,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Order and Stability\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nA government that only protects produces the most stable and natural social order. See the [central definition](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- No artificial displacements of capital or population.\r\n- Individuals bear responsibility for success and misfortune. The opposite occurs through the [causes of perversion](/perversion-of-law/causes-of-perversion.md). (see Natural Rights).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "fundamental-principles/order-and-stability.md",
       "degree": 6,
       "in": 0,
@@ -811,7 +185,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Personality, Liberty, and Property\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nThe three constitutive elements of man. See the [central definition](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- They are interdependent extensions of one another.\r\n- Property is the fruit of faculties applied to the world. The opposite occurs through the [causes of perversion](/perversion-of-law/causes-of-perversion.md). (see Natural Rights).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "fundamental-principles/personality-liberty-property.md",
       "degree": 6,
       "in": 0,
@@ -833,7 +206,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# France 1850\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nThe immediate setting of the essay.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Bastiat served as a deputy.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md). The roots lie in [the causes of perversion](/perversion-of-law/causes-of-perversion.md).\r\n",
       "path": "historical-context/1850-france.md",
       "degree": 6,
       "in": 0,
@@ -855,7 +227,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# American Ideal\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nProtection of life, liberty, property.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Two great exceptions noted: slavery and protectionist tariffs.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md). The roots lie in [the causes of perversion](/perversion-of-law/causes-of-perversion.md).\r\n",
       "path": "historical-context/american-ideal.md",
       "degree": 6,
       "in": 0,
@@ -877,7 +248,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Exceptions\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nHe would have been horrified by later developments.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md). The roots lie in [the causes of perversion](/perversion-of-law/causes-of-perversion.md).\r\n",
       "path": "historical-context/slavery-and-tariffs-exception.md",
       "degree": 4,
       "in": 0,
@@ -900,7 +270,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Conclusion\r\n\r\nThis passage comes from the discussion in [The Law](/the-law.md) and embodies the idea of [Natural Rights](/fundamental-principles/natural-rights.md).\r\n> The safest way to make laws respected is to make them respectable.\r\n\r\nThis quotation illustrates core ideas from [The Law](/the-law.md) and [the definition of law](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\nThis extract directly supports the analysis in [The Law](/the-law.md) and illustrates [legal plunder](/legal-plunder/definition.md).\r\n\r\nThis passage is discussed in the main analysis and directly illustrates the central [definition of law](/fundamental-principles/law-as-organization-of-defense.md) and the problem of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "key-extracts/extract-conclusion.md",
       "degree": 4,
       "in": 0,
@@ -923,7 +292,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Justice vs Law\r\n\r\nThis passage comes from the discussion in [The Law](/the-law.md) and embodies the idea of [Natural Rights](/fundamental-principles/natural-rights.md).\r\n> It would efface from everybody's conscience the distinction between justice and injustice.\r\n\r\nThis quotation illustrates core ideas from [The Law](/the-law.md) and [the definition of law](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\nThis extract directly supports the analysis in [The Law](/the-law.md) and illustrates [legal plunder](/legal-plunder/definition.md).\r\n\r\nThis passage is discussed in the main analysis and directly illustrates the central [definition of law](/fundamental-principles/law-as-organization-of-defense.md) and the problem of [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "key-extracts/extract-consequences1.md",
       "degree": 4,
       "in": 0,
@@ -946,7 +314,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Politics\r\n\r\nThis passage comes from the discussion in [The Law](/the-law.md) and embodies the idea of [Natural Rights](/fundamental-principles/natural-rights.md).\r\n> It gives to ... politics ... an exaggerated importance.\r\n\r\nThis quotation illustrates core ideas from [The Law](/the-law.md) and [the definition of law](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\nThis extract directly supports the analysis in [The Law](/the-law.md) and illustrates [legal plunder](/legal-plunder/definition.md).\r\n\r\nThis passage is discussed in the main analysis and directly illustrates the central [definition of law](/fundamental-principles/law-as-organization-of-defense.md) and the problem of [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "key-extracts/extract-consequences2.md",
       "degree": 4,
       "in": 0,
@@ -969,7 +336,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Government Role\r\n\r\nThis passage comes from the discussion in [The Law](/the-law.md) and embodies the idea of [Natural Rights](/fundamental-principles/natural-rights.md).\r\n> If law were confined to causing all persons, all liberties, and all properties to be respected ...\r\n\r\nThis quotation illustrates core ideas from [The Law](/the-law.md) and [the definition of law](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\nThis extract directly supports the analysis in [The Law](/the-law.md) and illustrates [legal plunder](/legal-plunder/definition.md).\r\n\r\nThis passage is discussed in the main analysis and directly illustrates the central [definition of law](/fundamental-principles/law-as-organization-of-defense.md) and the problem of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "key-extracts/extract-government-role.md",
       "degree": 4,
       "in": 0,
@@ -992,7 +358,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Law Definition\r\n\r\nThis passage comes from the discussion in [The Law](/the-law.md) and embodies the idea of [Natural Rights](/fundamental-principles/natural-rights.md).\r\n> The law is the organization of the natural right of lawful defense...\r\n\r\nThis quotation illustrates core ideas from [The Law](/the-law.md) and [the definition of law](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\nThis extract directly supports the analysis in [The Law](/the-law.md) and illustrates [legal plunder](/legal-plunder/definition.md).\r\n\r\nThis passage is discussed in the main analysis and directly illustrates the central [definition of law](/fundamental-principles/law-as-organization-of-defense.md) and the problem of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "key-extracts/extract-law-definition.md",
       "degree": 4,
       "in": 0,
@@ -1015,7 +380,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Causes\r\n\r\nThis passage comes from the discussion in [The Law](/the-law.md) and embodies the idea of [Natural Rights](/fundamental-principles/natural-rights.md).\r\n> The law has been perverted through ... naked greed and misconceived philanthropy.\r\n\r\nThis quotation illustrates core ideas from [The Law](/the-law.md) and [the definition of law](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\nThis extract directly supports the analysis in [The Law](/the-law.md) and illustrates [legal plunder](/legal-plunder/definition.md).\r\n\r\nThis passage is discussed in the main analysis and directly illustrates the central [definition of law](/fundamental-principles/law-as-organization-of-defense.md) and the problem of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "key-extracts/extract-perversion-causes.md",
       "degree": 4,
       "in": 0,
@@ -1038,7 +402,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Origin of Plunder\r\n\r\nThis passage comes from the discussion in [The Law](/the-law.md) and embodies the idea of [Natural Rights](/fundamental-principles/natural-rights.md).\r\n> Man can only derive life ... This is the origin of property. ... This is the origin of plunder.\r\n\r\nThis quotation illustrates core ideas from [The Law](/the-law.md) and [the definition of law](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\nThis extract directly supports the analysis in [The Law](/the-law.md) and illustrates [legal plunder](/legal-plunder/definition.md).\r\n\r\nThis passage is discussed in the main analysis and directly illustrates the central [definition of law](/fundamental-principles/law-as-organization-of-defense.md) and the problem of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "key-extracts/extract-plunder-origin.md",
       "degree": 4,
       "in": 0,
@@ -1061,7 +424,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Socialists\r\n\r\nThis passage comes from the discussion in [The Law](/the-law.md) and embodies the idea of [Natural Rights](/fundamental-principles/natural-rights.md).\r\n> Socialists want 'to play God' ... forced conformity; rigid regimentation ... dictatorship.\r\n\r\nThis quotation illustrates core ideas from [The Law](/the-law.md) and [the definition of law](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\nThis extract directly supports the analysis in [The Law](/the-law.md) and illustrates [legal plunder](/legal-plunder/definition.md).\r\n\r\nThis passage is discussed in the main analysis and directly illustrates the central [definition of law](/fundamental-principles/law-as-organization-of-defense.md) and the problem of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "key-extracts/extract-socialists.md",
       "degree": 4,
       "in": 0,
@@ -1084,7 +446,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Suffrage\r\n\r\nThis passage comes from the discussion in [The Law](/the-law.md) and embodies the idea of [Natural Rights](/fundamental-principles/natural-rights.md).\r\n> If the law may take from one party in order to give to another ... there is no class which may not try to place its hand upon the law.\r\n\r\nThis quotation illustrates core ideas from [The Law](/the-law.md) and [the definition of law](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\nThis extract directly supports the analysis in [The Law](/the-law.md) and illustrates [legal plunder](/legal-plunder/definition.md).\r\n\r\nThis passage is discussed in the main analysis and directly illustrates the central [definition of law](/fundamental-principles/law-as-organization-of-defense.md) and the problem of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "key-extracts/extract-suffrage.md",
       "degree": 4,
       "in": 0,
@@ -1107,7 +468,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Three Gifts\r\n\r\nThis passage comes from the discussion in [The Law](/the-law.md) and embodies the idea of [Natural Rights](/fundamental-principles/natural-rights.md).\r\n> We hold from God ... personality, liberty, property—this is man.\r\n\r\nThis quotation illustrates core ideas from [The Law](/the-law.md) and [the definition of law](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\nThis extract directly supports the analysis in [The Law](/the-law.md) and illustrates [legal plunder](/legal-plunder/definition.md).\r\n\r\nThis passage is discussed in the main analysis and directly illustrates the central [definition of law](/fundamental-principles/law-as-organization-of-defense.md) and the problem of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "key-extracts/extract-three-gifts.md",
       "degree": 4,
       "in": 0,
@@ -1129,7 +489,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Frédéric Bastiat\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nDied 1850. Clear stylist and uncompromising defender of liberty. His work prefigures Austrian economics.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Also wrote the famous Candlemakers' petition against protectionism.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "key-figures/frederic-bastiat.md",
       "degree": 5,
       "in": 0,
@@ -1151,7 +510,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Thomas J. DiLorenzo\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nHighlights continuing relevance against rent-seeking and state education.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md). The roots lie in [the causes of perversion](/perversion-of-law/causes-of-perversion.md).\r\n",
       "path": "key-figures/thomas-dilorenzo.md",
       "degree": 4,
       "in": 0,
@@ -1173,7 +531,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Class Conflict\r\n\r\nThis outcome follows directly from violating the ideas in [The Law](/the-law.md) and [Natural Rights](/fundamental-principles/natural-rights.md).\r\nEvery group organizes to plunder or to defend against plunder. Direct result of the [perversion of law](/perversion-of-law/).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md). The roots lie in [the causes of perversion](/perversion-of-law/causes-of-perversion.md).\r\n",
       "path": "legal-plunder/consequences/class-conflict.md",
       "degree": 4,
       "in": 0,
@@ -1195,7 +552,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Corruption of Education\r\n\r\nThis outcome follows directly from violating the ideas in [The Law](/the-law.md) and [Natural Rights](/fundamental-principles/natural-rights.md).\r\nState-paid teachers will not criticize the laws that pay them. Direct result of the [perversion of law](/perversion-of-law/).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md). The roots lie in [the causes of perversion](/perversion-of-law/causes-of-perversion.md).\r\n",
       "path": "legal-plunder/consequences/corruption-of-education.md",
       "degree": 4,
       "in": 0,
@@ -1217,7 +573,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Demoralization of Citizens\r\n\r\nThis outcome follows directly from violating the ideas in [The Law](/the-law.md) and [Natural Rights](/fundamental-principles/natural-rights.md).\r\nWhen law commands injustice citizens become cynics or accomplices. Direct result of the [perversion of law](/perversion-of-law/).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md). The roots lie in [the causes of perversion](/perversion-of-law/causes-of-perversion.md).\r\n",
       "path": "legal-plunder/consequences/demoralization-of-citizens.md",
       "degree": 4,
       "in": 0,
@@ -1239,7 +594,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Economic Impoverishment\r\n\r\nThis outcome follows directly from violating the ideas in [The Law](/the-law.md) and [Natural Rights](/fundamental-principles/natural-rights.md).\r\nLegal plunder reduces total wealth even for many of its beneficiaries. Direct result of the [perversion of law](/perversion-of-law/).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "legal-plunder/consequences/economic-impoverishment.md",
       "degree": 3,
       "in": 0,
@@ -1261,7 +615,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Effacing Justice\r\n\r\nThis outcome follows directly from violating the ideas in [The Law](/the-law.md) and [Natural Rights](/fundamental-principles/natural-rights.md).\r\nLaw that sanctions plunder destroys the distinction between justice and injustice. Direct result of the [perversion of law](/perversion-of-law/).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- People come to accept injustice if it is legal. (see Natural Rights).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "legal-plunder/consequences/effacing-justice.md",
       "degree": 5,
       "in": 0,
@@ -1283,7 +636,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Instability and Revolution\r\n\r\nThis outcome follows directly from violating the ideas in [The Law](/the-law.md) and [Natural Rights](/fundamental-principles/natural-rights.md).\r\nGeneralized plunder produces constant pressure for upheaval. Direct result of the [perversion of law](/perversion-of-law/).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "legal-plunder/consequences/instability-and-revolution.md",
       "degree": 3,
       "in": 0,
@@ -1305,7 +657,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Loss of Moral Sense\r\n\r\nThis outcome follows directly from violating the ideas in [The Law](/the-law.md) and [Natural Rights](/fundamental-principles/natural-rights.md).\r\nCitizens must choose between conscience and respect for law. Direct result of the [perversion of law](/perversion-of-law/).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "legal-plunder/consequences/loss-of-moral-sense.md",
       "degree": 3,
       "in": 0,
@@ -1327,7 +678,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Politicization of Society\r\n\r\nThis outcome follows directly from violating the ideas in [The Law](/the-law.md) and [Natural Rights](/fundamental-principles/natural-rights.md).\r\nWhen law = plunder, politics becomes the main arena of life. Direct result of the [perversion of law](/perversion-of-law/).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Everyone tries to live at the expense of everyone else.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "legal-plunder/consequences/politicization-of-society.md",
       "degree": 5,
       "in": 0,
@@ -1349,7 +699,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Rent Seeking\r\n\r\nThis outcome follows directly from violating the ideas in [The Law](/the-law.md) and [Natural Rights](/fundamental-principles/natural-rights.md).\r\nResources spent obtaining political transfers rather than producing value. Direct result of the [perversion of law](/perversion-of-law/).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Opportunity cost impoverishes society as a whole.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "legal-plunder/consequences/rent-seeking.md",
       "degree": 9,
       "in": 4,
@@ -1371,7 +720,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Definition of Legal Plunder\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nThe fatal principle that law may organize plunder. Once admitted, every class tries to capture the power to plunder. This page is one of the central hubs of the bundle.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Plunder made respectable by law. (see legal plunder).\r\n- Leads to universal plunder when the victims seize the legislature. The opposite occurs through the [causes of perversion](/perversion-of-law/causes-of-perversion.md). (see legal plunder).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md). Related consequences appear in the discussion of [rent-seeking behavior](/legal-plunder/consequences/rent-seeking.md). Related consequences appear in the discussion of [modern examples](/modern-relevance/contemporary-plunder.md). Related consequences appear in the discussion of [false philanthropy](/perversion-of-law/false-philanthropy.md).\r\n",
       "path": "legal-plunder/definition.md",
       "degree": 86,
       "in": 78,
@@ -1393,7 +741,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Political Economy\r\n\r\nOne of the concrete forms of what [The Law](/the-law.md) calls [legal plunder](/legal-plunder/definition.md).\r\nExplains why bad policy persists.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "legal-plunder/manifestations/deeper/political-economy-of-tariffs.md",
       "degree": 3,
       "in": 0,
@@ -1415,7 +762,6 @@
         "trade"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Effects on Consumers\r\n\r\nOne of the concrete forms of what [The Law](/the-law.md) calls [legal plunder](/legal-plunder/definition.md).\r\nEvery tariff is a forced transfer.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Higher prices, less choice.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "legal-plunder/manifestations/deeper/tariff-effects-on-consumers.md",
       "degree": 4,
       "in": 0,
@@ -1437,7 +783,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Forced Labor\r\n\r\nOne of the concrete forms of what [The Law](/the-law.md) calls [legal plunder](/legal-plunder/definition.md).\r\nCompulsory service extracted by the state. Classic example of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "legal-plunder/manifestations/forced-labor.md",
       "degree": 2,
       "in": 0,
@@ -1459,7 +804,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Government Jobs Programs\r\n\r\nOne of the concrete forms of what [The Law](/the-law.md) calls [legal plunder](/legal-plunder/definition.md).\r\nMake-work at taxpayer expense. Classic example of [legal plunder](/legal-plunder/definition.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Destroys real wealth.\r\n",
       "path": "legal-plunder/manifestations/government-jobs-programs.md",
       "degree": 4,
       "in": 0,
@@ -1481,7 +825,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Minimum Wage Laws\r\n\r\nOne of the concrete forms of what [The Law](/the-law.md) calls [legal plunder](/legal-plunder/definition.md).\r\nPrice floor on labor that creates unemployment. Classic example of [legal plunder](/legal-plunder/definition.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- False philanthropy.\r\n",
       "path": "legal-plunder/manifestations/minimum-wage-laws.md",
       "degree": 4,
       "in": 0,
@@ -1503,7 +846,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Monopolies\r\n\r\nOne of the concrete forms of what [The Law](/the-law.md) calls [legal plunder](/legal-plunder/definition.md).\r\nState-granted exclusive privileges. Classic example of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "legal-plunder/manifestations/monopolies.md",
       "degree": 2,
       "in": 0,
@@ -1525,7 +867,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Progressive Taxation\r\n\r\nOne of the concrete forms of what [The Law](/the-law.md) calls [legal plunder](/legal-plunder/definition.md).\r\nUsing the tax code to redistribute. Classic example of [legal plunder](/legal-plunder/definition.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Violates equal protection.\r\n",
       "path": "legal-plunder/manifestations/progressive-taxation.md",
       "degree": 4,
       "in": 0,
@@ -1547,7 +888,6 @@
         "trade"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Protectionism & Tariffs\r\n\r\nOne of the concrete forms of what [The Law](/the-law.md) calls [legal plunder](/legal-plunder/definition.md).\r\nTariffs force consumers to subsidize producers. Classic example of [legal plunder](/legal-plunder/definition.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Concentrated benefit, diffused cost.\r\n",
       "path": "legal-plunder/manifestations/protectionism-and-tariffs.md",
       "degree": 4,
       "in": 0,
@@ -1569,7 +909,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Public Schools\r\n\r\nOne of the concrete forms of what [The Law](/the-law.md) calls [legal plunder](/legal-plunder/definition.md).\r\nTax funded schooling used for indoctrination. Classic example of [legal plunder](/legal-plunder/definition.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Professors defend the system that pays them.\r\n",
       "path": "legal-plunder/manifestations/public-schools.md",
       "degree": 4,
       "in": 0,
@@ -1591,7 +930,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Subsidies\r\n\r\nOne of the concrete forms of what [The Law](/the-law.md) calls [legal plunder](/legal-plunder/definition.md).\r\nTax money given to favored groups. Classic example of [legal plunder](/legal-plunder/definition.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- No risk for the recipient.\r\n",
       "path": "legal-plunder/manifestations/subsidies.md",
       "degree": 4,
       "in": 0,
@@ -1613,7 +951,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Usury Laws\r\n\r\nOne of the concrete forms of what [The Law](/the-law.md) calls [legal plunder](/legal-plunder/definition.md).\r\nInterest caps that reduce credit for the poor. Classic example of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "legal-plunder/manifestations/usury-laws.md",
       "degree": 2,
       "in": 0,
@@ -1635,7 +972,6 @@
         "welfare"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Welfare\r\n\r\nOne of the concrete forms of what [The Law](/the-law.md) calls [legal plunder](/legal-plunder/definition.md).\r\nOrganized transfer presented as the poor's right to plunder. Classic example of [legal plunder](/legal-plunder/definition.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Creates client classes.\r\n",
       "path": "legal-plunder/manifestations/welfare.md",
       "degree": 4,
       "in": 0,
@@ -1657,7 +993,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Universal Plunder\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nEquilibrium sought by everyone trying to plunder everyone else through the law. See [consequences](/legal-plunder/consequences/).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Injustice is generalized rather than abolished. (see Natural Rights).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "legal-plunder/universal-plunder.md",
       "degree": 5,
       "in": 0,
@@ -1681,7 +1016,6 @@
         "welfare"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Contemporary Legal Plunder\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nTariffs, subsidies, entitlements, regulatory capture, occupational licensing all fit the pattern.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Higher prices and favors for politically connected interests.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "modern-relevance/contemporary-plunder.md",
       "degree": 9,
       "in": 4,
@@ -1703,7 +1037,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Influence on Austrian Economics\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nPrecursor emphasis on spontaneous order and critique of intervention.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Mises Institute keeps the work in print.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "modern-relevance/influence-on-austrian-economics.md",
       "degree": 5,
       "in": 0,
@@ -1725,7 +1058,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Influence on Libertarianism\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nFoundational text for natural-rights and limited-government thought.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Frequently recommended with Hazlitt and Rothbard.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "modern-relevance/influence-on-libertarianism.md",
       "degree": 5,
       "in": 0,
@@ -1747,7 +1079,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Lessons for Today\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nConfine law to defense. Reject the fatal principle that law may take from one to give to another.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Restore the principle that law protects rather than redistributes. (see Natural Rights).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "modern-relevance/lessons-for-today.md",
       "degree": 5,
       "in": 0,
@@ -1769,7 +1100,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Rent Seeking Today\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nIndustries and interest groups compete for favors instead of serving customers.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- The same opportunity cost Bastiat foresaw.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "modern-relevance/rent-seeking-today.md",
       "degree": 5,
       "in": 0,
@@ -1791,7 +1121,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Causes of Perversion\r\n\r\nThis illustrates how law becomes corrupted, as analyzed in [The Law](/the-law.md).\r\nNaked greed and misconceived philanthropy.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Two very different motives produce the same evil.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "perversion-of-law/causes-of-perversion.md",
       "degree": 20,
       "in": 16,
@@ -1813,7 +1142,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# False Philanthropy\r\n\r\nThis illustrates how law becomes corrupted, as analyzed in [The Law](/the-law.md).\r\nThe desire to do good to some by robbing others via law.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- True charity is voluntary.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "perversion-of-law/false-philanthropy.md",
       "degree": 8,
       "in": 4,
@@ -1835,7 +1163,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Greed\r\n\r\nThis illustrates how law becomes corrupted, as analyzed in [The Law](/the-law.md).\r\nLegislators using power to live at others' expense.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Where plunder is easier than labor it prevails. (see legal plunder).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "perversion-of-law/greed.md",
       "degree": 4,
       "in": 0,
@@ -1857,7 +1184,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# The Law Perverted\r\n\r\nThis illustrates how law becomes corrupted, as analyzed in [The Law](/the-law.md).\r\nLaw diverted from protection to predation.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Becomes the tool of avarice instead of its check.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "perversion-of-law/introduction-to-perversion.md",
       "degree": 4,
       "in": 0,
@@ -1879,7 +1205,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Law as Plunder Instrument\r\n\r\nThis illustrates how law becomes corrupted, as analyzed in [The Law](/the-law.md).\r\nLaw protects plunderers instead of the plundered.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Defense against plunder is criminalized. (see legal plunder).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "perversion-of-law/law-as-instrument-of-plunder.md",
       "degree": 4,
       "in": 0,
@@ -1901,7 +1226,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Law Manufacturing\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nPlundered classes try to enter the business of making law.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Either to stop plunder or to share in it. (see legal plunder).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "political-mechanisms/law-manufacturing.md",
       "degree": 5,
       "in": 0,
@@ -1923,7 +1247,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Political Struggle\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nPolitics receives exaggerated importance precisely because it controls plunder.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "political-mechanisms/political-struggle.md",
       "degree": 3,
       "in": 0,
@@ -1945,7 +1268,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Universal Suffrage\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nWhen law can plunder, the fight over who may vote becomes ferocious.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Limited law reduces the stakes dramatically. (see Natural Rights).\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "political-mechanisms/universal-suffrage.md",
       "degree": 5,
       "in": 0,
@@ -1967,7 +1289,6 @@
         "trade"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Free Trade\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nExchange is production. Barriers are plunder.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "related-concepts/free-trade.md",
       "degree": 3,
       "in": 0,
@@ -1989,7 +1310,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Individual Rights\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nThe moral unit is the individual; collective force exists only to protect individuals.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "related-concepts/individual-rights.md",
       "degree": 3,
       "in": 0,
@@ -2011,7 +1331,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Limited vs Activist State\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nThe activist state that tries to organize everything becomes the central plunderer.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "related-concepts/limited-vs-activist-state.md",
       "degree": 3,
       "in": 0,
@@ -2033,7 +1352,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Natural Law\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nRights inhere in human nature; positive law (see [/fundamental-principles/law-as-organization-of-defense.md](/fundamental-principles/law-as-organization-of-defense.md)) is valid only insofar as it recognizes them.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "related-concepts/natural-law.md",
       "degree": 4,
       "in": 0,
@@ -2055,7 +1373,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Voluntary vs Coerced\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nTrue giving requires a willing giver. Coercion destroys the moral act.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "related-concepts/philanthropy-vs-coercion.md",
       "degree": 3,
       "in": 0,
@@ -2077,7 +1394,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Property Rights\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nProperty is the extension of faculties. Attacks on property are attacks on liberty and personality.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "related-concepts/property-rights.md",
       "degree": 3,
       "in": 0,
@@ -2099,7 +1415,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Rule of Law\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nLaw must be general and equal. Targeting specific groups for plunder violates the rule of law.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "related-concepts/rule-of-law.md",
       "degree": 3,
       "in": 0,
@@ -2121,7 +1436,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Spontaneous Order\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nWhen law stays within its sphere, order emerges naturally.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n\r\nThe same principles appear in [The Law](/the-law.md) and are grounded in [Natural Rights](/fundamental-principles/natural-rights.md).\r\n",
       "path": "related-concepts/spontaneous-order.md",
       "degree": 3,
       "in": 0,
@@ -2143,7 +1457,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Critique of Coercive Charity\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nTaking by taxation is not charity.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Destroys genuine voluntary giving.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "socialism/critique-of-charity.md",
       "degree": 5,
       "in": 0,
@@ -2165,7 +1478,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Education as Indoctrination\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nState schools serve the state that funds them.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "socialism/education-as-indoctrination.md",
       "degree": 3,
       "in": 0,
@@ -2187,7 +1499,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Forced Conformity\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nRegulation and regimentation imposed on the whole population.\r\n\r\nThe ideas here connect directly to [the main essay](/the-law.md), [Natural Rights](/fundamental-principles/natural-rights.md), and the discussion of [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "socialism/forced-conformity.md",
       "degree": 3,
       "in": 0,
@@ -2209,7 +1520,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Playing God\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nSocialists want to remake man and society according to their plan.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Anticipates all later totalitarianism.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "socialism/playing-god.md",
       "degree": 5,
       "in": 0,
@@ -2231,7 +1541,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Socialist Doctrine\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nThe program of systematized legal plunder under philanthropic slogans.\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Organize everything by force.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md).\r\n",
       "path": "socialism/socialist-doctrine.md",
       "degree": 5,
       "in": 0,
@@ -2253,7 +1562,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# The Law (1850)\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nBastiat shows that life, liberty and property precede legislation. The law (see [/fundamental-principles/law-as-organization-of-defense.md](/fundamental-principles/law-as-organization-of-defense.md)) is the organization of the natural right of defense. When perverted (by greed or false philanthropy) it becomes an engine of legal plunder. The remedy is to return law strictly to its defensive sphere. See also the detailed treatment of the [core definition](/fundamental-principles/law-as-organization-of-defense.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Personality, liberty and property are natural and pre-political. (see Natural Rights).\r\n- Law = collective force organized only for protection. (see Natural Rights).\r\n- Perversion turns law into legalized theft benefiting some at expense of others.\r\n- Consequences: moral confusion, politicized society, rent-seeking, impoverishment.\r\n\r\nFor more, see [legal plunder](/legal-plunder/definition.md). Related consequences appear in the discussion of [rent-seeking behavior](/legal-plunder/consequences/rent-seeking.md). Related consequences appear in the discussion of [modern examples](/modern-relevance/contemporary-plunder.md). Related consequences appear in the discussion of [false philanthropy](/perversion-of-law/false-philanthropy.md).\r\n",
       "path": "the-law.md",
       "degree": 85,
       "in": 78,
@@ -2275,7 +1583,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Limited Government\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nThe most restrained government is the most just and stable. Contrasted with the [perverted law](/legal-plunder/definition.md).\r\n",
       "path": "true-law/limited-government.md",
       "degree": 3,
       "in": 0,
@@ -2297,7 +1604,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Negative Role of Law\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nLaw represses injustice; it does not positively organize society. Contrasted with the [perverted law](/legal-plunder/definition.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- Positive interventions are the source of plunder. (see legal plunder).\r\n",
       "path": "true-law/negative-role.md",
       "degree": 5,
       "in": 0,
@@ -2319,7 +1625,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Non-Intervention\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nWants and satisfactions develop in their natural order. Contrasted with the [perverted law](/legal-plunder/definition.md).\r\n",
       "path": "true-law/non-intervention.md",
       "degree": 3,
       "in": 0,
@@ -2341,7 +1646,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Proper Sphere of Law\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nLaw confined to protecting persons, liberties and properties. Contrasted with the [perverted law](/legal-plunder/definition.md).\r\n\r\n## Key Points\r\n\r\nFor the foundational treatment, see [the definition of law](/fundamental-principles/law-as-organization-of-defense.md) and [the proper sphere of law](/true-law/proper-sphere.md).\r\n- If law stayed here political disputes would lose most of their bitterness. (see Natural Rights). Related consequences appear in the discussion of [rent-seeking behavior](/legal-plunder/consequences/rent-seeking.md). Related consequences appear in the discussion of [modern examples](/modern-relevance/contemporary-plunder.md). Related consequences appear in the discussion of [false philanthropy](/perversion-of-law/false-philanthropy.md).\r\n",
       "path": "true-law/proper-sphere.md",
       "degree": 49,
       "in": 42,
@@ -2363,7 +1667,6 @@
         "the-law"
       ],
       "timestamp": "2026-07-02T12:00:00+00:00",
-      "body": "\r\n# Protection of Rights\r\n\r\nThese principles are developed in [The Law](/the-law.md) and rest on [Natural Rights](/fundamental-principles/natural-rights.md).\r\nThe only legitimate end of collective force. Contrasted with the [perverted law](/legal-plunder/definition.md).\r\n",
       "path": "true-law/protection-of-rights.md",
       "degree": 3,
       "in": 0,
