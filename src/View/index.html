@@ -17,6 +17,9 @@
     <strong id="bundle-name"></strong>
     <span class="muted">OKF view</span>
   </div>
+  <div class="header-actions">
+    <button type="button" id="tags-open-btn" class="header-link-btn" aria-label="Open tags" aria-expanded="false" title="Tags">Tags</button>
+  </div>
 </header>
 
 <main class="shell">
@@ -72,6 +75,23 @@
   </aside>
 </main>
 <div id="graph-backdrop" class="graph-backdrop" hidden></div>
+<div id="tag-backdrop" class="graph-backdrop" hidden></div>
+<div id="tag-panel" class="tag-panel" hidden>
+  <div class="panel-header">
+    <span class="placeholder-label muted">Tags</span>
+    <div class="graph-header-actions">
+      <span id="tag-note" class="muted graph-note"></span>
+      <button type="button" id="tag-close-btn" class="graph-icon-btn" aria-label="Close tags" title="Close tags">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div id="tag-cloud" class="tag-cloud" aria-label="Tag co-occurrence graph"></div>
+  <p id="tag-empty" class="tag-empty muted" hidden>No tags in this bundle</p>
+</div>
 
 <script>
 window.BUNDLE_NAME = __BUNDLE_NAME__;

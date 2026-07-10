@@ -32,7 +32,89 @@
     (backlinks[e.target] ||= []).push(e.source);
   }
 
-  /** @type {{ kind: 'dir'|'concept', id: string }} */
+  // ——— Tag index (count + co-occurrence) ———
+
+  /**
+   * @typedef {{ count: number, members: string[] }} TagEntry
+   * @type {{ byTag: Map<string, TagEntry>, co: Map<string, number>, graphData: { nodes: object[], links: object[] } }}
+   */
+  const tagIndex = buildTagIndex();
+
+  function buildTagIndex() {
+    /** @type {Map<string, TagEntry>} */
+    const byTag = new Map();
+    /** @type {Map<string, number>} */
+    const co = new Map();
+
+    function pairKey(a, b) {
+      return a < b ? a + "\0" + b : b + "\0" + a;
+    }
+
+    for (const n of graph.nodes || []) {
+      const tags = (n.tags || []).filter((t) => t != null && String(t).trim() !== "");
+      if (!tags.length) continue;
+      // de-dupe within a document
+      const unique = [...new Set(tags.map((t) => String(t)))];
+      for (const t of unique) {
+        let entry = byTag.get(t);
+        if (!entry) {
+          entry = { count: 0, members: [] };
+          byTag.set(t, entry);
+        }
+        entry.count++;
+        entry.members.push(n.id);
+      }
+      for (let i = 0; i < unique.length; i++) {
+        for (let j = i + 1; j < unique.length; j++) {
+          const k = pairKey(unique[i], unique[j]);
+          co.set(k, (co.get(k) || 0) + 1);
+        }
+      }
+    }
+
+    const nodes = [];
+    for (const [tag, entry] of byTag) {
+      // Log-scale size so hub tags (e.g. bastiat) do not dominate completely.
+      const val = 1.2 + Math.log2(entry.count + 1) * 1.8;
+      nodes.push({
+        id: tag,
+        name: tag,
+        val,
+        count: entry.count,
+        focused: false,
+      });
+    }
+
+    const links = [];
+    for (const [k, coCount] of co) {
+      const sep = k.indexOf("\0");
+      const a = k.slice(0, sep);
+      const b = k.slice(sep + 1);
+      const ca = byTag.get(a)?.count || 1;
+      const cb = byTag.get(b)?.count || 1;
+      const jaccard = coCount / (ca + cb - coCount);
+      links.push({
+        source: a,
+        target: b,
+        co: coCount,
+        jaccard,
+        // Width / visual weight from co-count; force strength uses Jaccard.
+        value: coCount,
+      });
+    }
+
+    return {
+      byTag,
+      co,
+      graphData: { nodes, links },
+    };
+  }
+
+  function tagExists(tag) {
+    return tagIndex.byTag.has(tag);
+  }
+
+  /** @type {{ kind: 'dir'|'concept'|'tag', id: string }} */
   let selected = { kind: "dir", id: "" };
 
   const treeEl = document.getElementById("tree");
@@ -233,13 +315,17 @@
     renderTree(searchEl.value);
     renderContent();
     updateLocalGraph();
+    if (tagsExpanded) updateTagCloudHighlight();
   }
 
-  // ——— Hash routing (#c/id, #d/id) ———
+  // ——— Hash routing (#c/id, #d/id, #t/tag) ———
 
   function updateHash() {
     try {
-      const prefix = selected.kind === "dir" ? "d/" : "c/";
+      let prefix;
+      if (selected.kind === "dir") prefix = "d/";
+      else if (selected.kind === "tag") prefix = "t/";
+      else prefix = "c/";
       const id = selected.id === "" && selected.kind === "dir" ? "" : selected.id;
       const hash = "#" + prefix + encodeURIComponent(id).replace(/%2F/gi, "/");
       if (location.hash !== hash) history.replaceState(null, "", hash);
@@ -272,6 +358,12 @@
       const id = raw.slice(2);
       if (dirIds.has(id)) {
         select({ kind: "dir", id }, { skipHash: true });
+        return true;
+      }
+    } else if (raw.startsWith("t/")) {
+      const id = raw.slice(2);
+      if (tagExists(id)) {
+        select({ kind: "tag", id }, { skipHash: true });
         return true;
       }
     } else if (conceptIds.has(raw)) {
@@ -377,8 +469,8 @@
   }
 
   /** Axis-aligned screen footprint of nodes (px), or null if unusable. */
-  function nodeScreenBounds(nodes) {
-    if (!forceGraph || !nodes.length) return null;
+  function nodeScreenBounds(nodes, graphInstance, el) {
+    if (!graphInstance || !nodes.length) return null;
     let minX = Infinity;
     let minY = Infinity;
     let maxX = -Infinity;
@@ -386,7 +478,7 @@
     let count = 0;
     for (const node of nodes) {
       if (node.x == null || node.y == null || node.z == null) continue;
-      const c = forceGraph.graph2ScreenCoords(node.x, node.y, node.z);
+      const c = graphInstance.graph2ScreenCoords(node.x, node.y, node.z);
       if (!c || !Number.isFinite(c.x) || !Number.isFinite(c.y)) continue;
       if (c.x < minX) minX = c.x;
       if (c.x > maxX) maxX = c.x;
@@ -436,7 +528,7 @@
       try {
         // Leave room for node spheres + labels above nodes (not just centers).
         const targetFill = 0.78;
-        const bounds = nodeScreenBounds(nodes);
+        const bounds = nodeScreenBounds(nodes, forceGraph, graphEl);
         const cw = graphEl.clientWidth || 1;
         const ch = graphEl.clientHeight || 1;
         if (bounds && bounds.w > 1 && bounds.h > 1) {
@@ -473,6 +565,7 @@
 
   function setGraphExpanded(expanded) {
     if (!graphPanel || graphExpanded === expanded) return;
+    if (expanded) setTagsExpanded(false);
     graphExpanded = expanded;
     document.body.classList.toggle("graph-expanded", expanded);
 
@@ -548,12 +641,6 @@
   if (graphBackdrop) {
     graphBackdrop.addEventListener("click", () => setGraphExpanded(false));
   }
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && graphExpanded) {
-      e.preventDefault();
-      setGraphExpanded(false);
-    }
-  });
 
   function collectDirConceptIds(dirId) {
     const prefix = dirId ? dirId + "/" : "";
@@ -572,6 +659,10 @@
   function buildLocalGraphData() {
     let focusIds = new Set();
     let note = "";
+
+    if (selected.kind === "tag") {
+      return { nodes: [], links: [], note: "Select a concept" };
+    }
 
     if (selected.kind === "concept") {
       focusIds.add(selected.id);
@@ -639,9 +730,375 @@
     setTimeout(() => resizeGraph(true), 350);
   }
 
+  // ——— Tag cloud floating panel ———
+
+  let tagForceGraph = null;
+  let tagLabelsLayer = null;
+  let tagsExpanded = false;
+  /** @type {Map<string, HTMLElement>} */
+  const tagLabelEls = new Map();
+  const tagPanel = document.getElementById("tag-panel");
+  const tagCloudEl = document.getElementById("tag-cloud");
+  const tagNote = document.getElementById("tag-note");
+  const tagBackdrop = document.getElementById("tag-backdrop");
+  const tagOpenBtn = document.getElementById("tags-open-btn");
+  const tagCloseBtn = document.getElementById("tag-close-btn");
+  const tagEmptyEl = document.getElementById("tag-empty");
+
+  function ensureTagLabelsLayer() {
+    if (!tagCloudEl || tagLabelsLayer) return;
+    tagLabelsLayer = document.createElement("div");
+    tagLabelsLayer.className = "graph-labels";
+    tagLabelsLayer.setAttribute("aria-hidden", "true");
+    tagCloudEl.appendChild(tagLabelsLayer);
+  }
+
+  function syncTagLabels() {
+    if (!tagForceGraph || !tagLabelsLayer) return;
+    const nodes = tagForceGraph.graphData()?.nodes || [];
+    const seen = new Set();
+
+    for (const n of nodes) {
+      const id = n.id;
+      if (id == null) continue;
+      seen.add(id);
+      let el = tagLabelEls.get(id);
+      if (!el) {
+        el = document.createElement("div");
+        el.className = "graph-label";
+        tagLabelsLayer.appendChild(el);
+        tagLabelEls.set(id, el);
+      }
+      const text = n.name || n.id || "";
+      if (el.textContent !== text) el.textContent = text;
+      el.classList.toggle("focused", !!n.focused);
+    }
+
+    for (const [id, el] of tagLabelEls) {
+      if (!seen.has(id)) {
+        el.remove();
+        tagLabelEls.delete(id);
+      }
+    }
+
+    positionTagLabels();
+  }
+
+  function positionTagLabels() {
+    if (!tagForceGraph || !tagLabelsLayer) return;
+    const nodes = tagForceGraph.graphData()?.nodes || [];
+    for (const n of nodes) {
+      const el = tagLabelEls.get(n.id);
+      if (!el) continue;
+      if (n.x == null || n.y == null || n.z == null) {
+        el.style.visibility = "hidden";
+        continue;
+      }
+      const coords = tagForceGraph.graph2ScreenCoords(n.x, n.y, n.z);
+      if (!coords || !Number.isFinite(coords.x) || !Number.isFinite(coords.y)) {
+        el.style.visibility = "hidden";
+        continue;
+      }
+      el.style.visibility = "visible";
+      el.style.transform = `translate(${coords.x}px, ${coords.y}px) translate(-50%, -120%)`;
+    }
+  }
+
+  function fitTagCamera(ms) {
+    if (!tagForceGraph) return;
+    const nodes = tagForceGraph.graphData()?.nodes || [];
+    if (!nodes.length) return;
+
+    const duration = ms == null ? 350 : ms;
+    const padPx = 28;
+
+    try {
+      tagForceGraph.zoomToFit(0, padPx);
+    } catch (_) {}
+
+    requestAnimationFrame(() => {
+      try {
+        const targetFill = 0.78;
+        const bounds = nodeScreenBounds(nodes, tagForceGraph, tagCloudEl);
+        const cw = tagCloudEl.clientWidth || 1;
+        const ch = tagCloudEl.clientHeight || 1;
+        if (bounds && bounds.w > 1 && bounds.h > 1) {
+          const fill = Math.max(bounds.w / cw, bounds.h / ch);
+          if (fill > 0.02 && fill < targetFill) {
+            const scale = fill / targetFill;
+            const center = nodeCentroid(nodes);
+            const pos = tagForceGraph.cameraPosition();
+            tagForceGraph.cameraPosition(
+              {
+                x: center.x + (pos.x - center.x) * scale,
+                y: center.y + (pos.y - center.y) * scale,
+                z: center.z + (pos.z - center.z) * scale,
+              },
+              center,
+              duration
+            );
+          }
+        }
+      } catch (_) {}
+      const after = () => positionTagLabels();
+      if (duration > 0) setTimeout(after, duration + 30);
+      else requestAnimationFrame(after);
+    });
+  }
+
+  function resizeTagGraph(fit) {
+    if (!tagForceGraph || !tagCloudEl) return;
+    const w = tagCloudEl.clientWidth || 400;
+    const h = tagCloudEl.clientHeight || 400;
+    tagForceGraph.width(w).height(h);
+    positionTagLabels();
+    if (fit) fitTagCamera();
+  }
+
+  function buildTagGraphPayload() {
+    const focusedTag = selected.kind === "tag" ? selected.id : null;
+    const nodes = tagIndex.graphData.nodes.map((n) => ({
+      ...n,
+      focused: focusedTag != null && n.id === focusedTag,
+    }));
+    // Fresh link objects so force-graph can rebind source/target refs.
+    const links = tagIndex.graphData.links.map((l) => ({
+      source: typeof l.source === "object" ? l.source.id : l.source,
+      target: typeof l.target === "object" ? l.target.id : l.target,
+      co: l.co,
+      jaccard: l.jaccard,
+      value: l.value,
+    }));
+    return { nodes, links };
+  }
+
+  function updateTagCloudHighlight() {
+    if (!tagForceGraph) return;
+    const data = buildTagGraphPayload();
+    // Preserve simulation positions by matching existing nodes when possible.
+    const prev = tagForceGraph.graphData();
+    const prevById = new Map((prev.nodes || []).map((n) => [n.id, n]));
+    for (const n of data.nodes) {
+      const old = prevById.get(n.id);
+      if (old) {
+        if (old.x != null) n.x = old.x;
+        if (old.y != null) n.y = old.y;
+        if (old.z != null) n.z = old.z;
+        if (old.vx != null) n.vx = old.vx;
+        if (old.vy != null) n.vy = old.vy;
+        if (old.vz != null) n.vz = old.vz;
+      }
+    }
+    tagForceGraph.graphData({ nodes: data.nodes, links: data.links });
+    syncTagLabels();
+  }
+
+  function initTagForceGraph() {
+    if (typeof ForceGraph3D !== "function" || !tagCloudEl) return;
+    if (tagForceGraph) return;
+
+    const maxCo = tagIndex.graphData.links.reduce((m, l) => Math.max(m, l.co || 0), 1);
+
+    tagForceGraph = ForceGraph3D()(tagCloudEl)
+      .backgroundColor("#1a1a1a")
+      .showNavInfo(false)
+      .nodeLabel((n) => `${n.name || n.id} (${n.count || 0})`)
+      .nodeRelSize(4)
+      .nodeResolution(32)
+      .nodeOpacity(0.95)
+      .nodeVal((n) => n.val || 1)
+      .nodeColor((n) => (n.focused ? NODE_COLOR_FOCUSED : NODE_COLOR))
+      .linkColor((l) => {
+        const j = l.jaccard != null ? l.jaccard : 0.2;
+        const a = 0.25 + Math.min(j, 1) * 0.55;
+        return `rgba(175, 180, 190, ${a})`;
+      })
+      .linkOpacity(0.85)
+      .linkWidth((l) => 0.2 + ((l.co || 1) / maxCo) * 1.4)
+      .linkDirectionalArrowLength(0)
+      .onNodeClick((n) => {
+        if (n && n.id && tagExists(n.id)) {
+          select({ kind: "tag", id: n.id });
+          // Keep panel open so proximity remains visible while browsing tags.
+        }
+      })
+      .onEngineTick(positionTagLabels);
+
+    // Link distance / strength from Jaccard (hub tags pull less universally).
+    try {
+      const linkForce = tagForceGraph.d3Force("link");
+      if (linkForce) {
+        linkForce
+          .distance((l) => {
+            const j = l.jaccard != null ? l.jaccard : 0.1;
+            return 28 + (1 - Math.min(j, 1)) * 90;
+          })
+          .strength((l) => {
+            const j = l.jaccard != null ? l.jaccard : 0.05;
+            return 0.05 + Math.min(j, 1) * 0.55;
+          });
+      }
+      const charge = tagForceGraph.d3Force("charge");
+      if (charge && typeof charge.strength === "function") {
+        charge.strength(-45);
+      }
+    } catch (_) {}
+
+    ensureTagLabelsLayer();
+    try {
+      tagForceGraph.controls()?.addEventListener("change", positionTagLabels);
+    } catch (_) {}
+
+    const data = buildTagGraphPayload();
+    tagForceGraph.graphData({ nodes: data.nodes, links: data.links });
+    syncTagLabels();
+  }
+
+  function setTagsExpanded(expanded) {
+    if (!tagPanel || tagsExpanded === expanded) return;
+    if (expanded) setGraphExpanded(false);
+    tagsExpanded = expanded;
+    document.body.classList.toggle("tags-expanded", expanded);
+    tagPanel.hidden = !expanded;
+    if (tagBackdrop) tagBackdrop.hidden = !expanded;
+
+    if (tagOpenBtn) {
+      tagOpenBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
+    }
+
+    if (!expanded) return;
+
+    const hasTags = tagIndex.byTag.size > 0;
+    if (tagEmptyEl) tagEmptyEl.hidden = hasTags;
+    if (tagCloudEl) tagCloudEl.hidden = !hasTags;
+    if (tagNote) {
+      if (!hasTags) {
+        tagNote.textContent = "0 tags";
+      } else {
+        const n = tagIndex.graphData.nodes.length;
+        const m = tagIndex.graphData.links.length;
+        tagNote.textContent = `${n} tags · ${m} links`;
+      }
+    }
+
+    if (!hasTags) return;
+
+    if (!tagForceGraph && typeof ForceGraph3D === "function") {
+      initTagForceGraph();
+    } else if (tagForceGraph) {
+      updateTagCloudHighlight();
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        resizeTagGraph(false);
+        fitTagCamera(0);
+        setTimeout(() => {
+          resizeTagGraph(false);
+          fitTagCamera(300);
+        }, 60);
+      });
+    });
+  }
+
+  if (tagOpenBtn) {
+    tagOpenBtn.addEventListener("click", () => setTagsExpanded(!tagsExpanded));
+  }
+  if (tagCloseBtn) {
+    tagCloseBtn.addEventListener("click", () => setTagsExpanded(false));
+  }
+  if (tagBackdrop) {
+    tagBackdrop.addEventListener("click", () => setTagsExpanded(false));
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (tagsExpanded) {
+      e.preventDefault();
+      setTagsExpanded(false);
+      return;
+    }
+    if (graphExpanded) {
+      e.preventDefault();
+      setGraphExpanded(false);
+    }
+  });
+
   window.addEventListener("resize", () => {
     resizeGraph(false);
+    if (tagsExpanded) resizeTagGraph(false);
   });
+
+  function renderTagContent(tag) {
+    const titleEl = document.getElementById("content-title");
+    const descEl = document.getElementById("content-desc");
+    const typeEl = document.getElementById("content-type");
+    const metaEl = document.getElementById("content-meta");
+    const bodyEl = document.getElementById("content-body");
+    const blSection = document.getElementById("backlinks");
+    const blList = document.getElementById("backlinks-list");
+
+    metaEl.innerHTML = "";
+    blList.innerHTML = "";
+    blSection.hidden = true;
+
+    const entry = tagIndex.byTag.get(tag);
+    titleEl.textContent = tag;
+    typeEl.hidden = false;
+    typeEl.textContent = "Tag";
+
+    const count = entry ? entry.count : 0;
+    descEl.textContent =
+      count === 1 ? "Used on 1 concept" : `Used on ${count} concepts`;
+
+    bodyEl.innerHTML = "";
+    if (!entry || !entry.members.length) {
+      const p = document.createElement("p");
+      p.className = "tag-results-empty";
+      p.textContent = "No concepts use this tag.";
+      bodyEl.appendChild(p);
+      buildToc(bodyEl);
+      return;
+    }
+
+    const members = entry.members.slice().sort((a, b) => {
+      const ta = (nodesById[a]?.title || nodesById[a]?.label || a).toLowerCase();
+      const tb = (nodesById[b]?.title || nodesById[b]?.label || b).toLowerCase();
+      return ta.localeCompare(tb);
+    });
+
+    const ul = document.createElement("ul");
+    ul.className = "tag-results";
+    for (const id of members) {
+      const n = nodesById[id];
+      const li = document.createElement("li");
+
+      const titleBtn = document.createElement("button");
+      titleBtn.type = "button";
+      titleBtn.className = "tag-result-title";
+      titleBtn.textContent = n?.title || n?.label || id;
+      titleBtn.addEventListener("click", () => select({ kind: "concept", id }));
+      li.appendChild(titleBtn);
+
+      if (n?.type) {
+        const chip = document.createElement("span");
+        chip.className = "tag-result-type";
+        chip.textContent = n.type;
+        li.appendChild(chip);
+      }
+
+      if (n?.description) {
+        const d = document.createElement("p");
+        d.className = "tag-result-desc";
+        d.textContent = n.description;
+        li.appendChild(d);
+      }
+
+      ul.appendChild(li);
+    }
+    bodyEl.appendChild(ul);
+    buildToc(bodyEl);
+  }
 
   function renderContent() {
     const titleEl = document.getElementById("content-title");
@@ -654,6 +1111,11 @@
 
     metaEl.innerHTML = "";
     blList.innerHTML = "";
+
+    if (selected.kind === "tag") {
+      renderTagContent(selected.id);
+      return;
+    }
 
     let md = "";
     if (selected.kind === "dir") {
@@ -676,10 +1138,13 @@
       typeEl.textContent = n.type || "Concept";
       if (n.tags && n.tags.length) {
         for (const t of n.tags) {
-          const span = document.createElement("span");
-          span.className = "tag";
-          span.textContent = t;
-          metaEl.appendChild(span);
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "tag";
+          btn.textContent = t;
+          btn.title = `Show concepts tagged “${t}”`;
+          btn.addEventListener("click", () => select({ kind: "tag", id: t }));
+          metaEl.appendChild(btn);
         }
       }
       if (n.resource) {
@@ -807,14 +1272,25 @@
     resolveHref,
     normalizeToId,
     buildLocalGraphData,
+    buildTagIndex,
     fitGraphCamera,
     resizeGraph,
     setGraphExpanded,
+    setTagsExpanded,
     get graphExpanded() {
       return graphExpanded;
     },
+    get tagsExpanded() {
+      return tagsExpanded;
+    },
     get forceGraph() {
       return forceGraph;
+    },
+    get tagForceGraph() {
+      return tagForceGraph;
+    },
+    get tagIndex() {
+      return tagIndex;
     },
     get selected() {
       return selected;

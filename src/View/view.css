@@ -10,12 +10,43 @@ html, body {
 .app-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding: 10px 16px;
   border-bottom: 1px solid #d0d7de;
   background: #f6f8fa;
   flex-shrink: 0;
 }
 .title strong { font-size: 15px; margin-right: 8px; }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.header-link-btn {
+  border: 0;
+  background: transparent;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: #656d76;
+  cursor: pointer;
+}
+.header-link-btn:hover {
+  color: #0969da;
+  background: #eaeef2;
+}
+.header-link-btn:focus-visible {
+  outline: 2px solid #0969da;
+  outline-offset: 1px;
+}
+.header-link-btn[aria-expanded="true"] {
+  color: #0969da;
+  background: #ddf4ff;
+}
 .muted { color: #656d76; font-size: 12px; }
 
 .shell {
@@ -113,10 +144,79 @@ html, body {
 .tag {
   display: inline-block;
   padding: 1px 7px;
+  border: 0;
   border-radius: 10px;
   background: #ddf4ff;
   color: #0969da;
+  font: inherit;
   font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1.4;
+}
+button.tag:hover,
+.tag:hover {
+  background: #b6e3ff;
+  color: #0550ae;
+}
+button.tag:focus-visible {
+  outline: 2px solid #0969da;
+  outline-offset: 1px;
+}
+
+/* Tag concept list (content pane when a tag is selected) */
+.tag-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 48rem;
+}
+.tag-results li {
+  margin: 0;
+  padding: 12px 0;
+  border-bottom: 1px solid #d8dee4;
+}
+.tag-results li:last-child { border-bottom: 0; }
+.tag-result-title {
+  display: inline;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0969da;
+  cursor: pointer;
+  text-align: left;
+}
+.tag-result-title:hover { text-decoration: underline; }
+.tag-result-title:focus-visible {
+  outline: 2px solid #0969da;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.tag-result-type {
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  background: #6e7781;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.tag-result-desc {
+  margin: 4px 0 0;
+  color: #656d76;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.tag-results-empty {
+  color: #656d76;
+  font-size: 14px;
 }
 .markdown-body {
   line-height: 1.6;
@@ -316,6 +416,83 @@ body.graph-expanded .graph-label {
 .graph-icon-btn .icon-collapse { display: none; }
 body.graph-expanded .graph-icon-btn .icon-expand { display: none; }
 body.graph-expanded .graph-icon-btn .icon-collapse { display: block; }
+
+/* Floating tag cloud panel (header-opened; same chrome as expanded local graph) */
+.tag-panel {
+  display: none;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+body.tags-expanded {
+  overflow: hidden;
+}
+body.tags-expanded .tag-panel {
+  display: flex;
+  position: fixed;
+  z-index: 910;
+  top: 3vh;
+  left: 4vw;
+  right: 4vw;
+  bottom: 3vh;
+  width: auto;
+  height: auto;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  background: #1a1a1a;
+}
+body.tags-expanded .tag-panel .panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #2a2a2a;
+  background: #141414;
+  flex-shrink: 0;
+}
+body.tags-expanded .tag-panel .panel-header .placeholder-label {
+  margin-bottom: 0;
+  color: #8b949e;
+}
+body.tags-expanded .tag-panel .graph-note {
+  color: #8b949e;
+}
+body.tags-expanded .tag-panel .graph-icon-btn {
+  color: #8b949e;
+}
+body.tags-expanded .tag-panel .graph-icon-btn:hover {
+  color: #e6edf3;
+  background: #21262d;
+  border-color: #30363d;
+}
+.tag-cloud {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  background: #1a1a1a;
+  overflow: hidden;
+}
+.tag-empty {
+  margin: 0;
+  padding: 48px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #8b949e;
+  flex: 1;
+}
+.tag-cloud .graph-labels { z-index: 1; }
+.tag-cloud .graph-label {
+  max-width: 140px;
+  font-size: 11px;
+}
+body.tags-expanded .tag-cloud .graph-label {
+  font-size: 12px;
+  max-width: 180px;
+}
+
 .toc-panel {
   flex: 1;
   padding: 12px 14px;
@@ -347,7 +524,8 @@ body.graph-expanded .graph-icon-btn .icon-collapse { display: block; }
   .shell { grid-template-columns: 220px minmax(0, 1fr); }
   .right-pane { display: none; }
   /* Expanded graph is reparented to body; keep it usable on narrow viewports. */
-  body.graph-expanded .graph-panel {
+  body.graph-expanded .graph-panel,
+  body.tags-expanded .tag-panel {
     top: 2vh;
     left: 2vw;
     right: 2vw;
