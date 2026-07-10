@@ -175,19 +175,147 @@ html, body {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  min-height: 0;
 }
 .graph-panel .panel-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
+  gap: 8px;
   padding: 8px 12px 0;
+  flex-shrink: 0;
 }
-.graph-note { font-size: 11px; }
+.graph-panel .panel-header .placeholder-label {
+  margin-bottom: 0;
+}
+.graph-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.graph-note { font-size: 11px; white-space: nowrap; }
+.graph-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #656d76;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.graph-icon-btn:hover {
+  color: #1f2328;
+  background: #eaeef2;
+  border-color: #d0d7de;
+}
+.graph-icon-btn:focus-visible {
+  outline: 2px solid #0969da;
+  outline-offset: 1px;
+}
 .graph3d {
+  position: relative;
   height: 260px;
   width: 100%;
-  background: #0d1117;
+  background: #1a1a1a;
+  overflow: hidden;
+  flex-shrink: 0;
 }
+.graph-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+.graph-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  max-width: 110px;
+  padding: 0 2px;
+  color: #d4d4d4;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow:
+    0 0 3px #1a1a1a,
+    0 1px 2px #1a1a1a,
+    0 0 8px #1a1a1a,
+    1px 0 2px #1a1a1a,
+    -1px 0 2px #1a1a1a;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+}
+.graph-label.focused {
+  color: #f0f0f0;
+  font-weight: 600;
+}
+
+/* Floating expanded graph (Obsidian-style) */
+.graph-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(15, 18, 22, 0.55);
+  backdrop-filter: blur(2px);
+}
+body.graph-expanded {
+  overflow: hidden;
+}
+body.graph-expanded .graph-panel {
+  position: fixed;
+  z-index: 910;
+  top: 3vh;
+  left: 4vw;
+  right: 4vw;
+  bottom: 3vh;
+  width: auto;
+  height: auto;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  background: #1a1a1a;
+  overflow: hidden;
+}
+body.graph-expanded .graph-panel .panel-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid #2a2a2a;
+  background: #141414;
+}
+body.graph-expanded .graph-panel .placeholder-label,
+body.graph-expanded .graph-note {
+  color: #8b949e;
+}
+body.graph-expanded .graph-icon-btn {
+  color: #8b949e;
+}
+body.graph-expanded .graph-icon-btn:hover {
+  color: #e6edf3;
+  background: #21262d;
+  border-color: #30363d;
+}
+body.graph-expanded .graph3d {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+}
+body.graph-expanded .graph-label {
+  font-size: 12px;
+  max-width: 180px;
+}
+.graph-icon-btn .icon-collapse { display: none; }
+body.graph-expanded .graph-icon-btn .icon-expand { display: none; }
+body.graph-expanded .graph-icon-btn .icon-collapse { display: block; }
 .toc-panel {
   flex: 1;
   padding: 12px 14px;
@@ -218,6 +346,13 @@ html, body {
 @media (max-width: 960px) {
   .shell { grid-template-columns: 220px minmax(0, 1fr); }
   .right-pane { display: none; }
+  /* Expanded graph is reparented to body; keep it usable on narrow viewports. */
+  body.graph-expanded .graph-panel {
+    top: 2vh;
+    left: 2vw;
+    right: 2vw;
+    bottom: 2vh;
+  }
 }
 @media (max-width: 700px) {
   .shell { grid-template-columns: 1fr; }

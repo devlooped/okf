@@ -42,10 +42,26 @@
   </section>
 
   <aside id="right-pane" class="pane right-pane">
-    <div class="graph-panel">
+    <div id="graph-panel" class="graph-panel">
       <div class="panel-header">
         <span class="placeholder-label muted">Local graph</span>
-        <span id="graph-note" class="muted graph-note"></span>
+        <div class="graph-header-actions">
+          <span id="graph-note" class="muted graph-note"></span>
+          <button type="button" id="graph-expand-btn" class="graph-icon-btn" aria-label="Expand graph" aria-expanded="false" title="Expand graph">
+            <svg class="icon-expand" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <polyline points="9 21 3 21 3 15"></polyline>
+              <line x1="21" y1="3" x2="14" y2="10"></line>
+              <line x1="3" y1="21" x2="10" y2="14"></line>
+            </svg>
+            <svg class="icon-collapse" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="4 14 10 14 10 20"></polyline>
+              <polyline points="20 10 14 10 14 4"></polyline>
+              <line x1="14" y1="10" x2="21" y2="3"></line>
+              <line x1="3" y1="21" x2="10" y2="14"></line>
+            </svg>
+          </button>
+        </div>
       </div>
       <div id="graph3d" class="graph3d" aria-label="Local relationship graph"></div>
     </div>
@@ -55,6 +71,7 @@
     </div>
   </aside>
 </main>
+<div id="graph-backdrop" class="graph-backdrop" hidden></div>
 
 <script>
 window.BUNDLE_NAME = __BUNDLE_NAME__;
