@@ -236,7 +236,8 @@ public static class CheckRenderer
         }
 
         var relativePath = file.Replace('\\', '/');
-        var full = Path.GetFullPath(Path.Combine(bundleRootFull, relativePath.Replace('/', Path.DirectorySeparatorChar)));
+        var full = Path.GetFullPath(Path.Combine(bundleRootFull, relativePath.Replace('/', Path.DirectorySeparatorChar)))
+            .Replace(" ", "%20");
         return (full, relativePath);
     }
 }
