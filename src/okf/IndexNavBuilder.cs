@@ -151,7 +151,7 @@ public static partial class IndexNavBuilder
         {
             Kind = "dir",
             Id = dirId,
-            Label = label,
+            Label = label.Replace("%20", " "),
             Body = body,
             Synthetic = synthetic ? true : null,
             Children = children.Count > 0 ? children : null,
@@ -532,7 +532,7 @@ public static partial class IndexNavBuilder
             : TitleCaseSegment(dirId.Contains('/') ? dirId[(dirId.LastIndexOf('/') + 1)..] : dirId);
 
         var sb = new StringBuilder();
-        sb.Append("# ").Append(dirLabel).Append('\n');
+        sb.Append("# ").Append(dirLabel.Replace("%20", " ")).Append('\n');
 
         var children = new List<GraphBuilder.NavNode>();
 
@@ -543,15 +543,15 @@ public static partial class IndexNavBuilder
             var file = (id.Contains('/') ? id[(id.LastIndexOf('/') + 1)..] : id) + ".md";
             var desc = concept.Description;
             if (!string.IsNullOrEmpty(desc))
-                sb.Append("\n* [").Append(title).Append("](").Append(file).Append(") - ").Append(desc).Append('\n');
+                sb.Append("\n* [").Append(title).Append("](").Append(file.Replace(" ", "%20")).Append(") - ").Append(desc).Append('\n');
             else
-                sb.Append("\n* [").Append(title).Append("](").Append(file).Append(")\n");
+                sb.Append("\n* [").Append(title).Append("](").Append(file.Replace(" ", "%20")).Append(")\n");
 
             children.Add(new GraphBuilder.NavNode
             {
                 Kind = "concept",
                 Id = id,
-                Label = concept.Label ?? title,
+                Label = (concept.Label ?? title).Replace("%20", " "),
                 Description = desc,
             });
         }
@@ -559,7 +559,7 @@ public static partial class IndexNavBuilder
         foreach (var childDirId in directorySet.Where(d => IsDirectChildDir(dirId, d)).OrderBy(d => d, Ordinal))
         {
             var seg = childDirId.Contains('/') ? childDirId[(childDirId.LastIndexOf('/') + 1)..] : childDirId;
-            var title = TitleCaseSegment(seg);
+            var title = TitleCaseSegment(seg).Replace("%20", " ");
             sb.Append("\n* [").Append(title).Append("](").Append(seg).Append("/)\n");
 
             var childDir = BuildDir(childDirId, bundleRoot, nodeById, conceptIds, directorySet, built);

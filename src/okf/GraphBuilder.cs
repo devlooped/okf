@@ -307,7 +307,7 @@ public static partial class GraphBuilder
             }
 
             var relativePath = Path.GetRelativePath(bundleRootFull, absolutePath).Replace('\\', '/');
-            var conceptId = Path.ChangeExtension(relativePath, null)!.Replace('\\', '/');
+            var conceptId = Path.ChangeExtension(relativePath, null)!.Replace('\\', '/').Replace(" ", "%20");
 
             var text = File.ReadAllText(absolutePath);
 
@@ -390,7 +390,7 @@ public static partial class GraphBuilder
             };
 
             nodes.Add(node);
-            nodeLookup[c.Id] = node;
+            nodeLookup[c.Id.Replace(" ", "%20")] = node;
         }
 
         // Resolve links and build edges
