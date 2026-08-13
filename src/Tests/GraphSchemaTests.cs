@@ -21,6 +21,17 @@ public class GraphSchemaTests
     {
         var repoSchema = File.ReadAllText(FindRepoSchema());
         Assert.Equal(Normalize(repoSchema), Normalize(GraphSchema.Json));
+        Assert.Equal(GraphSchema.Json, GraphSchema.Get("latest"));
+        Assert.Equal(GraphSchema.Json, GraphSchema.Get("0.1"));
+        Assert.Equal(GraphSchema.Json, GraphSchema.Get("v0.1"));
+    }
+
+    [Fact]
+    public void Unknown_version_lists_bundled_versions()
+    {
+        var ex = Assert.Throws<ArgumentException>(() => GraphSchema.Get("99.0"));
+        Assert.Contains("0.1", ex.Message);
+        Assert.Contains("latest", ex.Message);
     }
 
     [Fact]

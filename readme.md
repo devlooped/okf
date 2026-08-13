@@ -43,6 +43,8 @@ dnx okf --prerelease -- check samples/the-law
 | [`check`](#check) | Validate a bundle (structure, frontmatter, links) |
 | [`graph`](#graph) | Emit `okf.json` / `okf.js` knowledge graph |
 | [`schema`](#schema) | Print or save the bundled graph JSON Schema |
+| [`spec`](#spec) | Print or save the bundled OKF specification |
+| [`skill`](#skill) | Install or remove the bundled agent skill |
 | [`view`](#view) | Obsidian-style single-file reader (`index.html` + full graph) |
 
 The sample bundle under [`samples/the-law`](samples/the-law) is used in the screenshots below
@@ -143,9 +145,11 @@ dnx okf -- graph samples/the-law --js -o samples/the-law/okf.js
 The JSON Schema for this format is published at
 [https://www.schemastore.org/okf-0.1.json](https://www.schemastore.org/okf-0.1.json)
 (also in-repo at [`schemas/okf-0.1.json`](schemas/okf-0.1.json), and bundled
-with the tool — see [`schema`](#schema)). Editors that support SchemaStore pick
-it up when a graph file includes `"$schema"` pointing at that URL — `okf graph`
-and `okf view` write that annotation automatically.
+with the tool — see [`schema`](#schema)). The OKF spec is bundled the same
+way — see [`spec`](#spec). Editors that support SchemaStore pick it up when a
+graph file includes `"$schema"` pointing at that URL — `okf graph` and
+`okf view` write that annotation automatically. Both `schema` and `spec`
+accept `-v` / `--version` (`latest` by default).
 
 Top-level shape:
 
@@ -332,17 +336,65 @@ Index-driven tree used by `view`. Node kinds:
 
 ## `schema`
 
-Write the bundled OKF graph JSON Schema (the same document published on SchemaStore)
-to stdout, or to a file.
+Write a bundled OKF graph JSON Schema (the same documents published on SchemaStore)
+to stdout, or to a file. Default version is `latest` (currently `0.1`).
 
 ```bash
 dnx okf -- schema
+dnx okf -- schema -v 0.1
 dnx okf -- schema -o okf-0.1.json
 ```
 
 | Argument / option | Description |
 |-------------------|-------------|
 | `-o`, `--out` | Output path. Writes to stdout when omitted. |
+| `-v`, `--version` | Format version to emit (`latest` or a bundled version such as `0.1`). |
+
+---
+
+## `spec`
+
+Write a bundled OKF specification to stdout, or to a file. Same version flag as
+[`schema`](#schema). Use this instead of fetching the spec over the network.
+
+```bash
+dnx okf -- spec
+dnx okf -- spec -v 0.1 -o SPEC.md
+```
+
+| Argument / option | Description |
+|-------------------|-------------|
+| `-o`, `--out` | Output path. Writes to stdout when omitted. |
+| `-v`, `--version` | Format version to emit (`latest` or a bundled version such as `0.1`). |
+
+---
+
+## `skill`
+
+Install or remove the bundled [agent skill](skills/okf/SKILL.md) that teaches
+coding agents how to run `dnx okf`. Same path rules as
+[go#’s skill command](https://github.com/devlooped/go#agent-skill):
+
+```bash
+# Install to ~/.agents/skills/okf/SKILL.md (prompts for confirmation)
+dnx okf -- skill
+
+# Install for the current project under .agents/skills/okf/SKILL.md
+dnx okf -- skill .
+
+# Skip the confirmation prompt
+dnx okf -- skill -y
+dnx okf -- skill . --yes
+
+# Remove a previously installed skill (same path rules as install)
+dnx okf -- skill remove
+dnx okf -- skill remove .
+dnx okf -- skill remove -y
+```
+
+With no directory, the skill is written under the user home directory. Pass a
+base directory (commonly `.`) to install under that location instead. Either
+form overwrites an existing install.
 
 ---
 

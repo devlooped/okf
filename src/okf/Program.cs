@@ -12,26 +12,41 @@ if (runArgs.IndexOf("--debug") is var debugIdx and not -1)
     runArgs.RemoveAt(debugIdx);
 }
 
+runArgs = [.. CafArgs.RestrictToolVersion([.. runArgs])];
+
 var app = ConsoleApp.Create();
 app.Add("check", Check);
 app.Add("graph", Graph);
 app.Add("schema", Schema);
+app.Add("spec", Spec);
 app.Add("view", View);
+app.Add<SkillCommands>();
 app.Run([.. runArgs]);
 
 /// <summary>Write the bundled OKF graph JSON Schema to stdout, or to a file with -o.</summary>
 /// <param name="out">-o, Output path. Writes to stdout when omitted.</param>
-static int Schema([HideDefaultValue] string? @out = null)
-{
-    if (string.IsNullOrWhiteSpace(@out))
-    {
-        Console.Out.Write(GraphSchema.Json);
-        return 0;
-    }
+/// <param name="version">-v, Format version to emit (or 'latest').</param>
+static int Schema([HideDefaultValue] string? @out = null, [HideDefaultValue] string version = "latest")
+    => WriteBundled(GraphSchema.Get, @out, version);
 
+/// <summary>Write the bundled OKF specification to stdout, or to a file with -o.</summary>
+/// <param name="out">-o, Output path. Writes to stdout when omitted.</param>
+/// <param name="version">-v, Format version to emit (or 'latest').</param>
+static int Spec([HideDefaultValue] string? @out = null, [HideDefaultValue] string version = "latest")
+    => WriteBundled(OkfSpec.Get, @out, version);
+
+static int WriteBundled(Func<string?, string> load, string? @out, string version)
+{
     try
     {
-        GraphSchema.Write(@out);
+        var text = load(version);
+        if (string.IsNullOrWhiteSpace(@out))
+        {
+            Console.Out.Write(text);
+            return 0;
+        }
+
+        OkfVersions.Write(@out, text);
         Console.WriteLine($"Wrote {Path.GetFullPath(@out)}");
         return 0;
     }
