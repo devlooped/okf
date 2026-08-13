@@ -1,0 +1,24 @@
+---
+type: Metric
+title: Income statement (fiscal year)
+description: Headline income-statement figures for a fiscal year.
+tags: [finance, income-statement]
+status: stable
+generated: { by: grok-4.6, at: 2026-06-20T22:53:05Z }
+verified:
+  - { by: process:finance-nightly, at: 2026-06-24T02:00:00Z }
+  - { by: human:ahormati, at: 2026-06-25T09:00:00Z }
+stale_after: 2099-12-31
+sources:
+  - id: fpa-handbook
+    resource: https://wiki.acme/finance/fpa-handbook
+    title: FP&A reporting handbook
+---
+
+# Definition
+
+The income statement reports [revenue](../computations/revenue.md) and
+[gross profit](../computations/profit.md) for a fiscal year, per the FP&A
+reporting handbook.[^fpa-handbook]
+
+[^fpa-handbook]: FP&A reporting handbook

@@ -9,7 +9,7 @@ tags:
   - the-law
   - trade
   - welfare
-timestamp: '2026-07-02T12:00:00Z'
+generated: { by: human:kzu, at: 2026-07-02T12:00:00Z }
 ---
 
 # Contemporary Legal Plunder

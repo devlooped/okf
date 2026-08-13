@@ -7,7 +7,7 @@ tags:
   - legal-philosophy
   - natural-rights
   - the-law
-timestamp: '2026-07-02T12:00:00Z'
+generated: { by: human:kzu, at: 2026-07-02T12:00:00Z }
 ---
 
 # Natural Rights

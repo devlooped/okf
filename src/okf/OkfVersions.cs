@@ -9,12 +9,13 @@ namespace Devlooped;
 /// </summary>
 public static class OkfVersions
 {
-    public const string Latest = "0.1";
+    public const string Latest = "0.2";
 
     static readonly FrozenDictionary<string, Documents> Bundled =
         new Dictionary<string, Documents>(StringComparer.OrdinalIgnoreCase)
         {
             ["0.1"] = new(ThisAssembly.Resources.okf_0_1.Text, ThisAssembly.Resources.Specs.okf_0_1.Text),
+            ["0.2"] = new(ThisAssembly.Resources.okf_0_2.Text, ThisAssembly.Resources.Specs.okf_0_2.Text),
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
     static readonly Encoding Utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);

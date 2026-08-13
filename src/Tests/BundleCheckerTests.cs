@@ -75,6 +75,69 @@ public class BundleCheckerTests
         Assert.Empty(result.Errors);
         Assert.DoesNotContain(result.Warnings, issue => issue.Rule == CheckRule.IndexProse);
     }
+
+    [Fact]
+    public void V02_family_warnings_are_soft()
+    {
+        var bundlePath = Path.Combine(Path.GetTempPath(), $"okf-check-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(bundlePath);
+
+        try
+        {
+            File.WriteAllText(Path.Combine(bundlePath, "bad.md"), """
+                ---
+                type: Metric
+                generated: { at: 2026-06-20T22:53:05Z }
+                verified: just-a-string
+                status: published
+                stale_after: next-tuesday
+                sources:
+                  - id: orphan
+                    title: Missing resource
+                ---
+                A claim.[^missing]
+                """);
+
+            var result = new BundleChecker(bundlePath).Check();
+            Assert.Empty(result.Errors);
+            Assert.Contains(result.Warnings, w => w.Rule == CheckRule.GeneratedBy);
+            Assert.Contains(result.Warnings, w => w.Rule == CheckRule.VerifiedShape);
+            Assert.Contains(result.Warnings, w => w.Rule == CheckRule.StatusValue);
+            Assert.Contains(result.Warnings, w => w.Rule == CheckRule.StaleAfter);
+            Assert.Contains(result.Warnings, w => w.Rule == CheckRule.SourcesResource);
+            Assert.Contains(result.Warnings, w => w.Rule == CheckRule.SourceFootnotes);
+        }
+        finally
+        {
+            if (Directory.Exists(bundlePath)) Directory.Delete(bundlePath, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void Attested_computation_without_runtime_is_not_a_finding()
+    {
+        var bundlePath = Path.Combine(Path.GetTempPath(), $"okf-check-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(bundlePath);
+
+        try
+        {
+            File.WriteAllText(Path.Combine(bundlePath, "revenue.md"), """
+                ---
+                type: Attested Computation
+                title: Revenue
+                ---
+                SELECT 1
+                """);
+
+            var result = new BundleChecker(bundlePath).Check();
+            Assert.Empty(result.Errors);
+            Assert.Empty(result.Warnings);
+        }
+        finally
+        {
+            if (Directory.Exists(bundlePath)) Directory.Delete(bundlePath, recursive: true);
+        }
+    }
 }
 
 public class OKFDocumentTests
@@ -94,7 +157,7 @@ public class OKFDocumentTests
 
         Assert.True(OKFDocument.TryParse(text, out var document, out var error), error);
         Assert.Equal("BigQuery Table", OKFDocument.GetTypeValue(document!.Frontmatter));
-        Assert.StartsWith("# Body", document.Body);
+        Assert.StartsWith("# Body", document.Body.TrimStart('\r', '\n'));
     }
 
     [Fact]

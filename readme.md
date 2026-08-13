@@ -143,20 +143,22 @@ dnx okf -- graph samples/the-law --js -o samples/the-law/okf.js
 ### Graph schema
 
 The JSON Schema for this format is published at
-[https://www.schemastore.org/okf-0.1.json](https://www.schemastore.org/okf-0.1.json)
-(also in-repo at [`schemas/okf-0.1.json`](schemas/okf-0.1.json), and bundled
+[https://www.schemastore.org/okf-0.2.json](https://www.schemastore.org/okf-0.2.json)
+(also in-repo at [`schemas/okf-0.2.json`](schemas/okf-0.2.json); v0.1 remains
+at [`schemas/okf-0.1.json`](schemas/okf-0.1.json), and both are bundled
 with the tool — see [`schema`](#schema)). The OKF spec is bundled the same
 way — see [`spec`](#spec). Editors that support SchemaStore pick it up when a
 graph file includes `"$schema"` pointing at that URL — `okf graph` and
 `okf view` write that annotation automatically. Both `schema` and `spec`
-accept `-v` / `--version` (`latest` by default).
+accept `-v` / `--version` (`latest` is currently `0.2`).
 
 Top-level shape:
 
 ```json
 {
-  "$schema": "https://www.schemastore.org/okf-0.1.json",
-  "version": "0.1",
+  "$schema": "https://www.schemastore.org/okf-0.2.json",
+  "version": "0.2",
+  "generated": { "by": "okf/0.2", "at": "2026-07-10T05:21:13.1336661+00:00" },
   "timestamp": "2026-07-10T05:21:13.1336661+00:00",
   "nav": { },
   "nodes": [ ],
@@ -168,8 +170,9 @@ Top-level shape:
 | Field | When present | Description |
 |-------|--------------|-------------|
 | `$schema` | always | SchemaStore URL for this graph format |
-| `version` | always | Graph format version (`0.1`) |
-| `timestamp` | always | Generation time (UTC offset) |
+| `version` | always | Graph format version (`0.2`) |
+| `generated` | always | `{ by: "okf/<format version>", at }` — who produced the graph file |
+| `timestamp` | always | Generation time (same instant as `generated.at`) |
 | `nodes` | always | Concept nodes (one per concept `.md`) |
 | `edges` | always | Directed links from markdown references |
 | `nav` | `--nav` | Index-driven tree for progressive disclosure |
@@ -190,7 +193,14 @@ Each concept becomes a node. Concept **id** is the path within the bundle withou
 | `description` | frontmatter | One-line summary |
 | `resource` | frontmatter | Optional canonical URI for an underlying asset |
 | `tags` | frontmatter | Optional tag list |
-| `timestamp` | frontmatter | Optional last-modified |
+| `timestamp` | `generated.at` or legacy `timestamp` | Last meaningful content change |
+| `generated` | frontmatter | `{ by, at }` who wrote the current content |
+| `verified` | frontmatter | Normalized list of `{ by, at }` confirmations |
+| `sources` | frontmatter or `# Citations` | Provenance entries |
+| `status` | frontmatter | `draft` / `stable` / `deprecated` (omitted if absent) |
+| `staleAfter` | `stale_after` | Absolute freshness date |
+| `stale` | derived | Present only when `staleAfter` is set |
+| `trustTier` | derived | `unverified` / `machine-confirmed` / `human-reviewed` |
 | `path` | file | Relative path to the `.md` file |
 | `body` | file (`--body`) | Markdown body after frontmatter |
 | `degree` / `in` / `out` | graph | Link counts |
@@ -202,8 +212,9 @@ Plus any other frontmatter keys are preserved as extension data on the node.
 
 ```json
 {
-  "$schema": "https://www.schemastore.org/okf-0.1.json",
-  "version": "0.1",
+  "$schema": "https://www.schemastore.org/okf-0.2.json",
+  "version": "0.2",
+  "generated": { "by": "okf/0.2", "at": "2026-07-10T05:21:13.1336661+00:00" },
   "timestamp": "2026-07-10T05:21:13.1336661+00:00",
   "nodes": [
     {
@@ -214,7 +225,9 @@ Plus any other frontmatter keys are preserved as extension data on the node.
       "label": "Foreword",
       "description": "Places the essay in the tradition of the Declaration of Independence and warns against modern forms of legal plunder.",
       "tags": ["bastiat", "foreword", "legal-philosophy", "the-law"],
+      "generated": { "by": "human:kzu", "at": "2026-07-02T12:00:00+00:00" },
       "timestamp": "2026-07-02T12:00:00+00:00",
+      "trustTier": "unverified",
       "path": "foreword.md",
       "degree": 5,
       "in": 0,
@@ -230,7 +243,9 @@ Plus any other frontmatter keys are preserved as extension data on the node.
       "label": "Natural Rights",
       "description": "Life, liberty and property are God-given and exist prior to any legislation.",
       "tags": ["bastiat", "legal-philosophy", "natural-rights", "the-law"],
+      "generated": { "by": "human:kzu", "at": "2026-07-02T12:00:00+00:00" },
       "timestamp": "2026-07-02T12:00:00+00:00",
+      "trustTier": "unverified",
       "path": "fundamental-principles/natural-rights.md",
       "degree": 70,
       "in": 62,
@@ -337,12 +352,12 @@ Index-driven tree used by `view`. Node kinds:
 ## `schema`
 
 Write a bundled OKF graph JSON Schema (the same documents published on SchemaStore)
-to stdout, or to a file. Default version is `latest` (currently `0.1`).
+to stdout, or to a file. Default version is `latest` (currently `0.2`).
 
 ```bash
 dnx okf -- schema
-dnx okf -- schema -v 0.1
-dnx okf -- schema -o okf-0.1.json
+dnx okf -- schema -v 0.2
+dnx okf -- schema -v 0.1 -o okf-0.1.json
 ```
 
 | Argument / option | Description |
@@ -359,7 +374,7 @@ Write a bundled OKF specification to stdout, or to a file. Same version flag as
 
 ```bash
 dnx okf -- spec
-dnx okf -- spec -v 0.1 -o SPEC.md
+dnx okf -- spec -v 0.2 -o SPEC.md
 ```
 
 | Argument / option | Description |
@@ -424,7 +439,7 @@ dnx okf -- view samples/the-law --name "The Law" --open
 The generated viewer is a self-contained HTML app (marked + DOMPurify + 3d-force-graph):
 
 - **Navigation tree** from `index.md` groups and directories, with search
-- **Concept reader** — type chip, title, description, tags, rendered markdown
+- **Concept reader** — type chip, title, description, tags, trust/status/stale chips, rendered markdown
 - **Backlinks** — “Linked from” list derived from graph edges
 - **Local graph** — force-directed neighborhood of the current concept (expandable)
 - **Tags panel** — co-occurrence graph across the corpus

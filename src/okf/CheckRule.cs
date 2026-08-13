@@ -10,6 +10,13 @@ public enum CheckRule
     IndexProse,
     LogFormat,
     InternalLinks,
+    SourcesResource,
+    GeneratedBy,
+    VerifiedShape,
+    StatusValue,
+    StaleAfter,
+    PathValuedFields,
+    SourceFootnotes,
 }
 
 public static class CheckRules
@@ -28,5 +35,12 @@ public static class CheckRules
     [
         (CheckRule.InternalLinks, "Unresolved internal links"),
         (CheckRule.IndexProse, "index.md free prose (non-structural lines)"),
+        (CheckRule.SourcesResource, "sources entries missing resource"),
+        (CheckRule.GeneratedBy, "generated present without by"),
+        (CheckRule.VerifiedShape, "verified is not a mapping or list of mappings"),
+        (CheckRule.StatusValue, "status is not draft, stable, or deprecated"),
+        (CheckRule.StaleAfter, "stale_after is not YYYY-MM-DD"),
+        (CheckRule.PathValuedFields, "Unresolved path-valued frontmatter fields"),
+        (CheckRule.SourceFootnotes, "Footnote labels with no matching sources id"),
     ];
 }

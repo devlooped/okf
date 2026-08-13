@@ -25,7 +25,9 @@
     <EmbeddedResource Include="..\View\view.css" Link="View/view-styles.css" Kind="Text" />
     <EmbeddedResource Include="..\View\view.js" Link="View/view-script.js" Kind="Text" />
     <EmbeddedResource Include="..\..\schemas\okf-0.1.json" Link="okf-0.1.json" Kind="Text" />
+    <EmbeddedResource Include="..\..\schemas\okf-0.2.json" Link="okf-0.2.json" Kind="Text" />
     <EmbeddedResource Include="..\..\specs\okf-0.1.md" Link="Specs/okf-0.1.md" Kind="Text" />
+    <EmbeddedResource Include="..\..\specs\okf-0.2.md" Link="Specs/okf-0.2.md" Kind="Text" />
     <EmbeddedResource Include="..\..\skills\okf\SKILL.md" Link="SKILL.md" Kind="Text" />
   </ItemGroup>
 </Project>

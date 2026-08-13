@@ -62,6 +62,7 @@ public class BundleVisualizerTests
 
             Assert.Equal(["tables/customers", "tables/orders"], nodeIds);
             Assert.Equal("BigQuery Table", root.GetProperty("nodes")[0].GetProperty("data").GetProperty("type").GetString());
+            Assert.Equal("unverified", root.GetProperty("nodes")[0].GetProperty("data").GetProperty("trustTier").GetString());
             Assert.True(root.GetProperty("bodies").TryGetProperty("tables/orders", out var body));
             Assert.Contains("customers", body.GetString());
         }
