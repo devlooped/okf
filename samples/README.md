@@ -1,5 +1,9 @@
 # OKF sample bundles
 
+Generated graph files (`okf.json`, `graph.json`) include
+`"$schema": "https://www.schemastore.org/okf-0.1.json"` so editors can validate
+against the published OKF graph format.
+
 Run the checker against the failure showcase bundle:
 
 ```bash

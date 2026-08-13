@@ -1,4 +1,5 @@
 ﻿{
+  "$schema": "https://www.schemastore.org/okf-0.1.json",
   "version": "0.1",
   "timestamp": "2026-07-02T23:37:47.8797331+00:00",
   "nodes": [

@@ -519,6 +519,9 @@ public class GraphBuilderTests
         using var doc = JsonDocument.Parse(json);
         var root = doc.RootElement;
 
+        Assert.True(root.TryGetProperty("$schema", out var schema));
+        Assert.Equal("https://www.schemastore.org/okf-0.1.json", schema.GetString());
+
         Assert.True(root.TryGetProperty("version", out var v));
         Assert.Equal("0.1", v.GetString());
 
@@ -634,6 +637,7 @@ public class GraphBuilderTests
 
             using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
+            Assert.Equal("https://www.schemastore.org/okf-0.1.json", root.GetProperty("$schema").GetString());
             Assert.Equal("0.1", root.GetProperty("version").GetString());
             Assert.Equal(2, root.GetProperty("nodes").GetArrayLength());
             Assert.Equal(1, root.GetProperty("edges").GetArrayLength());

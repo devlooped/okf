@@ -1,4 +1,5 @@
 {
+  "$schema": "https://www.schemastore.org/okf-0.1.json",
   "version": "0.1",
   "timestamp": "2026-07-10T05:14:21.0903439+00:00",
   "nav": {

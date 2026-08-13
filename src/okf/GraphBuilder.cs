@@ -30,6 +30,10 @@ public static partial class GraphBuilder
         [JsonPropertyOrder(-8)]
         public NavNode? Nav { get; init; }
 
+        [JsonPropertyName("$schema")]
+        [JsonPropertyOrder(-11)]
+        public string Schema { get; init; } = "https://www.schemastore.org/okf-0.1.json";
+
         [JsonPropertyOrder(-10)]
         public string Version { get; init; } = "0.1";
 

@@ -139,10 +139,17 @@ dnx okf -- graph samples/the-law --js -o samples/the-law/okf.js
 
 ### Graph schema
 
+The JSON Schema for this format is published at
+[https://www.schemastore.org/okf-0.1.json](https://www.schemastore.org/okf-0.1.json)
+(also in-repo at [`schemas/okf-0.1.json`](schemas/okf-0.1.json)). Editors that
+support SchemaStore pick it up when a graph file includes `"$schema"` pointing
+at that URL — `okf graph` and `okf view` write that annotation automatically.
+
 Top-level shape:
 
 ```json
 {
+  "$schema": "https://www.schemastore.org/okf-0.1.json",
   "version": "0.1",
   "timestamp": "2026-07-10T05:21:13.1336661+00:00",
   "nav": { },
@@ -154,6 +161,7 @@ Top-level shape:
 
 | Field | When present | Description |
 |-------|--------------|-------------|
+| `$schema` | always | SchemaStore URL for this graph format |
 | `version` | always | Graph format version (`0.1`) |
 | `timestamp` | always | Generation time (UTC offset) |
 | `nodes` | always | Concept nodes (one per concept `.md`) |
@@ -188,6 +196,7 @@ Plus any other frontmatter keys are preserved as extension data on the node.
 
 ```json
 {
+  "$schema": "https://www.schemastore.org/okf-0.1.json",
   "version": "0.1",
   "timestamp": "2026-07-10T05:21:13.1336661+00:00",
   "nodes": [

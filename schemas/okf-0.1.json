@@ -6,6 +6,11 @@
   "type": "object",
   "required": ["version", "nodes", "edges"],
   "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://www.schemastore.org/okf-0.1.json",
+      "description": "JSON Schema identifier for this graph document. Published on SchemaStore."
+    },
     "version": {
       "type": "string",
       "const": "0.1",
