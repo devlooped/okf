@@ -20,7 +20,7 @@ OSMF tier. A single fee covers all of [Devlooped packages](https://www.nuget.org
 <!-- #content -->
 ## Overview
 
-**okf** is a .NET tool for working with [Open Knowledge Format](src/okf/SPEC.md) (OKF) bundles —
+**okf** is a .NET tool for working with [Open Knowledge Format](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) (OKF) bundles —
 directories of markdown concepts with YAML frontmatter, linked by relative paths.
 
 It validates bundles, builds a knowledge **graph** (nodes + edges + optional body/nav), and
@@ -400,8 +400,7 @@ A **bundle** is a directory of UTF-8 markdown files:
 Concept **id** = relative path without `.md`. Links between concepts use normal markdown links;
 `graph` / `view` turn those into edges.
 
-See the full draft specification embedded in the tool package and in
-[`src/okf/SPEC.md`](src/okf/SPEC.md).
+See the official [OKF specification](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 <!-- #content -->
 ---
 <!-- include https://github.com/devlooped/sponsors/raw/main/footer.md -->
