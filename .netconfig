@@ -142,7 +142,7 @@
 	sha = cf76df0d6a218c26ebe117339fe3445050b0532a
 	etag = aed711a45e051edfddfcb76d9f8021d30f9817c342cfe8d1cc38f2af37b47aa8
 	weak
-[file "src/okf/SPEC.md"]
+[file "src/Google/SPEC.md"]
 	url = https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md
 	sha = ee67a5ca27044ebe7c38385f5b6cffc2305a9c1a
 	etag = 3c457e96d10fcdefb5ec752e5283949347900a99187b5b7b516ab0feca437117
