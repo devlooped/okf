@@ -8,6 +8,9 @@
     <PackAsTool>true</PackAsTool>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="ConsoleAppFramework" Version="5.7.13" PrivateAssets="all" />
     <PackageReference Include="Spectre.Console" Version="0.57.2" />
     <PackageReference Include="SharpYaml" Version="3.12.0" />
@@ -21,7 +24,8 @@
     <EmbeddedResource Include="..\View\index.html" Link="View/view-template.html" Kind="Text" />
     <EmbeddedResource Include="..\View\view.css" Link="View/view-styles.css" Kind="Text" />
     <EmbeddedResource Include="..\View\view.js" Link="View/view-script.js" Kind="Text" />
-    <EmbeddedResource Include="SPEC.md" Kind="Text" />
     <EmbeddedResource Include="..\..\schemas\okf-0.1.json" Link="okf-0.1.json" Kind="Text" />
+    <EmbeddedResource Include="..\..\specs\okf-0.1.md" Link="Specs/okf-0.1.md" Kind="Text" />
+    <EmbeddedResource Include="..\..\skills\okf\SKILL.md" Link="SKILL.md" Kind="Text" />
   </ItemGroup>
 </Project>
