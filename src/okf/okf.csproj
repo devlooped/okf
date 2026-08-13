@@ -22,5 +22,6 @@
     <EmbeddedResource Include="..\View\view.css" Link="View/view-styles.css" Kind="Text" />
     <EmbeddedResource Include="..\View\view.js" Link="View/view-script.js" Kind="Text" />
     <EmbeddedResource Include="SPEC.md" Kind="Text" />
+    <EmbeddedResource Include="..\..\schemas\okf-0.1.json" Link="okf-0.1.json" Kind="Text" />
   </ItemGroup>
 </Project>
