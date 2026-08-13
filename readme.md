@@ -42,6 +42,7 @@ dnx okf --prerelease -- check samples/the-law
 |---------|---------|
 | [`check`](#check) | Validate a bundle (structure, frontmatter, links) |
 | [`graph`](#graph) | Emit `okf.json` / `okf.js` knowledge graph |
+| [`schema`](#schema) | Print or save the bundled graph JSON Schema |
 | [`view`](#view) | Obsidian-style single-file reader (`index.html` + full graph) |
 
 The sample bundle under [`samples/the-law`](samples/the-law) is used in the screenshots below
@@ -141,9 +142,10 @@ dnx okf -- graph samples/the-law --js -o samples/the-law/okf.js
 
 The JSON Schema for this format is published at
 [https://www.schemastore.org/okf-0.1.json](https://www.schemastore.org/okf-0.1.json)
-(also in-repo at [`schemas/okf-0.1.json`](schemas/okf-0.1.json)). Editors that
-support SchemaStore pick it up when a graph file includes `"$schema"` pointing
-at that URL — `okf graph` and `okf view` write that annotation automatically.
+(also in-repo at [`schemas/okf-0.1.json`](schemas/okf-0.1.json), and bundled
+with the tool — see [`schema`](#schema)). Editors that support SchemaStore pick
+it up when a graph file includes `"$schema"` pointing at that URL — `okf graph`
+and `okf view` write that annotation automatically.
 
 Top-level shape:
 
@@ -325,6 +327,22 @@ Index-driven tree used by `view`. Node kinds:
   ]
 }
 ```
+
+---
+
+## `schema`
+
+Write the bundled OKF graph JSON Schema (the same document published on SchemaStore)
+to stdout, or to a file.
+
+```bash
+dnx okf -- schema
+dnx okf -- schema -o okf-0.1.json
+```
+
+| Argument / option | Description |
+|-------------------|-------------|
+| `-o`, `--out` | Output path. Writes to stdout when omitted. |
 
 ---
 

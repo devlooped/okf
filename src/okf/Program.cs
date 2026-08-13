@@ -15,8 +15,32 @@ if (runArgs.IndexOf("--debug") is var debugIdx and not -1)
 var app = ConsoleApp.Create();
 app.Add("check", Check);
 app.Add("graph", Graph);
+app.Add("schema", Schema);
 app.Add("view", View);
 app.Run([.. runArgs]);
+
+/// <summary>Write the bundled OKF graph JSON Schema to stdout, or to a file with -o.</summary>
+/// <param name="out">-o, Output path. Writes to stdout when omitted.</param>
+static int Schema([HideDefaultValue] string? @out = null)
+{
+    if (string.IsNullOrWhiteSpace(@out))
+    {
+        Console.Out.Write(GraphSchema.Json);
+        return 0;
+    }
+
+    try
+    {
+        GraphSchema.Write(@out);
+        Console.WriteLine($"Wrote {Path.GetFullPath(@out)}");
+        return 0;
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine(ex.Message);
+        return 1;
+    }
+}
 
 /// <summary>Validate an OKF bundle directory for structural and content issues.</summary>
 /// <param name="path">Path to the bundle directory. [Default: .]</param>

@@ -32,7 +32,7 @@ public static partial class GraphBuilder
 
         [JsonPropertyName("$schema")]
         [JsonPropertyOrder(-11)]
-        public string Schema { get; init; } = "https://www.schemastore.org/okf-0.1.json";
+        public string Schema { get; init; } = GraphSchema.Url;
 
         [JsonPropertyOrder(-10)]
         public string Version { get; init; } = "0.1";
