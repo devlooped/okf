@@ -268,7 +268,35 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.meta { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+.meta { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.chip {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  line-height: 1.4;
+}
+.chip.status-stable { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.chip.status-draft { background: #fefce8; color: #a16207; border-color: #fde68a; }
+.chip.status-deprecated { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; text-decoration: line-through; }
+.chip.trust-unverified { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
+.chip.trust-machine-confirmed { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+.chip.trust-human-reviewed { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+.chip.stale { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+.chip.fresh { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+[data-theme="dark"] .chip.status-stable { background: #064e3b; color: #6ee7b7; border-color: #047857; }
+[data-theme="dark"] .chip.status-draft { background: #422006; color: #fde68a; border-color: #a16207; }
+[data-theme="dark"] .chip.status-deprecated { background: #2f2f2f; color: #98989f; border-color: #3a3a3a; }
+[data-theme="dark"] .chip.trust-unverified { background: #2f2f2f; color: #98989f; border-color: #3a3a3a; }
+[data-theme="dark"] .chip.trust-machine-confirmed { background: #1e3a5f; color: #93c5fd; border-color: #1d4ed8; }
+[data-theme="dark"] .chip.trust-human-reviewed { background: #2e1065; color: #ddd6fe; border-color: #6d28d9; }
+[data-theme="dark"] .chip.stale { background: #450a0a; color: #fecaca; border-color: #b91c1c; }
+[data-theme="dark"] .chip.fresh { background: #064e3b; color: #6ee7b7; border-color: #047857; }
+.signal-line { flex: 1 0 100%; font-size: 12px; }
+.sources-list { flex: 1 0 100%; margin: 4px 0 0; padding-left: 18px; }
+.sources-list li { margin: 1px 0; font-size: 12px; }
 .tag {
   display: inline-block;
   padding: 1px 7px;

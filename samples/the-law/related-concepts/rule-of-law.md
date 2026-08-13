@@ -7,7 +7,7 @@ tags:
   - legal-philosophy
   - rule-of-law
   - the-law
-timestamp: '2026-07-02T12:00:00Z'
+generated: { by: human:kzu, at: 2026-07-02T12:00:00Z }
 ---
 
 # Rule of Law

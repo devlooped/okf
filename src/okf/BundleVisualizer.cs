@@ -13,6 +13,8 @@ public static partial class BundleVisualizer
         ["BigQuery Dataset"] = "#8b5cf6",
         ["BigQuery Table"] = "#3b82f6",
         ["Reference"] = "#10b981",
+        ["Attested Computation"] = "#f59e0b",
+        ["Metric"] = "#ec4899",
     };
 
     const string DefaultNodeColor = "#94a3b8";
@@ -139,6 +141,13 @@ public static partial class BundleVisualizer
             Description = n.Description ?? "",
             Resource = n.Resource ?? "",
             Tags = n.Tags?.ToList() ?? [],
+            Status = n.Status ?? "",
+            Generated = n.Generated,
+            Verified = n.Verified?.ToList() ?? [],
+            StaleAfter = n.StaleAfter?.ToString("yyyy-MM-dd") ?? "",
+            Sources = n.Sources?.ToList() ?? [],
+            TrustTier = n.TrustTier ?? TrustSignals.Unverified,
+            Stale = n.Stale ?? false,
             Color = color,
             Size = size,
             Weight = weight,
@@ -198,6 +207,27 @@ public static partial class BundleVisualizer
 
         [JsonPropertyName("tags")]
         public List<string> Tags { get; init; } = [];
+
+        [JsonPropertyName("status")]
+        public string Status { get; init; } = "";
+
+        [JsonPropertyName("generated")]
+        public ActorEvent? Generated { get; init; }
+
+        [JsonPropertyName("verified")]
+        public List<ActorEvent> Verified { get; init; } = [];
+
+        [JsonPropertyName("staleAfter")]
+        public string StaleAfter { get; init; } = "";
+
+        [JsonPropertyName("sources")]
+        public List<SourceEntry> Sources { get; init; } = [];
+
+        [JsonPropertyName("trustTier")]
+        public string TrustTier { get; init; } = TrustSignals.Unverified;
+
+        [JsonPropertyName("stale")]
+        public bool Stale { get; init; }
 
         [JsonPropertyName("color")]
         public string Color { get; init; } = "";

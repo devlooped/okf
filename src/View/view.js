@@ -582,6 +582,9 @@
     if (graphHoverId != null) {
       return graphHoverNodeIds.has(n.id) ? NODE_COLOR_HIGHLIGHT : NODE_COLOR_DIM;
     }
+    const concept = nodesById[n.id];
+    if (concept?.stale) return "#b91c1c";
+    if (concept?.status === "deprecated") return "#94a3b8";
     return n.focused ? NODE_COLOR_FOCUSED : NODE_COLOR;
   }
 
@@ -1509,6 +1512,7 @@
       descEl.textContent = n.description || "";
       typeEl.hidden = false;
       typeEl.textContent = n.type || "Concept";
+      appendSignalChips(metaEl, n);
       if (n.tags && n.tags.length) {
         for (const t of n.tags) {
           const btn = document.createElement("button");
@@ -1529,6 +1533,7 @@
         a.className = "external";
         metaEl.appendChild(a);
       }
+      appendProvenance(metaEl, n);
       md = n.body || "";
 
       const bl = backlinks[selected.id] || [];
@@ -1556,6 +1561,88 @@
     slugifyHeadings(bodyEl);
     wireContentLinks(bodyEl);
     buildToc(bodyEl);
+  }
+
+  function appendSignalChips(metaEl, n) {
+    if (n.status) {
+      metaEl.appendChild(makeChip(n.status, "status status-" + n.status));
+    }
+    const tier = n.trustTier || "unverified";
+    metaEl.appendChild(makeChip(tier, "trust trust-" + tier));
+    if (n.stale) {
+      const label = n.staleAfter ? `stale (since ${n.staleAfter})` : "stale";
+      metaEl.appendChild(makeChip(label, "stale"));
+    } else if (n.staleAfter) {
+      metaEl.appendChild(makeChip(`stale after ${n.staleAfter}`, "fresh"));
+    }
+  }
+
+  function appendProvenance(metaEl, n) {
+    if (n.generated?.by) {
+      const line = document.createElement("div");
+      line.className = "signal-line muted";
+      line.textContent = "Generated " + formatActorEvent(n.generated);
+      metaEl.appendChild(line);
+    }
+    if (n.verified && n.verified.length) {
+      const line = document.createElement("div");
+      line.className = "signal-line muted";
+      line.textContent = "Verified " + n.verified.map(formatActorEvent).join("; ");
+      metaEl.appendChild(line);
+    }
+    if (n.runtime) {
+      const line = document.createElement("div");
+      line.className = "signal-line muted";
+      const params = (n.parameters || [])
+        .map((p) => p.name)
+        .filter(Boolean)
+        .join(", ");
+      line.textContent = params ? `Runtime ${n.runtime} (${params})` : `Runtime ${n.runtime}`;
+      metaEl.appendChild(line);
+    }
+    const sources = n.sources || [];
+    if (!sources.length) return;
+    const ul = document.createElement("ul");
+    ul.className = "sources-list";
+    for (const s of sources) {
+      const li = document.createElement("li");
+      const label = s.title || s.resource || s.id || "source";
+      if (s.resource && /^https?:\/\//.test(s.resource)) {
+        const a = document.createElement("a");
+        a.href = s.resource;
+        a.textContent = label;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.className = "external";
+        li.appendChild(a);
+      } else {
+        li.textContent = s.resource ? `${label} (${s.resource})` : label;
+      }
+      const bits = [];
+      if (s.author) bits.push(s.author);
+      if (s.usageCount != null) bits.push(`${s.usageCount} uses`);
+      if (s.lastModified) bits.push(`updated ${s.lastModified}`);
+      if (bits.length) {
+        const extra = document.createElement("span");
+        extra.className = "muted";
+        extra.textContent = " · " + bits.join(" · ");
+        li.appendChild(extra);
+      }
+      ul.appendChild(li);
+    }
+    metaEl.appendChild(ul);
+  }
+
+  function makeChip(text, cls) {
+    const span = document.createElement("span");
+    span.className = "chip " + cls;
+    span.textContent = text;
+    return span;
+  }
+
+  function formatActorEvent(event) {
+    if (!event || !event.by) return "—";
+    return event.at ? `${event.by} · ${event.at}` : String(event.by);
   }
 
   function slugifyHeadings(root) {

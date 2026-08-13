@@ -34,6 +34,8 @@ public class BundleViewerTests
             Assert.Contains("co-tags", html);
             Assert.Contains("#c/", html);
             Assert.Contains("tags-open-btn", html);
+            Assert.Contains("appendSignalChips", html);
+            Assert.Contains("trust-human-reviewed", html);
             Assert.Contains("theme-toggle", html);
             Assert.Contains("okf-theme", html);
             Assert.Contains("setTheme", html);

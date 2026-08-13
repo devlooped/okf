@@ -25,6 +25,33 @@ public class GraphBuilderTests
             : null;
 
     [Fact]
+    public void Attested_sample_has_spec_trust_tiers_and_stale_profit()
+    {
+        var sample = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "samples", "attested"));
+        Assert.True(Directory.Exists(sample), sample);
+
+        var check = new BundleChecker(sample).Check();
+        Assert.Empty(check.Errors);
+        Assert.Empty(check.Warnings);
+
+        var graph = GraphBuilder.Build(sample);
+        var income = graph.Nodes.First(n => n.Id == "metrics/income-statement");
+        var revenue = graph.Nodes.First(n => n.Id == "computations/revenue");
+        var profit = graph.Nodes.First(n => n.Id == "computations/profit");
+        var legacy = graph.Nodes.First(n => n.Id == "metrics/legacy-handbook");
+
+        Assert.Equal(TrustSignals.HumanReviewed, income.TrustTier);
+        Assert.Equal(2, income.Verified!.Count);
+        Assert.Equal(TrustSignals.HumanReviewed, revenue.TrustTier);
+        Assert.False(revenue.Stale);
+        Assert.Equal(TrustSignals.MachineConfirmed, profit.TrustTier);
+        Assert.True(profit.Stale);
+        Assert.Equal(TrustSignals.Unverified, legacy.TrustTier);
+        Assert.Null(legacy.Generated);
+        Assert.Equal("https://wiki.acme/finance/fpa-handbook", Assert.Single(legacy.Sources!).Resource);
+    }
+
+    [Fact]
     public void Generates_expected_shape_and_counts_for_valid_bundle()
     {
         var graph = GraphBuilder.Build(FixturePath("valid"));
@@ -307,6 +334,98 @@ public class GraphBuilderTests
             var unstamped = graph.Nodes.First(n => n.Id == "unstamped");
             Assert.Null(unstamped.Timestamp);
             Assert.False(HasExtensionKey(unstamped, "timestamp"));
+            Assert.Equal(TrustSignals.Unverified, unstamped.TrustTier);
+        }
+        finally
+        {
+            if (Directory.Exists(bundlePath)) Directory.Delete(bundlePath, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void V02_trust_and_provenance_are_lifted_not_duplicated_in_extension_data()
+    {
+        var bundlePath = Path.Combine(Path.GetTempPath(), $"okf-graph-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(bundlePath);
+
+        try
+        {
+            File.WriteAllText(Path.Combine(bundlePath, "revenue.md"), """
+                ---
+                type: Attested Computation
+                generated: { by: grok-4.6, at: 2026-06-20T22:53:05Z }
+                verified:
+                  - { by: process:finance-nightly, at: 2026-06-21T02:00:00Z }
+                  - { by: human:ahormati, at: 2026-06-25T09:00:00Z }
+                status: stable
+                stale_after: 2020-01-01
+                runtime: bigquery
+                parameters:
+                  - { name: year, type: integer, required: true }
+                executor:
+                  resource: references/run.md
+                  receipt: [job_id, executed_sql]
+                attester:
+                  resource: references/attest.py
+                sources:
+                  - id: rev-policy
+                    resource: https://wiki.acme/finance/revenue
+                    title: Revenue recognition policy
+                    author: team:finance
+                    usage_count: 12
+                    last_modified: 2026-04-02
+                usage_window: { from: 2026-06-01, to: 2026-06-30 }
+                ---
+                # Computation
+
+                SELECT 1
+                """);
+
+            File.WriteAllText(Path.Combine(bundlePath, "legacy.md"), """
+                ---
+                type: Metric
+                timestamp: 2026-05-28T14:30:00Z
+                ---
+                See the handbook.
+
+                # Citations
+                [1] [Handbook](https://wiki.acme/handbook)
+                """);
+
+            var graph = GraphBuilder.Build(bundlePath);
+            Assert.Equal("okf/0.2", graph.Generated!.By);
+            Assert.Equal(graph.Timestamp, graph.Generated.At);
+
+            var revenue = graph.Nodes.First(n => n.Id == "revenue");
+            Assert.Equal("grok-4.6", revenue.Generated!.By);
+            Assert.Equal(DateTimeOffset.Parse("2026-06-20T22:53:05Z"), revenue.Timestamp);
+            Assert.Equal(2, revenue.Verified!.Count);
+            Assert.Equal(TrustSignals.HumanReviewed, revenue.TrustTier);
+            Assert.Equal("stable", revenue.Status);
+            Assert.Equal(new DateOnly(2020, 1, 1), revenue.StaleAfter);
+            Assert.True(revenue.Stale);
+            Assert.Equal("bigquery", revenue.Runtime);
+            Assert.Equal("year", Assert.Single(revenue.Parameters!).Name);
+            Assert.Equal("references/run.md", revenue.Executor!.Resource);
+            Assert.Equal(["job_id", "executed_sql"], revenue.Executor.Receipt);
+            Assert.Equal("references/attest.py", revenue.Attester!.Resource);
+            var source = Assert.Single(revenue.Sources!);
+            Assert.Equal("rev-policy", source.Id);
+            Assert.Equal(12, source.UsageCount);
+            Assert.Equal(new DateOnly(2026, 6, 1), revenue.UsageWindow!.From);
+            Assert.False(HasExtensionKey(revenue, "generated"));
+            Assert.False(HasExtensionKey(revenue, "verified"));
+            Assert.False(HasExtensionKey(revenue, "sources"));
+            Assert.False(HasExtensionKey(revenue, "status"));
+            Assert.False(HasExtensionKey(revenue, "stale_after"));
+
+            var legacy = graph.Nodes.First(n => n.Id == "legacy");
+            Assert.Null(legacy.Generated);
+            Assert.Equal(DateTimeOffset.Parse("2026-05-28T14:30:00+00:00"), legacy.Timestamp);
+            Assert.Equal(TrustSignals.Unverified, legacy.TrustTier);
+            var citation = Assert.Single(legacy.Sources!);
+            Assert.Equal("https://wiki.acme/handbook", citation.Resource);
+            Assert.Equal("Handbook", citation.Title);
         }
         finally
         {
@@ -523,9 +642,12 @@ public class GraphBuilderTests
         Assert.Equal(GraphSchema.Url, schema.GetString());
 
         Assert.True(root.TryGetProperty("version", out var v));
-        Assert.Equal("0.1", v.GetString());
+        Assert.Equal("0.2", v.GetString());
 
         Assert.True(root.TryGetProperty("timestamp", out _));
+        Assert.True(root.TryGetProperty("generated", out var generated));
+        Assert.Equal("okf/0.2", generated.GetProperty("by").GetString());
+        Assert.True(generated.TryGetProperty("at", out _));
         Assert.False(root.TryGetProperty("bundle", out _));  // no -p properties provided, so bundle is omitted
 
         var firstNode = root.GetProperty("nodes")[0];
@@ -638,7 +760,7 @@ public class GraphBuilderTests
             using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
             Assert.Equal(GraphSchema.Url, root.GetProperty("$schema").GetString());
-            Assert.Equal("0.1", root.GetProperty("version").GetString());
+            Assert.Equal("0.2", root.GetProperty("version").GetString());
             Assert.Equal(2, root.GetProperty("nodes").GetArrayLength());
             Assert.Equal(1, root.GetProperty("edges").GetArrayLength());
         }

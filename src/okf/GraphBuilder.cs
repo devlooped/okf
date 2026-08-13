@@ -27,7 +27,7 @@ public static partial class GraphBuilder
         public List<Edge> Edges { get; init; } = [];
 
         /// <summary>Index-driven nav tree; null when includeNav is false.</summary>
-        [JsonPropertyOrder(-8)]
+        [JsonPropertyOrder(-7)]
         public NavNode? Nav { get; init; }
 
         [JsonPropertyName("$schema")]
@@ -35,9 +35,12 @@ public static partial class GraphBuilder
         public string Schema { get; init; } = GraphSchema.Url;
 
         [JsonPropertyOrder(-10)]
-        public string Version { get; init; } = "0.1";
+        public string Version { get; init; } = OkfVersions.Latest;
 
         [JsonPropertyOrder(-9)]
+        public ActorEvent? Generated { get; init; }
+
+        [JsonPropertyOrder(-8)]
         public DateTimeOffset? Timestamp { get; init; }
 
         public Bundle? Bundle { get; init; }
@@ -93,6 +96,19 @@ public static partial class GraphBuilder
         public string? Resource { get; init; }
         public IReadOnlyList<string>? Tags { get; init; }
         public DateTimeOffset? Timestamp { get; init; }
+        public ActorEvent? Generated { get; init; }
+        public IReadOnlyList<ActorEvent>? Verified { get; init; }
+        public IReadOnlyList<SourceEntry>? Sources { get; init; }
+        public UsageWindow? UsageWindow { get; init; }
+        public string? Status { get; init; }
+        public DateOnly? StaleAfter { get; init; }
+        public bool? Stale { get; init; }
+        public string? TrustTier { get; init; }
+        public string? Runtime { get; init; }
+        public IReadOnlyList<ComputationParameter>? Parameters { get; init; }
+        public string? Computation { get; init; }
+        public ExecutorContract? Executor { get; init; }
+        public AttesterContract? Attester { get; init; }
         public string? Body { get; init; }
         public string? Path { get; init; }
         public int? Degree { get; init; }
@@ -330,7 +346,9 @@ public static partial class GraphBuilder
                 conceptId,
                 relativePath,
                 conceptDoc!,
+                document.Frontmatter,
                 includeBody ? document.Body : null,
+                document.Body,
                 ExtractLinks(document.Body, relativePath, bundleRootFull)));
         }
 
@@ -372,8 +390,17 @@ public static partial class GraphBuilder
         // Build nodes first (without degrees)
         var nodeLookup = new Dictionary<string, Node>(StringComparer.Ordinal);
 
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
         foreach (var c in concepts.OrderBy(c => c.Id, StringComparer.Ordinal))
         {
+            var generated = TrustSignals.ParseGenerated(c.Frontmatter);
+            var verified = TrustSignals.NormalizeVerified(c.Frontmatter);
+            var sources = TrustSignals.ParseSources(c.Frontmatter)
+                ?? TrustSignals.ParseCitations(c.FullBody);
+            var staleAfter = TrustSignals.ParseStaleAfter(c.Frontmatter);
+            var contract = ComputationContract.Parse(c.Frontmatter);
+
             var node = new Node
             {
                 Id = c.Id,
@@ -388,8 +415,21 @@ public static partial class GraphBuilder
                 Description = c.Document.Description,
                 Resource = c.Document.Resource,
                 Tags = c.Document.Tags,
-                Timestamp = c.Document.Timestamp,
-                ExtensionData = CopyExtensionDataExcluding(c.Document.ExtensionData, "label"),
+                Timestamp = generated?.At ?? c.Document.Timestamp,
+                Generated = generated,
+                Verified = verified.Count > 0 ? verified : null,
+                Sources = sources,
+                UsageWindow = TrustSignals.ParseUsageWindow(c.Frontmatter),
+                Status = TrustSignals.ParseStatus(c.Frontmatter),
+                StaleAfter = staleAfter,
+                Stale = staleAfter is { } date ? TrustSignals.IsStale(date, today) : null,
+                TrustTier = TrustSignals.TrustTier(verified),
+                Runtime = contract.Runtime,
+                Parameters = contract.Parameters,
+                Computation = contract.Computation,
+                Executor = contract.Executor,
+                Attester = contract.Attester,
+                ExtensionData = CopyExtensionDataExcluding(c.Document.ExtensionData, LiftedExtensionKeys),
                 Body = c.Body,
             };
 
@@ -481,12 +521,14 @@ public static partial class GraphBuilder
             nav = IndexNavBuilder.Build(bundleRoot, finalNodes);
         }
 
+        var generatedAt = DateTimeOffset.UtcNow;
         return new KnowledgeGraph
         {
             Nodes = finalNodes,
             Edges = edges,
             Nav = nav,
-            Timestamp = DateTimeOffset.UtcNow,
+            Generated = TrustSignals.GraphProducer(generatedAt),
+            Timestamp = generatedAt,
             Bundle = bundle,
         };
     }
@@ -834,11 +876,29 @@ public static partial class GraphBuilder
         return links;
     }
 
+    static readonly string[] LiftedExtensionKeys =
+    [
+        "label",
+        "generated",
+        "verified",
+        "sources",
+        "usage_window",
+        "status",
+        "stale_after",
+        "runtime",
+        "parameters",
+        "computation",
+        "executor",
+        "attester",
+    ];
+
     // Internal concept representation
     sealed record Concept(
         string Id,
         string Path,
         ConceptDocument Document,
+        IReadOnlyDictionary<string, object?> Frontmatter,
         string? Body,
+        string FullBody,
         List<(string Text, string Target)> LinksTo);
 }

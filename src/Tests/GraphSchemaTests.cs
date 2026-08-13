@@ -12,18 +12,21 @@ public class GraphSchemaTests
         var root = doc.RootElement;
 
         Assert.Equal(GraphSchema.Url, root.GetProperty("$id").GetString());
-        Assert.Equal("0.1", root.GetProperty("properties").GetProperty("version").GetProperty("const").GetString());
+        Assert.Equal("0.2", root.GetProperty("properties").GetProperty("version").GetProperty("const").GetString());
         Assert.Equal(GraphSchema.Url, root.GetProperty("properties").GetProperty("$schema").GetProperty("const").GetString());
     }
 
     [Fact]
     public void Bundled_schema_matches_repo_schema_file()
     {
-        var repoSchema = File.ReadAllText(FindRepoSchema());
+        var repoSchema = File.ReadAllText(FindRepoSchema("okf-0.2.json"));
+        var v01 = File.ReadAllText(FindRepoSchema("okf-0.1.json"));
         Assert.Equal(Normalize(repoSchema), Normalize(GraphSchema.Json));
         Assert.Equal(GraphSchema.Json, GraphSchema.Get("latest"));
-        Assert.Equal(GraphSchema.Json, GraphSchema.Get("0.1"));
-        Assert.Equal(GraphSchema.Json, GraphSchema.Get("v0.1"));
+        Assert.Equal(GraphSchema.Json, GraphSchema.Get("0.2"));
+        Assert.Equal(GraphSchema.Json, GraphSchema.Get("v0.2"));
+        Assert.Equal(Normalize(v01), Normalize(GraphSchema.Get("0.1")));
+        Assert.Equal(Normalize(v01), Normalize(GraphSchema.Get("v0.1")));
     }
 
     [Fact]
@@ -31,6 +34,7 @@ public class GraphSchemaTests
     {
         var ex = Assert.Throws<ArgumentException>(() => GraphSchema.Get("99.0"));
         Assert.Contains("0.1", ex.Message);
+        Assert.Contains("0.2", ex.Message);
         Assert.Contains("latest", ex.Message);
     }
 
@@ -38,7 +42,7 @@ public class GraphSchemaTests
     public void Write_creates_parent_directories_and_file()
     {
         var dir = Path.Combine(Path.GetTempPath(), "okf-schema-" + Guid.NewGuid().ToString("N"));
-        var path = Path.Combine(dir, "nested", "okf-0.1.json");
+        var path = Path.Combine(dir, "nested", "okf-0.2.json");
 
         try
         {
@@ -70,19 +74,19 @@ public class GraphSchemaTests
         }
     }
 
-    static string FindRepoSchema()
+    static string FindRepoSchema(string fileName = "okf-0.2.json")
     {
         var dir = AppContext.BaseDirectory;
         while (dir is not null)
         {
-            var candidate = Path.Combine(dir, "schemas", "okf-0.1.json");
+            var candidate = Path.Combine(dir, "schemas", fileName);
             if (File.Exists(candidate))
                 return candidate;
 
             dir = Directory.GetParent(dir)?.FullName;
         }
 
-        throw new FileNotFoundException("Could not locate schemas/okf-0.1.json from " + AppContext.BaseDirectory);
+        throw new FileNotFoundException("Could not locate schemas/" + fileName + " from " + AppContext.BaseDirectory);
     }
 
     static string Normalize(string text) => text.Replace("\r\n", "\n").TrimEnd();

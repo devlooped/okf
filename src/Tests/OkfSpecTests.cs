@@ -7,11 +7,14 @@ public class OkfSpecTests
     [Fact]
     public void Latest_spec_matches_repo_file()
     {
-        var repo = File.ReadAllText(FindRepoFile("specs", "okf-0.1.md"));
-        Assert.Equal(Normalize(repo), Normalize(OkfSpec.Markdown));
+        var latest = File.ReadAllText(FindRepoFile("specs", "okf-0.2.md"));
+        var v01 = File.ReadAllText(FindRepoFile("specs", "okf-0.1.md"));
+        Assert.Equal(Normalize(latest), Normalize(OkfSpec.Markdown));
         Assert.Equal(OkfSpec.Markdown, OkfSpec.Get("latest"));
-        Assert.Equal(OkfSpec.Markdown, OkfSpec.Get("0.1"));
-        Assert.Equal(OkfSpec.Markdown, OkfSpec.Get("v0.1"));
+        Assert.Equal(OkfSpec.Markdown, OkfSpec.Get("0.2"));
+        Assert.Equal(OkfSpec.Markdown, OkfSpec.Get("v0.2"));
+        Assert.Equal(Normalize(v01), Normalize(OkfSpec.Get("0.1")));
+        Assert.Equal(Normalize(v01), Normalize(OkfSpec.Get("v0.1")));
     }
 
     [Fact]
@@ -22,7 +25,7 @@ public class OkfSpecTests
 
         try
         {
-            OkfSpec.Write(path, "0.1");
+            OkfSpec.Write(path, "0.2");
             Assert.Equal(Normalize(OkfSpec.Markdown), Normalize(File.ReadAllText(path)));
         }
         finally

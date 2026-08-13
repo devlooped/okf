@@ -31,12 +31,22 @@ ones.
 
 ```bash
 dnx okf -- schema
-dnx okf -- schema -v 0.1 -o okf-0.1.json
+dnx okf -- schema -v 0.2 -o okf-0.2.json
 dnx okf -- spec
 dnx okf -- spec -v latest -o SPEC.md
 ```
 
-Generated graphs include `"$schema": "https://www.schemastore.org/okf-0.1.json"`.
+Generated graphs include `"$schema": "https://www.schemastore.org/okf-0.2.json"`
+and `generated: { by: "okf/0.2", at: … }`.
+
+When writing concepts, emit v0.2 trust fields:
+
+- `generated: { by: <agent model identifier>, at: <ISO 8601> }` — for this
+  tool's agents that is the model id (e.g. `grok-4.6`), not a wrapped
+  `okf/…` producer string. Humans stay `human:<id>`; jobs stay `process:<id>`.
+- `sources` in frontmatter, not a body `# Citations` list.
+- `verified`, `status`, and `stale_after` when known. Do not invent
+  verification events.
 
 ## Workflow
 

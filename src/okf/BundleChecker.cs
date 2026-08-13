@@ -87,6 +87,9 @@ public sealed partial class BundleChecker
             AddError(CheckRule.ConceptFrontmatter, relativePath, "Concept frontmatter could not be deserialized.");
         }
 
+        ValidateTrustFamilies(relativePath, document.Frontmatter);
+        ValidatePathValuedFields(relativePath, document.Frontmatter, markdownFiles);
+        ValidateSourceFootnotes(relativePath, document.Frontmatter, document.Body);
         ValidateLinks(relativePath, document.Body, markdownFiles);
     }
 
@@ -248,6 +251,189 @@ public sealed partial class BundleChecker
         }
     }
 
+    static readonly HashSet<string> AllowedStatuses = new(StringComparer.Ordinal)
+    {
+        "draft",
+        "stable",
+        "deprecated",
+    };
+
+    void ValidateTrustFamilies(string relativePath, IReadOnlyDictionary<string, object?> frontmatter)
+    {
+        if (frontmatter.TryGetValue("sources", out var sourcesRaw) && sourcesRaw is not null)
+        {
+            IEnumerable<object?> entries;
+            if (YamlValue.AsMap(sourcesRaw) is { } single)
+            {
+                entries = [single];
+            }
+            else if (YamlValue.AsList(sourcesRaw) is { } list)
+            {
+                entries = list;
+            }
+            else
+            {
+                entries = [];
+            }
+
+            foreach (var entry in entries)
+            {
+                var map = YamlValue.AsMap(entry);
+                if (map is not null && YamlValue.GetString(map, "resource") is null)
+                {
+                    AddWarning(CheckRule.SourcesResource, relativePath, "sources entry is missing a 'resource' field.");
+                }
+            }
+        }
+
+        if (frontmatter.ContainsKey("generated") && TrustSignals.ParseGenerated(frontmatter) is null)
+        {
+            AddWarning(CheckRule.GeneratedBy, relativePath, "generated must include a 'by' actor.");
+        }
+
+        if (frontmatter.TryGetValue("verified", out var verifiedRaw) && verifiedRaw is not null
+            && YamlValue.AsMap(verifiedRaw) is null && YamlValue.AsList(verifiedRaw) is null)
+        {
+            AddWarning(CheckRule.VerifiedShape, relativePath, "verified must be a mapping or a list of mappings.");
+        }
+
+        if (TrustSignals.ParseStatus(frontmatter) is { } status && !AllowedStatuses.Contains(status))
+        {
+            AddWarning(
+                CheckRule.StatusValue,
+                relativePath,
+                $"status must be draft, stable, or deprecated (got '{status}').");
+        }
+
+        if (frontmatter.TryGetValue("stale_after", out var staleRaw) && staleRaw is not null
+            && TrustSignals.ParseStaleAfter(frontmatter) is null)
+        {
+            AddWarning(CheckRule.StaleAfter, relativePath, "stale_after must use ISO 8601 YYYY-MM-DD form.");
+        }
+    }
+
+    void ValidatePathValuedFields(
+        string relativePath,
+        IReadOnlyDictionary<string, object?> frontmatter,
+        HashSet<string> markdownFiles)
+    {
+        foreach (var (field, value) in EnumeratePathValuedFields(frontmatter))
+        {
+            if (!LooksLikeBundlePath(value))
+            {
+                continue;
+            }
+
+            if (!MarkdownLinks.TryResolve(value, relativePath, bundleRoot, out var resolved)
+                || !MarkdownLinks.TargetExists(resolved, bundleRoot, markdownFiles))
+            {
+                AddWarning(
+                    CheckRule.PathValuedFields,
+                    relativePath,
+                    $"Unresolved {field} path '{value}'.");
+            }
+        }
+    }
+
+    static IEnumerable<(string Field, string Value)> EnumeratePathValuedFields(
+        IReadOnlyDictionary<string, object?> frontmatter)
+    {
+        if (YamlValue.GetString(frontmatter, "resource") is { } resource)
+        {
+            yield return ("resource", resource);
+        }
+
+        if (YamlValue.GetString(frontmatter, "computation") is { } computation)
+        {
+            yield return ("computation", computation);
+        }
+
+        if (YamlValue.GetString(YamlValue.GetMap(frontmatter, "executor"), "resource") is { } executor)
+        {
+            yield return ("executor.resource", executor);
+        }
+
+        if (YamlValue.GetString(YamlValue.GetMap(frontmatter, "attester"), "resource") is { } attester)
+        {
+            yield return ("attester.resource", attester);
+        }
+
+        IEnumerable<object?> sources = YamlValue.AsMap(frontmatter.GetValueOrDefault("sources")) is { } single
+            ? [single]
+            : YamlValue.GetList(frontmatter, "sources") ?? [];
+
+        var index = 0;
+        foreach (var entry in sources)
+        {
+            if (YamlValue.GetString(YamlValue.AsMap(entry), "resource") is { } sourceResource)
+            {
+                yield return ($"sources[{index}].resource", sourceResource);
+            }
+
+            index++;
+        }
+    }
+
+    static bool LooksLikeBundlePath(string value)
+    {
+        if (value.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (value.StartsWith('/') || value.StartsWith("./", StringComparison.Ordinal)
+            || value.StartsWith("../", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (value.Contains(' ', StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        return value.Contains('/', StringComparison.Ordinal)
+            || value.Contains('\\', StringComparison.Ordinal)
+            || value.EndsWith(".md", StringComparison.OrdinalIgnoreCase)
+            || value.EndsWith(".py", StringComparison.OrdinalIgnoreCase)
+            || value.EndsWith(".sql", StringComparison.OrdinalIgnoreCase)
+            || value.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase)
+            || value.EndsWith(".yml", StringComparison.OrdinalIgnoreCase);
+    }
+
+    void ValidateSourceFootnotes(
+        string relativePath,
+        IReadOnlyDictionary<string, object?> frontmatter,
+        string body)
+    {
+        var sourceIds = new HashSet<string>(StringComparer.Ordinal);
+        var sources = TrustSignals.ParseSources(frontmatter);
+        if (sources is not null)
+        {
+            foreach (var source in sources)
+            {
+                if (source.Id is { } id)
+                {
+                    sourceIds.Add(id);
+                }
+            }
+        }
+
+        foreach (Match match in FootnoteLabelRegex().Matches(body))
+        {
+            var label = match.Groups[1].Value;
+            if (!sourceIds.Contains(label))
+            {
+                AddWarning(
+                    CheckRule.SourceFootnotes,
+                    relativePath,
+                    $"Footnote '[^{label}]' has no matching sources[].id.");
+            }
+        }
+    }
+
     void ValidateLinks(string sourceRelativePath, string body, HashSet<string> markdownFiles)
     {
         foreach (var (target, line) in MarkdownLinks.Extract(body))
@@ -292,4 +478,7 @@ public sealed partial class BundleChecker
 
     [GeneratedRegex(@"^## (\d{4}-\d{2}-\d{2})\s*$", RegexOptions.Compiled)]
     private static partial Regex LogDateHeadingRegex();
+
+    [GeneratedRegex(@"\[\^([^\]]+)\]", RegexOptions.Compiled)]
+    private static partial Regex FootnoteLabelRegex();
 }
