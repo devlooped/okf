@@ -387,29 +387,36 @@ dnx okf -- spec -v 0.2 -o SPEC.md
 ## `skill`
 
 Install or remove the bundled [agent skill](skills/okf/SKILL.md) that teaches
-coding agents how to run `dnx okf`. Same path rules as
-[go#’s skill command](https://github.com/devlooped/go#agent-skill):
+coding agents how to run `dnx okf`. Writes to `.agents/skills/okf/SKILL.md`
+under the chosen base directory.
 
 ```bash
-# Install to ~/.agents/skills/okf/SKILL.md (prompts for confirmation)
+# Interactive: choose Local (.) vs Global (~)
 dnx okf -- skill
 
-# Install for the current project under .agents/skills/okf/SKILL.md
+# Install under the current directory
 dnx okf -- skill .
 
-# Skip the confirmation prompt
-dnx okf -- skill -y
-dnx okf -- skill . --yes
+# Install under the user home directory
+dnx okf -- skill -g
+dnx okf -- skill --global
 
-# Remove a previously installed skill (same path rules as install)
-dnx okf -- skill remove
+# Skip the confirmation prompt (directory or --global required)
+dnx okf -- skill . -y
+dnx okf -- skill -g --yes
+
+# Remove a previously installed skill
+dnx okf -- skill remove          # only one copy → remove it; both → pick
 dnx okf -- skill remove .
+dnx okf -- skill remove -g
 dnx okf -- skill remove -y
 ```
 
-With no directory, the skill is written under the user home directory. Pass a
-base directory (commonly `.`) to install under that location instead. Either
-form overwrites an existing install.
+With no directory and no `--global`, `skill` prompts for **Local** (same
+destination as `.`) or **Global** (`~\.agents\skills\okf\SKILL.md`, including
+on Windows). `skill remove` with no destination removes the only installed
+copy; if both Local and Global exist, it prompts. Pass a base directory or
+`-g`/`--global` to skip the picker. Either form overwrites an existing install.
 
 ---
 

@@ -46,7 +46,7 @@ Do not fetch the spec over the network. `schema` is the graph JSON Schema for
 | `schema [-v ver] [-o file]` | Graph JSON Schema (`okf.json` shape) to stdout or file |
 | `spec [-v ver] [-o file]` | OKF spec markdown to stdout or file |
 | `view [path]` | HTML reader + full body+nav graph |
-| `skill [dir]` | Install this skill (`skill remove` to uninstall) |
+| `skill [dir] [-g]` | Install this skill (`skill remove` to uninstall) |
 
 `-v` / `--version` selects a bundled format version (`latest` by default).
 Pass an explicit version when a bundle declares `okf_version`. Unknown
