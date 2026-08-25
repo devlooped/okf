@@ -1,5 +1,20 @@
 # Changelog
 
+## [v0.2.0](https://github.com/devlooped/okf/tree/v0.2.0) (2026-08-25)
+
+[Full Changelog](https://github.com/devlooped/okf/compare/v0.1.2...v0.2.0)
+
+:sparkles: Implemented enhancements:
+
+- Align okf skill generated.by and add What's OKF digest [\#32](https://github.com/devlooped/okf/pull/32) (@kzu)
+- Implement OKF v0.2 trust, provenance, and lifecycle signals [\#31](https://github.com/devlooped/okf/pull/31) (@kzu)
+- Add skill and spec commands with versioned bundled docs [\#30](https://github.com/devlooped/okf/pull/30) (@kzu)
+- Add schema command that prints the bundled graph JSON Schema [\#29](https://github.com/devlooped/okf/pull/29) (@kzu)
+
+:bug: Fixed bugs:
+
+- Error when displaying validation information [\#26](https://github.com/devlooped/okf/issues/26)
+
 ## [v0.1.2](https://github.com/devlooped/okf/tree/v0.1.2) (2026-07-10)
 
 [Full Changelog](https://github.com/devlooped/okf/compare/v0.1.1...v0.1.2)
