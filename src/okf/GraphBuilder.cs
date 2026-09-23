@@ -148,7 +148,7 @@ public static partial class GraphBuilder
         if (json.Length > 0 && json[0] == '\uFEFF')
             json = json[1..];
 
-        var graph = JsonSerializer.Deserialize<KnowledgeGraph>(json, JsonOptions);
+        var graph = JsonSerializer.Deserialize(json, GraphJsonContext.Default.KnowledgeGraph);
         if (graph is null)
             throw new InvalidDataException($"Failed to deserialize graph from {fullPath}");
 
@@ -261,7 +261,7 @@ public static partial class GraphBuilder
         {
             Directory.CreateDirectory(outDir);
         }
-        var json = JsonSerializer.Serialize(graph, JsonOptions);
+        var json = JsonSerializer.Serialize(graph, GraphJsonContext.Relaxed.KnowledgeGraph);
         var content = script
             ? FormatAsScriptWithWindowGlobal(json)
             : json;
@@ -302,7 +302,7 @@ public static partial class GraphBuilder
         {
             Directory.CreateDirectory(outDir);
         }
-        var json = JsonSerializer.Serialize(graph, JsonOptions);
+        var json = JsonSerializer.Serialize(graph, GraphJsonContext.Relaxed.KnowledgeGraph);
         var content = asScript
             ? FormatAsScriptWithWindowGlobal(json)
             : json;

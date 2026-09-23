@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -23,4 +24,15 @@ namespace Devlooped;
 [JsonSerializable(typeof(List<SourceEntry>))]
 [JsonSerializable(typeof(List<ComputationParameter>))]
 [JsonSerializable(typeof(Dictionary<string, JsonElement>))]
-public partial class GraphJsonContext : JsonSerializerContext;
+[JsonSerializable(typeof(string))]
+public partial class GraphJsonContext : JsonSerializerContext
+{
+    static GraphJsonContext? relaxed;
+
+    /// <summary>Same contract as <see cref="Default"/>, but HTML-embedding safe (does not escape <c>&lt;</c>).</summary>
+    public static GraphJsonContext Relaxed =>
+        relaxed ??= new(new JsonSerializerOptions(Default.Options)
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        });
+}

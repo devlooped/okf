@@ -2,7 +2,7 @@
 name: okf
 description: >
   Work with Open Knowledge Format (OKF) markdown knowledge bundles using
-  `dnx okf`. Use when validating a bundle, emitting okf.json, generating the
+  `ndx okf` or `dnx okf`. Use when validating a bundle, emitting okf.json, generating the
   HTML reader, or dumping the bundled OKF spec. Triggers:
   OKF, okf check, okf graph, okf view, okf spec, knowledge bundle.
 license: MIT
@@ -10,7 +10,7 @@ license: MIT
 
 ## What's OKF
 
-Authoritative text: `dnx okf -- spec`. This digest is for in-context authoring.
+Authoritative text: `okf spec` (`ndx okf -- spec` or `dnx okf -- spec`). This digest is for in-context authoring.
 
 - Bundle: dir of UTF-8 `.md`. Reserved: `index.md`, `log.md`. All other `.md` = concepts. id = path in bundle without `.md`.
 - Concept: YAML frontmatter + body. REQUIRED: `type` (unregistered string). RECOMMENDED: `title`, `description`, `resource`, `tags`. Extra keys allowed.
@@ -27,13 +27,16 @@ Authoritative text: `dnx okf -- spec`. This digest is for in-context authoring.
 - Conventional headings when applicable: `# Schema`, `# Examples`.
 - Conformance: every non-reserved `.md` has parseable YAML + non-empty `type`; reserved files follow their shapes. Missing optional families ok. Unknown `type`/keys ok. Do not reject for broken links or missing indexes.
 
-Need a rule not listed here: `dnx okf -- spec`.
+Need a rule not listed here: `okf spec`.
 
 # okf tool
 
-> Requires .NET 10 SDK
+> `ndx okf` runs the native RID package and does not need a .NET runtime.
+> `dnx okf` needs the .NET 10 SDK. Both use the same NuGet tool: native RID when one is published, otherwise the `any` fallback.
 
-Always invoke via `dnx okf`. Format rules: `dnx okf -- spec` (optional `-v 0.2`).
+Prefer `ndx okf` when `ndx` is on PATH. Otherwise `dnx okf`.
+Examples below use `dnx okf`. `ndx okf` takes the same arguments.
+Format rules: `okf spec` (optional `-v 0.2`).
 Do not fetch the spec over the network. `schema` is the graph JSON Schema for
 `okf.json`, not the format spec.
 

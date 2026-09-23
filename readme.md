@@ -26,11 +26,14 @@ directories of markdown concepts with YAML frontmatter, linked by relative paths
 It validates bundles, builds a knowledge **graph** (nodes + edges + optional body/nav), and
 emits an interactive HTML reader (`view`).
 
-Run without installing permanently via [`dnx`](https://learn.microsoft.com/dotnet/core/tools/dotnet-dnx):
+Run it with [`ndx`](https://github.com/devlooped/ndx) (native executable, no .NET runtime) or [`dnx`](https://learn.microsoft.com/dotnet/core/tools/dotnet-dnx):
 
 ```bash
+ndx okf -- --help
 dnx okf -- --help
 ```
+
+`okf` is a pointer package. `ndx` / `dnx` hop to a per-RID Native AOT build (`okf.win-x64`, `okf.linux-x64`, …) and fall back to the framework-dependent `okf.any` package when no native RID matches. The `any` package needs the .NET 10 runtime.
 
 While the package is pre-release, pass `--prerelease` to `dnx` (before the tool args):
 
@@ -53,7 +56,10 @@ The sample bundle under [`samples/the-law`](samples/the-law) is used in the scre
 ## Install / run
 
 ```bash
-# One-shot (downloads tool package as needed)
+# Native, no .NET runtime once ndx itself is installed
+ndx okf -- check samples/the-law
+
+# Or the .NET SDK one-shot runner (same packages)
 dnx okf -- check samples/the-law
 
 # Or install as a local/global tool

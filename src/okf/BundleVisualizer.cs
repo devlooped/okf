@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -18,12 +19,6 @@ public static partial class BundleVisualizer
     };
 
     const string DefaultNodeColor = "#94a3b8";
-
-    static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = null,
-        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-    };
 
     public static VisualizationStats Generate(string bundleRoot, string outPath, string? bundleName = null)
     {
@@ -47,8 +42,8 @@ public static partial class BundleVisualizer
         var html = ThisAssembly.Resources.Google.viz_template.Text
             .Replace("/*__VIZ_CSS__*/", ThisAssembly.Resources.Google.viz_styles.Text, StringComparison.Ordinal)
             .Replace("/*__VIZ_JS__*/", ThisAssembly.Resources.Google.viz_script.Text, StringComparison.Ordinal)
-            .Replace("__BUNDLE_NAME__", JsonSerializer.Serialize(name, JsonOptions), StringComparison.Ordinal)
-            .Replace("__BUNDLE_DATA__", JsonSerializer.Serialize(vizData, JsonOptions), StringComparison.Ordinal);
+            .Replace("__BUNDLE_NAME__", JsonSerializer.Serialize(name, VizJsonContext.Relaxed.String), StringComparison.Ordinal)
+            .Replace("__BUNDLE_DATA__", JsonSerializer.Serialize(vizData, VizJsonContext.Relaxed.GraphData), StringComparison.Ordinal);
 
         Directory.CreateDirectory(Path.GetDirectoryName(outPath)!);
         File.WriteAllText(outPath, html, Encoding.UTF8);
@@ -271,5 +266,18 @@ public static partial class BundleVisualizer
 
         [JsonPropertyName("target")]
         public string Target { get; init; } = "";
+    }
+
+    [JsonSerializable(typeof(GraphData))]
+    [JsonSerializable(typeof(string))]
+    sealed partial class VizJsonContext : JsonSerializerContext
+    {
+        static VizJsonContext? relaxed;
+
+        public static VizJsonContext Relaxed =>
+            relaxed ??= new(new JsonSerializerOptions(Default.Options)
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            });
     }
 }
