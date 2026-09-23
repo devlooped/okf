@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.2.1](https://github.com/devlooped/okf/tree/v0.2.1) (2026-09-23)
+
+[Full Changelog](https://github.com/devlooped/okf/compare/v0.2.0...v0.2.1)
+
+:sparkles: Implemented enhancements:
+
+- OKF timestamps: support datetime+offset \(upstream SPEC amendment still labeled 0.2\) [\#41](https://github.com/devlooped/okf/issues/41)
+- Package okf as a hybrid Native AOT tool [\#45](https://github.com/devlooped/okf/pull/45) (@kzu)
+- Add Local/Global scope picker for skill install and remove [\#34](https://github.com/devlooped/okf/pull/34) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- Refresh bundled OKF 0.2 spec to the current upstream text [\#42](https://github.com/devlooped/okf/pull/42) (@kzu)
+
 ## [v0.2.0](https://github.com/devlooped/okf/tree/v0.2.0) (2026-08-25)
 
 [Full Changelog](https://github.com/devlooped/okf/compare/v0.1.2...v0.2.0)
