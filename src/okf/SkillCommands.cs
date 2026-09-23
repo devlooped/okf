@@ -236,6 +236,14 @@ public class SkillCommands
             .AutoClear(false)
             .Start(ctx =>
             {
+                // Live draws only when something is written, and the first draw
+                // cannot rewind — the shape is recorded during that draw. Paint
+                // twice before reading a key so the prompt is visible immediately
+                // and already on the settled frame. Otherwise it stays blank until
+                // the first key, and that paint sits a line low until the next one.
+                ctx.Refresh();
+                ctx.Refresh();
+
                 while (true)
                 {
                     var key = AnsiConsole.Console.Input.ReadKey(intercept: true);
