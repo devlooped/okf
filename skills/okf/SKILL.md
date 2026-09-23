@@ -10,7 +10,7 @@ license: MIT
 
 ## What's OKF
 
-Authoritative text: `okf spec` (`ndx okf -- spec` or `dnx okf -- spec`). This digest is for in-context authoring.
+Authoritative text: `okf spec` (`ndx okf spec` or `dnx okf spec`). This digest is for in-context authoring.
 
 - Bundle: dir of UTF-8 `.md`. Reserved: `index.md`, `log.md`. All other `.md` = concepts. id = path in bundle without `.md`.
 - Concept: YAML frontmatter + body. REQUIRED: `type` (unregistered string). RECOMMENDED: `title`, `description`, `resource`, `tags`. Extra keys allowed.
@@ -36,6 +36,7 @@ Need a rule not listed here: `okf spec`.
 
 Prefer `ndx okf` when `ndx` is on PATH. Otherwise `dnx okf`.
 Examples below use `dnx okf`. `ndx okf` takes the same arguments.
+When there's ambiguity between ndx or dnx args and okf args, use `--` to separate them.
 Format rules: `okf spec` (optional `-v 0.2`).
 Do not fetch the spec over the network. `schema` is the graph JSON Schema for
 `okf.json`, not the format spec.
@@ -56,7 +57,7 @@ Pass an explicit version when a bundle declares `okf_version`. Unknown
 versions error with the list of bundled ones.
 
 ```bash
-dnx okf -- spec
+dnx okf spec
 dnx okf -- spec -v 0.2 -o SPEC.md
 ```
 
@@ -75,6 +76,6 @@ Do not invent `verified` events. Prefer `sources` over a body `# Citations` list
 
 ## Workflow
 
-1. `dnx okf -- check ./bundle`
-2. Agents/APIs: `dnx okf -- graph ./bundle -o ./bundle/okf.json`
-3. Humans: `dnx okf -- view ./bundle --open`
+1. `dnx okf check ./bundle`
+2. Agents/APIs: `dnx okf graph ./bundle -o ./bundle/okf.json`
+3. Humans: `dnx okf view ./bundle --open`

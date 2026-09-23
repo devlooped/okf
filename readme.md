@@ -29,7 +29,7 @@ emits an interactive HTML reader (`view`).
 Run it with [`ndx`](https://github.com/devlooped/ndx) (native executable, no .NET runtime) or [`dnx`](https://learn.microsoft.com/dotnet/core/tools/dotnet-dnx):
 
 ```bash
-ndx okf -- --help
+ndx okf --help
 dnx okf -- --help
 ```
 
@@ -38,7 +38,7 @@ dnx okf -- --help
 While the package is pre-release, pass `--prerelease` to `dnx` (before the tool args):
 
 ```bash
-dnx okf --prerelease -- check samples/the-law
+dnx okf --prerelease check samples/the-law
 ```
 
 | Command | Purpose |
@@ -57,18 +57,17 @@ The sample bundle under [`samples/the-law`](samples/the-law) is used in the scre
 
 ```bash
 # Native, no .NET runtime once ndx itself is installed
-ndx okf -- check samples/the-law
+ndx okf check samples/the-law
 
 # Or the .NET SDK one-shot runner (same packages)
-dnx okf -- check samples/the-law
+dnx okf check samples/the-law
 
 # Or install as a local/global tool
 dotnet tool install okf --prerelease
 okf check samples/the-law
 ```
 
-Use `--` after `dnx okf` when you need to pass flags that might otherwise be parsed by `dnx`
-itself (for example `dnx okf -- --help`).
+When there's ambiguity between ndx or dnx args and okf args, use `--` to separate them.
 
 ---
 
@@ -77,7 +76,7 @@ itself (for example `dnx okf -- --help`).
 Validate an OKF bundle directory for structural and content issues.
 
 ```bash
-dnx okf -- check [path] [--json]
+dnx okf check [path] [--json]
 ```
 
 | Argument / option | Description |
@@ -102,12 +101,12 @@ dnx okf -- check [path] [--json]
 Exit code is `1` when any errors are reported, `0` otherwise.
 
 ```bash
-dnx okf -- check samples/the-law
+dnx okf check samples/the-law
 # ✓ Bundle directory exists
 # ✓ Concept files have valid YAML frontmatter
 # …
 
-dnx okf -- check samples/check-failures
+dnx okf check samples/check-failures
 # intentionally invalid showcase (see samples/README.md)
 ```
 
@@ -119,7 +118,7 @@ Generate an OKF graph file for the bundle. Runs validation first; generation is 
 there are errors.
 
 ```bash
-dnx okf -- graph [path] [-o|--out <path>] [-b|--body] [--nav] [--js] [-q|--quiet] [--json] [-p|--properties Key=Value]
+dnx okf graph [path] [-o|--out <path>] [-b|--body] [--nav] [--js] [-q|--quiet] [--json] [-p|--properties Key=Value]
 ```
 
 | Argument / option | Description |
@@ -137,13 +136,13 @@ Examples:
 
 ```bash
 # Compact graph (metadata + link edges + PageRank metrics)
-dnx okf -- graph samples/the-law -o samples/the-law/okf.json
+dnx okf graph samples/the-law -o samples/the-law/okf.json
 
 # Full graph for offline consumers / custom UIs
-dnx okf -- graph samples/the-law --body --nav -o samples/the-law/okf-full.json
+dnx okf graph samples/the-law --body --nav -o samples/the-law/okf-full.json
 
 # JS global for file:// hosting
-dnx okf -- graph samples/the-law --js -o samples/the-law/okf.js
+dnx okf graph samples/the-law --js -o samples/the-law/okf.js
 ```
 
 ### Graph schema
@@ -361,7 +360,7 @@ Write a bundled OKF graph JSON Schema (the same documents published on SchemaSto
 to stdout, or to a file. Default version is `latest` (currently `0.2`).
 
 ```bash
-dnx okf -- schema
+dnx okf schema
 dnx okf -- schema -v 0.2
 dnx okf -- schema -v 0.1 -o okf-0.1.json
 ```
@@ -379,7 +378,7 @@ Write a bundled OKF specification to stdout, or to a file. Same version flag as
 [`schema`](#schema). Use this instead of fetching the spec over the network.
 
 ```bash
-dnx okf -- spec
+dnx okf spec
 dnx okf -- spec -v 0.2 -o SPEC.md
 ```
 
@@ -398,24 +397,24 @@ under the chosen base directory.
 
 ```bash
 # Interactive: choose Local (.) vs Global (~)
-dnx okf -- skill
+dnx okf skill
 
 # Install under the current directory
-dnx okf -- skill .
+dnx okf skill .
 
 # Install under the user home directory
-dnx okf -- skill -g
-dnx okf -- skill --global
+dnx okf skill -g
+dnx okf skill --global
 
 # Skip the confirmation prompt (directory or --global required)
-dnx okf -- skill . -y
-dnx okf -- skill -g --yes
+dnx okf skill . -y
+dnx okf skill -g --yes
 
 # Remove a previously installed skill
-dnx okf -- skill remove          # only one copy → remove it; both → pick
-dnx okf -- skill remove .
-dnx okf -- skill remove -g
-dnx okf -- skill remove -y
+dnx okf skill remove          # only one copy → remove it; both → pick
+dnx okf skill remove .
+dnx okf skill remove -g
+dnx okf skill remove -y
 ```
 
 With no directory and no `--global`, `skill` prompts for **Local** (same
@@ -433,7 +432,7 @@ Always builds with concept bodies and the index-driven nav tree. Default writes 
 the bundle root (overwrites an existing compact `okf.json`).
 
 ```bash
-dnx okf -- view [path] [-o|--out <path>] [--name <title>] [--open]
+dnx okf view [path] [-o|--out <path>] [--name <title>] [--open]
 ```
 
 | Argument / option | Description |
@@ -444,7 +443,7 @@ dnx okf -- view [path] [-o|--out <path>] [--name <title>] [--open]
 | `--open` | Open the generated `index.html` in the default browser |
 
 ```bash
-dnx okf -- view samples/the-law --name "The Law" --open
+dnx okf view samples/the-law --name "The Law" --open
 ```
 
 ### Reader features
@@ -487,13 +486,13 @@ Light theme:
 ```bash
 # 1. Author markdown concepts under a bundle directory
 # 2. Validate
-dnx okf -- check ./my-bundle
+dnx okf check ./my-bundle
 
 # 3a. Ship a compact graph for agents / APIs
-dnx okf -- graph ./my-bundle -o ./my-bundle/okf.json
+dnx okf graph ./my-bundle -o ./my-bundle/okf.json
 
 # 3b. Or ship a human reader
-dnx okf -- view ./my-bundle --open
+dnx okf view ./my-bundle --open
 ```
 
 ## OKF format (brief)
