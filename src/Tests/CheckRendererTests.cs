@@ -106,5 +106,6 @@ public class CheckRendererTests
         Assert.True(document.RootElement.GetProperty("success").GetBoolean());
         Assert.Equal(0, document.RootElement.GetProperty("errors").GetInt32());
         Assert.Equal(0, document.RootElement.GetProperty("warnings").GetInt32());
+        Assert.Equal("bundleExists", document.RootElement.GetProperty("rules")[0].GetProperty("rule").GetString());
     }
 }

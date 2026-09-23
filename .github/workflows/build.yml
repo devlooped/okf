@@ -21,8 +21,6 @@ on:
 
 env:
   DOTNET_NOLOGO: true
-  PackOnBuild: true
-  GeneratePackageOnBuild: true
   VersionPrefix: 42.42.${{ github.run_number }}
   VersionLabel: ${{ github.ref }}
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -74,6 +72,13 @@ jobs:
       - name: 🧪 test
         shell: pwsh
         run: dnx --yes retest -- --no-build
+
+      # Pointer lists only `any` so the CI feed runs without the native matrix.
+      # Release publish packs every RID, then this same pointer with the full list.
+      - name: 📦 pack
+        run: |
+          dotnet pack src/okf/okf.csproj -c "$Configuration" -p:RuntimeIdentifiers=any -bl:pointer-pack.binlog
+          dotnet pack src/okf/okf.csproj -c "$Configuration" -r any -bl:any-pack.binlog
 
       - name: 🐛 logs
         uses: actions/upload-artifact@v4

@@ -6,13 +6,6 @@ namespace Devlooped;
 
 public static class CheckRenderer
 {
-    static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
-    };
-
     public static void Render(BundleCheckResult result, string bundleRoot, bool quiet = false)
     {
         if (quiet)
@@ -131,7 +124,7 @@ public static class CheckRenderer
     public static void RenderJson(BundleCheckResult result, string bundleRoot, TextWriter writer)
     {
         var jsonResult = BuildJsonResult(result, bundleRoot);
-        writer.WriteLine(JsonSerializer.Serialize(jsonResult, JsonOptions));
+        writer.WriteLine(JsonSerializer.Serialize(jsonResult, CheckJsonContext.Default.CheckJsonResult));
     }
 
     public static CheckJsonResult BuildJsonResult(BundleCheckResult result, string bundleRoot)
@@ -277,3 +270,28 @@ public sealed record CheckJsonSnippetLine(
     string Text,
     int StartColumn,
     int EndColumn);
+
+[JsonSourceGenerationOptions(
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+    Converters = [typeof(CheckRuleJsonConverter)])]
+[JsonSerializable(typeof(CheckJsonResult))]
+sealed partial class CheckJsonContext : JsonSerializerContext;
+
+sealed class CheckRuleJsonConverter : JsonConverter<CheckRule>
+{
+    public override CheckRule Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Number && reader.TryGetInt32(out var number))
+            return (CheckRule)number;
+
+        var text = reader.GetString();
+        if (text is not null && Enum.TryParse(text, ignoreCase: true, out CheckRule value))
+            return value;
+
+        throw new JsonException($"Unknown check rule '{text}'.");
+    }
+
+    public override void Write(Utf8JsonWriter writer, CheckRule value, JsonSerializerOptions options)
+        => writer.WriteStringValue(JsonNamingPolicy.CamelCase.ConvertName(value.ToString()));
+}

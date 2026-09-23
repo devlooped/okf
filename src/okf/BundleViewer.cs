@@ -10,11 +10,6 @@ public sealed record ViewerStats(int Concepts, int Edges, int Bytes);
 /// </summary>
 public static class BundleViewer
 {
-    static readonly JsonSerializerOptions JsonOptions = new(GraphBuilder.JsonOptions)
-    {
-        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-    };
-
     public static ViewerStats Generate(GraphBuilder.KnowledgeGraph graph, string outPath, string? displayName = null)
     {
         outPath = Path.GetFullPath(outPath);
@@ -23,8 +18,8 @@ public static class BundleViewer
         var html = ThisAssembly.Resources.View.view_template.Text
             .Replace("/*__VIEW_CSS__*/", ThisAssembly.Resources.View.view_styles.Text, StringComparison.Ordinal)
             .Replace("/*__VIEW_JS__*/", ThisAssembly.Resources.View.view_script.Text, StringComparison.Ordinal)
-            .Replace("__BUNDLE_NAME__", JsonSerializer.Serialize(name, JsonOptions), StringComparison.Ordinal)
-            .Replace("__GRAPH_DATA__", JsonSerializer.Serialize(graph, JsonOptions), StringComparison.Ordinal);
+            .Replace("__BUNDLE_NAME__", JsonSerializer.Serialize(name, GraphJsonContext.Relaxed.String), StringComparison.Ordinal)
+            .Replace("__GRAPH_DATA__", JsonSerializer.Serialize(graph, GraphJsonContext.Relaxed.KnowledgeGraph), StringComparison.Ordinal);
 
         var dir = Path.GetDirectoryName(outPath);
         if (!string.IsNullOrEmpty(dir))

@@ -6,6 +6,24 @@
     <PackageId>okf</PackageId>
     <ToolCommandName>okf</ToolCommandName>
     <PackAsTool>true</PackAsTool>
+    <Description>Open Knowledge Format (OKF) tool. Validates markdown bundles, emits okf.json, and builds the HTML reader.</Description>
+
+    <!-- Hybrid tool package (same shape as ndx and dotnet-stop):
+         dotnet pack           -> pointer okf, listing RuntimeIdentifierPackages
+         dotnet pack -r any    -> framework-dependent okf.any (CoreCLR fallback)
+         dotnet pack -r <rid>  -> Native AOT okf.<rid>
+         ndx and dnx hop from the pointer to the best RID, then any.
+         The any package rolls forward onto a newer installed runtime. -->
+    <RollForward>LatestMajor</RollForward>
+    <RuntimeIdentifiers>win-x64;win-arm64;linux-x64;linux-arm64;linux-musl-x64;linux-musl-arm64;osx-x64;osx-arm64;any</RuntimeIdentifiers>
+    <PublishAot>true</PublishAot>
+    <StripSymbols>true</StripSymbols>
+    <StackTraceSupport>true</StackTraceSupport>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'any'">
+    <PublishAot>false</PublishAot>
+    <StripSymbols>false</StripSymbols>
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Tests" />
@@ -15,7 +33,7 @@
     <PackageReference Include="Spectre.Console" Version="0.57.2" />
     <PackageReference Include="SharpYaml" Version="3.14.0" />
     <PackageReference Include="ThisAssembly.Resources" Version="2.1.5" PrivateAssets="all" />
-    <PackageReference Include="NuGetizer" Version="1.5.0" />
+    <PackageReference Include="Readme" Version="1.2.1" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\Google\viz.html" Link="Google/viz-template.html" Kind="Text" />
