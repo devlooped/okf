@@ -29,7 +29,7 @@
     <InternalsVisibleTo Include="Tests" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ConsoleAppFramework" Version="5.7.13" PrivateAssets="all" />
+    <PackageReference Include="ConsoleAppFramework" Version="5.8.0" PrivateAssets="all" />
     <PackageReference Include="Spectre.Console" Version="0.57.2" />
     <PackageReference Include="SharpYaml" Version="3.14.0" />
     <PackageReference Include="ThisAssembly.Resources" Version="2.1.5" PrivateAssets="all" />
